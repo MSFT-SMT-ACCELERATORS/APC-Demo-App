@@ -1,0 +1,6 @@
+@APC.ProxyServer_HostAddress = http://localhost:5009
+
+GET {{APC.ProxyServer_HostAddress}}/apc/test
+Accept: application/json
+
+###
