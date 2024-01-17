@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import Colors from '../themes/Colors';
 import Button from '../components/Button'
-import CheckBox from '../components/CheckBox'
+import CheckboxWithText from '../components/CheckBox';
 
 function Consents() {
   const navigation = useNavigation();
@@ -22,10 +22,7 @@ function Consents() {
       <Text style={{'fontSize': 16, 'color': '#AAA', fontWeight: "100", textAlign: 'justify'}}>This application is secured based on the mobile phone line used, checking that the provided information matches certain checks performed by the carrier's network APIs.</Text>
       <Text style={{'fontSize': 16, 'color': '#AAA', fontWeight: "100", textAlign: 'justify' }}>This demo application uses Microsoft Azure Programmable Connectivity (APC) as a single platform interface and under the covers it communicates with any of the multiple supported carriers such as TELEFONICA, ORANGE, AT&T, DT, Singtel, etc.</Text>
 
-      <CheckBox 
-        isChecked={isChecked} 
-        onCheck={()=>setIsChecked(!isChecked)} 
-        text='I authorize and consent this application to verify data such as phone number identification, phone location and SIM swap, for fraud detection safety'/>
+      <CheckboxWithText label={'I authorize and consent this application to verify data such as phone number identification, phone location and SIM swap, for fraud detection safety'} />
 
       <Button
         title="Accept"

@@ -12,6 +12,7 @@ import ResidenceLocation from './app/screens/ResidenceLocation';
 import StarterPage from './app/screens/StarterPage';
 import TestProgress from './app/screens/TestProgress';
 import Information from './app/screens/Information';
+import Demo from './app/screens/Demo';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +21,7 @@ function App() {
     <PaperProvider>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Welcome">
+          <Stack.Screen name="Demo" component={Demo} options={{ header: () => <Header /> }} />
           <Stack.Screen name="Landing" component={Landing} options={{ headerShown: false }} />
           <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false }} />
           <Stack.Screen name="Consents" component={Consents} options={{ header: () => <Header /> }} />
