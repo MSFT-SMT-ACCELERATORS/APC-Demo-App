@@ -40,7 +40,7 @@ function ResidenceLocation() {
         <Button
           title="Submit"
           style={styles.button}
-          onPress={() => navigation.navigate('TestProgress')}
+          onPress={() => navigation.navigate('Success')}
         />
       </View>
     </ScrollView>

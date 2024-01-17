@@ -12,6 +12,7 @@ import ResidenceLocation from './app/screens/ResidenceLocation';
 import StarterPage from './app/screens/StarterPage';
 import TestProgress from './app/screens/TestProgress';
 import Information from './app/screens/Information';
+import Success from './app/screens/Success';
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +27,7 @@ function App() {
           <Stack.Screen name="ResidenceLocation" component={ResidenceLocation} options={{ header: () => <Header /> }} />
           <Stack.Screen name="StarterPage" component={StarterPage} options={{ header: () => <Header /> }} />
           <Stack.Screen name="Information" component={Information} options={{ header: () => <Header /> }} />
+          <Stack.Screen name="Success" component={Success} options={{ headerShown: false }} />
           <Stack.Screen name="TestProgress" component={TestProgress} />
         </Stack.Navigator>
       </NavigationContainer>
