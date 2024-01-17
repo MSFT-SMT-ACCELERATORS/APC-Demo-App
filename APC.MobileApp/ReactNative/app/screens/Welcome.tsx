@@ -22,6 +22,11 @@ function Welcome() {
         style={styles.button}
         onPress={() => navigation.navigate('Consents')}
       />
+      <Button
+        title="DEMO"
+        style={styles.button}
+        onPress={() => navigation.navigate('Demo')}
+      />
     </View>
   );
 }

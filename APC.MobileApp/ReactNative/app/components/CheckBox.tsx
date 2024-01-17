@@ -1,47 +1,64 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, View, StyleSheet, Text } from 'react-native';
-import Colors from '../themes/Colors';
+import { StyleSheet, Text, View } from 'react-native';
+import { Checkbox } from 'react-native-paper';
+import palette from '../themes/Colors';
+import StyledText from './StyledText';
 
-interface CheckboxProps {
-    text: string,
-    isChecked: boolean;
-    onCheck: () => void;
-  }
+interface CheckboxWithTextProps {
+  label: string;
+  styles?: {
+    container?: object;
+    checkbox?: object;
+    checked?: object;
+    text?: object;
+  };
+}
 
-const Checkbox: React.FC<CheckboxProps> = ({ text, isChecked, onCheck }) => {
-  return (
-    <TouchableOpacity onPress={onCheck} style={styles.container}>
-      <View style={[styles.checkbox, isChecked && styles.checked]}>
-        {/* Renderiza un ícono o imagen si está marcado */}
-      </View>
-      <Text style={styles.text}>{text}</Text>
-    </TouchableOpacity>
-  );
-};
-
-const styles = StyleSheet.create({
-    container: {
-        flexDirection: 'row',
-        gap: 10,
-        // padding:10
-    },
+const defaultStyles = StyleSheet.create({
+  flex: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
   checkbox: {
     marginTop: 5,
     height: 25,
     width: 25,
-    backgroundColor: '#FFF',
+    backgroundColor: palette.accent200,
     borderWidth: 1,
     borderColor: '#000',
-    borderRadius: 5
+    borderRadius: 5,
   },
   checked: {
-    backgroundColor: Colors.accent200
+    backgroundColor: palette.accent200,
   },
   text: {
     color: '#FFF',
     flex: 1,
-    textAlign: 'justify'
-  }
+    textAlign: 'justify',
+  },
 });
 
-export default Checkbox;
+const CheckboxWithText: React.FC<CheckboxWithTextProps> = ({ label, styles = {} }) => {
+  const [checked, setChecked] = useState(false);
+
+  const handleCheckboxToggle = () => {
+    setChecked(!checked);
+  };
+
+
+
+  return (
+    <View style={defaultStyles.flex }>
+      <Checkbox
+        status={checked ? 'checked' : 'unchecked'}
+        onPress={handleCheckboxToggle}
+        uncheckedColor={palette.accent200} // Personaliza el color no seleccionado
+        color={palette.accent200} // Personaliza el color seleccionado
+      />
+      <StyledText>{label}</StyledText>
+    </View>
+  );
+};
+
+export default CheckboxWithText;
