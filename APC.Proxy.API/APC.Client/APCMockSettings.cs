@@ -4,7 +4,6 @@ namespace APC.Client
 {
     public class APCMockSettings
     {
-        public bool IsMockEnabled { get; set; }
         public VerifyLocationResponse MockVerifyLocationResponse { get; set; } = new VerifyLocationResponse
         {
             LastLocationTime = DateTime.UtcNow,

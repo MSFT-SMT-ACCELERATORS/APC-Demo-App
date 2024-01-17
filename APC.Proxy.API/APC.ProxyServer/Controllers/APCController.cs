@@ -1,7 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+using APC.Client;
 using APC.DataModel;
-using APC.Client; 
+using Microsoft.AspNetCore.Mvc;
 
 namespace APC.ProxyServer.Controllers
 {
@@ -10,9 +9,9 @@ namespace APC.ProxyServer.Controllers
     public class APCController : ControllerBase
     {
         private readonly ILogger<APCController> _logger;
-        private readonly APCClient _apcClient;
+        private readonly IAPCClient _apcClient;
 
-        public APCController(ILogger<APCController> logger, APCClient apcClient)
+        public APCController(ILogger<APCController> logger, IAPCClient apcClient)
         {
             _logger = logger;
             _apcClient = apcClient;
