@@ -31,7 +31,7 @@ function Landing() {
       <StyledText textStyle="big">Texto grande</StyledText>
       <StyledText textStyle="title3" color="accent200">Título 3 en color primario 100</StyledText>
       <StatusBar style="auto" />
-      <Slider minValue={100} maxValue={10000} formatter={currencyFormatter} />
+      <Slider minValue={500} maxValue={10000} formatter={currencyFormatter} />
       <Button
         title="Get Started"
         // style={styles.button}

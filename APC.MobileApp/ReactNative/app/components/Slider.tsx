@@ -1,13 +1,13 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useRef, useState, useEffect } from 'react';
-import { Text, View, StyleSheet, PanResponder, Animated, DimensionValue } from 'react-native';
+import { Text, View, StyleSheet, PanResponder, Animated, DimensionValue, StyleProp, ViewStyle } from 'react-native';
 import Colors from '../themes/Colors';
 
 interface Props {
-    barWidth?: DimensionValue;
-    sliderColor?: string;
     minValue: number;
     maxValue: number;
+    style?: StyleProp<ViewStyle>;
+    sliderColor?: string;
     gradientColors?: string[];
     formatter?: (value: number) => string;
 }
@@ -17,9 +17,10 @@ const defaultFormatter = (value: number) => {
 }
 
 const Slider: React.FC<Props> = ({
-    sliderColor = '#4ad896',
     minValue,
     maxValue,
+    style,
+    sliderColor = '#4ad896',
     gradientColors = ['#00fdee', '#4ad896'],
     formatter = defaultFormatter
 }) => {
@@ -70,7 +71,7 @@ const Slider: React.FC<Props> = ({
     }
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, style]}>
             <View style={[styles.limitContainer]}>
                 <Text style={styles.limitText}>{formatter(minValue)}</Text>
                 <Text style={styles.limitText}>{formatter(maxValue)}</Text>

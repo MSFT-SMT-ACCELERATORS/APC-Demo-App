@@ -11,6 +11,8 @@ import ProgressBar from '../components/ProgressBar';
 import StyledText from '../components/StyledText';
 import StyledInputText from '../components/StyledInputText';
 import palette from '../themes/Colors';
+import Slider from '../components/Slider';
+
 
 function ResidenceLocation() {
   const navigation = useNavigation();
@@ -23,6 +25,7 @@ function ResidenceLocation() {
         <Text style={{ 'fontSize': 16, 'color': '#AAA', fontWeight: "normal", alignSelf: "center", width: '100%', textAlign: 'center' }}>Please complete the form below.</Text>
         <StyledInputText labelText="Phone Number" placeholder="+1 365-478-8429" placeholderTextColor={palette.accent200}></StyledInputText>
         <StyledText textStyle='small'>I would like to formally request a loan for the following amount:</StyledText>
+        <Slider minValue={500} maxValue={10000} formatter={currencyFormatter} style={{padding: 10}}/>
         <StyledText textStyle='small'>Purpose:</StyledText>
         <View style={styles.btn_Container}>
           <View style={styles.row}>
@@ -59,6 +62,12 @@ function ResidenceLocation() {
       </View>
     </ScrollView>
   );
+}
+
+const currencyFormatter = (value: number) => {
+  return "$" + new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 0, // Esto asegura que no haya decimales
+  }).format(value);
 }
 
 const styles = StyleSheet.create({
