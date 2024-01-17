@@ -8,11 +8,15 @@ namespace APC.Client
     {
         private readonly HttpClient _httpClient;
         private readonly APCClientSettings _settings;
+        private readonly IAPCMockService _mockService;
+        private readonly bool _isMockEnabled;
 
-        public APCClient(HttpClient httpClient, IOptions<APCClientSettings> settings)
+        public APCClient(HttpClient httpClient, IOptions<APCClientSettings> settings, IAPCMockService mockService)
         {
             _httpClient = httpClient;
             _settings = settings.Value;
+            _mockService = mockService;
+            _isMockEnabled = settings.Value.IsMockEnabled;
         }
 
         private void PrepareRequestHeaders(HttpRequestMessage requestMessage)
@@ -27,6 +31,9 @@ namespace APC.Client
 
         public async Task<VerifyLocationResponse> VerifyLocationAsync(VerifyLocationRequest request)
         {
+            if (_isMockEnabled)
+                return await _mockService.VerifyLocationAsync(request);
+
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, "verify-device-location")
             {
                 Content = JsonContent.Create(request)
@@ -42,6 +49,9 @@ namespace APC.Client
 
         public async Task<LocationResponse> RetrieveLocationAsync(LocationRequest request)
         {
+            if (_isMockEnabled)
+                return await _mockService.RetrieveLocationAsync(request);
+
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, "device-location")
             {
                 Content = JsonContent.Create(request)

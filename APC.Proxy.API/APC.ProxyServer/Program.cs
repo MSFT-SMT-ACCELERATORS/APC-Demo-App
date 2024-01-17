@@ -7,8 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Bind the section of appsettings.json to the APCClientSettings class
 builder.Services.Configure<APCClientSettings>(builder.Configuration.GetSection("APCClientSettings"));
+builder.Services.Configure<APCMockSettings>(builder.Configuration.GetSection("APCMockSettings"));
 
-// Register APCClient as a service
+
+// Register APCClient and APCMockService
+builder.Services.AddTransient<IAPCMockService, APCMockService>();
 builder.Services.AddHttpClient<APCClient>((serviceProvider, httpClient) =>
 {
     var settings = serviceProvider.GetRequiredService<IOptions<APCClientSettings>>().Value;

@@ -5,7 +5,8 @@
         public required string APCAccessKey { get; set; }
         public required string APCAppId { get; set; }
         public required string APCBaseUri { get; set; }
-        public required string Correlator { get; set; }
+        public string? Correlator { get; set; }
+        public bool IsMockEnabled { get; set; }
     }
 
 }
