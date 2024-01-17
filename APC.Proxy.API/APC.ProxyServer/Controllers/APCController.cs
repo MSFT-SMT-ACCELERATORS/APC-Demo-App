@@ -34,7 +34,9 @@ namespace APC.ProxyServer.Controllers
 
             try
             {
-                var response = await _apcClient.VerifyLocationAsync(request);
+                var useMock = HttpContext.Request.Headers.TryGetValue("X-Use-Mock", out var value)
+                    && value.ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
+                var response = await _apcClient.VerifyLocationAsync(request, useMock);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -54,7 +56,9 @@ namespace APC.ProxyServer.Controllers
 
             try
             {
-                var response = await _apcClient.RetrieveLocationAsync(request);
+                var useMock = HttpContext.Request.Headers.TryGetValue("X-Use-Mock", out var value)
+                    && value.ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
+                var response = await _apcClient.RetrieveLocationAsync(request, useMock);
                 return Ok(response);
             }
             catch (Exception ex)

@@ -29,9 +29,9 @@ namespace APC.Client
             }
         }
 
-        public async Task<VerifyLocationResponse> VerifyLocationAsync(VerifyLocationRequest request)
+        public async Task<VerifyLocationResponse> VerifyLocationAsync(VerifyLocationRequest request, bool useMock = false)
         {
-            if (_isMockEnabled)
+            if (_isMockEnabled || useMock)
                 return await _mockService.VerifyLocationAsync(request);
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, "verify-device-location")
@@ -47,9 +47,9 @@ namespace APC.Client
             return await response.Content.ReadFromJsonAsync<VerifyLocationResponse>();
         }
 
-        public async Task<LocationResponse> RetrieveLocationAsync(LocationRequest request)
+        public async Task<LocationResponse> RetrieveLocationAsync(LocationRequest request, bool useMock = false)
         {
-            if (_isMockEnabled)
+            if (_isMockEnabled || useMock)
                 return await _mockService.RetrieveLocationAsync(request);
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, "device-location")
