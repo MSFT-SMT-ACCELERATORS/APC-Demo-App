@@ -12,55 +12,58 @@ import StyledText from '../components/StyledText';
 import StyledInputText from '../components/StyledInputText';
 import palette from '../themes/Colors';
 import Slider from '../components/Slider';
+import AppContainer from '../components/AppContainer';
 
 
 function ResidenceLocation() {
   const navigation = useNavigation();
 
   return (
-    <ScrollView style={styles.container} >
-      <View >
-        <ProgressBar progress={10} height={15} />
-        <Text style={{ 'fontSize': 30, 'color': '#FFF', fontWeight: "bold", alignSelf: "center" }}>Let’s get started</Text>
-        <Text style={{ 'fontSize': 16, 'color': '#AAA', fontWeight: "normal", alignSelf: "center", width: '100%', textAlign: 'center' }}>Please complete the form below.</Text>
-        <StyledInputText labelText="Phone Number" placeholder="+1 365-478-8429" placeholderTextColor={palette.accent200}></StyledInputText>
-        <StyledText textStyle='small'>I would like to formally request a loan for the following amount:</StyledText>
-        <Slider minValue={500} maxValue={10000} formatter={currencyFormatter} style={{padding: 10}}/>
-        <StyledText textStyle='small'>Purpose:</StyledText>
-        <View style={styles.btn_Container}>
-          <View style={styles.row}>
-            <Button
-              title="Debt Consolidation"
-              style={styles.icon_button}
-              onPress={() => navigation.navigate('')}
-            />
-            <Button
-              title="Monthly Bills"
-              style={styles.icon_button}
-              onPress={() => navigation.navigate('')}
-            />
+    <AppContainer>
+      <ScrollView style={styles.container} >
+        <View >
+          <ProgressBar progress={10} height={15} />
+          <Text style={{ 'fontSize': 30, 'color': '#FFF', fontWeight: "bold", alignSelf: "center" }}>Let’s get started</Text>
+          <Text style={{ 'fontSize': 16, 'color': '#AAA', fontWeight: "normal", alignSelf: "center", width: '100%', textAlign: 'center' }}>Please complete the form below.</Text>
+          <StyledInputText labelText="Phone Number" placeholder="+1 365-478-8429" placeholderTextColor={palette.accent200}></StyledInputText>
+          <StyledText textStyle='small'>I would like to formally request a loan for the following amount:</StyledText>
+          <Slider minValue={500} maxValue={10000} formatter={currencyFormatter} style={{ padding: 10 }} />
+          <StyledText textStyle='small'>Purpose:</StyledText>
+          <View style={styles.btn_Container}>
+            <View style={styles.row}>
+              <Button
+                title="Debt Consolidation"
+                style={styles.icon_button}
+                onPress={() => navigation.navigate('')}
+              />
+              <Button
+                title="Monthly Bills"
+                style={styles.icon_button}
+                onPress={() => navigation.navigate('')}
+              />
+            </View>
+            <View style={styles.row}>
+              <Button
+                title="Moving"
+                style={styles.icon_button}
+                onPress={() => navigation.navigate('')}
+              />
+              <Button
+                title="Other"
+                style={styles.icon_button}
+                onPress={() => navigation.navigate('')}
+              />
+            </View>
           </View>
-          <View style={styles.row}>
-            <Button
-              title="Moving"
-              style={styles.icon_button}
-              onPress={() => navigation.navigate('')}
-            />
-            <Button
-              title="Other"
-              style={styles.icon_button}
-              onPress={() => navigation.navigate('')}
-            />
-          </View>
-        </View>
 
-        <Button
-          title="Submit"
-          style={styles.button}
-          onPress={() => navigation.navigate('Information')}
-        />
-      </View>
-    </ScrollView>
+          <Button
+            title="Submit"
+            style={styles.button}
+            onPress={() => navigation.navigate('Information')}
+          />
+        </View>
+      </ScrollView>
+    </AppContainer>
   );
 }
 
@@ -72,7 +75,6 @@ const currencyFormatter = (value: number) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 70,
     flex: 1,
     backgroundColor: Colors.primary300,
     // justifyContent: 'flex-start',

@@ -17,39 +17,40 @@ function ResidenceLocation() {
   const navigation = useNavigation();
 
   return (
-    <ScrollView >
-      <View style={styles.container}>
-        <ProgressBar progress={10} height={15} />
-        <Text style={{ 'fontSize': 30, 'color': '#FFF', fontWeight: "bold", alignSelf: "center" }}>Personal Information</Text>
-        <Text style={{ 'fontSize': 16, 'color': '#AAA', fontWeight: "normal", alignSelf: "center", width: '100%', textAlign: 'center' }}> Please complete the required information fields</Text>
-        <StyledInputText labelText="First Name" placeholder="First Name"></StyledInputText>
-        <StyledInputText labelText="Last Name" placeholder="Last Name"></StyledInputText>
-        <StyledInputText labelText="Street Address" placeholder="Start typing your street... (e.g. 28 Mai...)"></StyledInputText>
-        <StyledInputText labelText="Unit/Apt Number (optional)" placeholder="Address Line 2"></StyledInputText>
-        <StyledInputText labelText="City" placeholder="City"></StyledInputText>
-        <StyledInputText labelText="State" placeholder="Ohio" placeholderTextColor={palette.accent200}></StyledInputText>
-        <StyledInputText labelText="Zip Code" placeholder="Zip Code"></StyledInputText>
-        <View style={styles.idContainer}>
-          <StyledText textStyle='small'>Identity Verification</StyledText>
-          <StyledInputText labelText="Your Date of Birth" placeholder="MM/DD/YYYY"></StyledInputText>
-          <StyledInputText labelText="Your Social Security Number (SSN)" placeholder="9 digit number"></StyledInputText>
+    <AppContainer>
+      <ScrollView>
+        <View style={styles.container}>
+          <ProgressBar progress={10} height={15} />
+          <Text style={{ 'fontSize': 30, 'color': '#FFF', fontWeight: "bold", alignSelf: "center" }}>Personal Information</Text>
+          <Text style={{ 'fontSize': 16, 'color': '#AAA', fontWeight: "normal", alignSelf: "center", width: '100%', textAlign: 'center' }}> Please complete the required information fields</Text>
+          <StyledInputText labelText="First Name" placeholder="First Name"></StyledInputText>
+          <StyledInputText labelText="Last Name" placeholder="Last Name"></StyledInputText>
+          <StyledInputText labelText="Street Address" placeholder="Start typing your street... (e.g. 28 Mai...)"></StyledInputText>
+          <StyledInputText labelText="Unit/Apt Number (optional)" placeholder="Address Line 2"></StyledInputText>
+          <StyledInputText labelText="City" placeholder="City"></StyledInputText>
+          <StyledInputText labelText="State" placeholder="Ohio" placeholderTextColor={palette.accent200}></StyledInputText>
+          <StyledInputText labelText="Zip Code" placeholder="Zip Code"></StyledInputText>
+          <View style={styles.idContainer}>
+            <StyledText textStyle='small'>Identity Verification</StyledText>
+            <StyledInputText labelText="Your Date of Birth" placeholder="MM/DD/YYYY"></StyledInputText>
+            <StyledInputText labelText="Your Social Security Number (SSN)" placeholder="9 digit number"></StyledInputText>
+          </View>
+          <StyledText textStyle='small' color='accent200'>By selecting the 'Confirm Operation' option, you are agreeing to our terms and conditions, and will proceed with the account creation process.</StyledText>
+          <StyledInputText labelText="Email" placeholder="Email"></StyledInputText>
+          <StyledInputText labelText="Password" placeholder="Password"></StyledInputText>
+          <Button
+            title="Submit"
+            style={styles.button}
+            onPress={() => navigation.navigate('Success')}
+          />
         </View>
-        <StyledText textStyle='small' color='accent200'>By selecting the 'Confirm Operation' option, you are agreeing to our terms and conditions, and will proceed with the account creation process.</StyledText>
-        <StyledInputText labelText="Email" placeholder="Email"></StyledInputText>
-        <StyledInputText labelText="Password" placeholder="Password"></StyledInputText>
-        <Button
-          title="Submit"
-          style={styles.button}
-          onPress={() => navigation.navigate('Success')}
-        />
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </AppContainer>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 70,
     flex: 1,
     backgroundColor: Colors.primary300,
     justifyContent: 'flex-start',

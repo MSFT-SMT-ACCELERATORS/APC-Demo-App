@@ -12,101 +12,91 @@ import { RadioButton } from 'react-native-paper';
 import StyledText from '../components/StyledText';
 import { useState } from 'react';
 import textStyles from '../themes/Texts';
+import { useApiClient } from '../api/ApiClientProvider';
+import AppContainer from '../components/AppContainer';
+import CheckboxWithText from '../components/CheckBox';
 
 function ResidenceLocation() {
-  const configuration = new Configuration({ basePath: "https://apc-proxy-prv-001.azurewebsites.net" });
-  const apiClient = new APCApi(configuration);
-
   const navigation = useNavigation();
+  const apiClient = useApiClient();
   const [value, setValue] = useState('hacked');
-  const [testResponse, setTestResponse] = useState('Click button to test APC proxy');
-
-  async function CallAPCTest(event: GestureResponderEvent) {
-    try {
-      var response = await apiClient.aPCTestGet("0.0.0.0");
-      console.log(response.data);
-      setTestResponse(response.data);
-    } catch (err) {
-      console.log(err);
-      setTestResponse(JSON.stringify(err));
-    }
-  }
+  const [useAPC, setUseAPC] = useState(true);
 
   return (
-    <ScrollView style={styles.container}>
-      <View>
-        <ProgressBar progress={10} height={15} />
-        <Text style={{ 'fontSize': 30, 'color': '#FFF', fontWeight: "bold", alignSelf: "center" }}>Residence Location</Text>
-        <Text style={{ 'fontSize': 16, 'color': '#AAA', fontWeight: "normal", alignSelf: "center", width: '100%', textAlign: 'center' }}>Please, select your country and state/province of residence</Text>
-        <StyledInputText labelText="Country" placeholder=""></StyledInputText>
-        <StyledInputText labelText="State/Province" placeholder=""></StyledInputText>
-        <StyledInputText labelText="City" placeholder=""></StyledInputText>
+    <AppContainer>
+      <ScrollView style={styles.container}>
         <View>
-          <Button title='Call APC proxy API test endpoint' onPress={CallAPCTest} />
-          <Text style={{ color: 'white' }}>{testResponse}</Text>
-        </View>
-        <View style={styles.btnContainer}>
-          <StyledText style={styles.comparisonTitle} textStyle="title6">Internal Comparison with:</StyledText>
-          <RadioButton.Group onValueChange={newValue => setValue(newValue)} value={value}>
-            <View >
+          <ProgressBar progress={10} height={15} />
+          <Text style={{ 'fontSize': 30, 'color': '#FFF', fontWeight: "bold", alignSelf: "center" }}>Residence Location</Text>
+          <Text style={{ 'fontSize': 16, 'color': '#AAA', fontWeight: "normal", alignSelf: "center", width: '100%', textAlign: 'center' }}>Please, select your country and state/province of residence</Text>
+          <StyledInputText labelText="Country" placeholder=""></StyledInputText>
+          <StyledInputText labelText="State/Province" placeholder=""></StyledInputText>
+          <StyledInputText labelText="City" placeholder=""></StyledInputText>
+
+          <View style={styles.btnContainer}>
+            <StyledText style={styles.comparisonTitle} textStyle="title6">Internal Comparison with:</StyledText>
+            <RadioButton.Group onValueChange={newValue => setValue(newValue)} value={value}>
+              <View >
+                <View>
+                  <View style={styles.flex}>
+                    <RadioButton value="true" color={Colors.accent200}/>
+                    <StyledText textStyle="title6">True GPS</StyledText>
+                  </View>
+                  <View style={styles.optionSubtitleContainer}>
+                    <View style={styles.optionSubtitleBadge}>
+                      <StyledText>UUS - Ohio - Massillon</StyledText>
+                    </View>
+                    <View style={styles.optionSubtitleBadge}>
+                      <StyledText>40.79434, -81.52214</StyledText>
+                    </View>
+                  </View>
+                </View>
+              </View>
+
               <View>
-                <StyledText textStyle="title6" style={{ textAlign: 'center' }}>True GPS</StyledText>
+                <View style={styles.flex}>
+                  <RadioButton value="hacked" color={Colors.accent200}/>
+                  <StyledText textStyle="title6">Hacked GPS</StyledText>
+                </View>
                 <View style={styles.optionSubtitleContainer}>
                   <View style={styles.optionSubtitleBadge}>
-                    <StyledText>UUS - Ohio - Massillon</StyledText>
+                    <StyledText >US - NY - New York</StyledText>
                   </View>
                   <View style={styles.optionSubtitleBadge}>
-                    <StyledText>40.79434, -81.52214</StyledText>
+                    <StyledText>40.61454, -73.82024</StyledText>
                   </View>
                 </View>
               </View>
-            </View>
 
-            <View>
-              <View style={styles.flex}>
-                <RadioButton value="hacked" />
-                <StyledText textStyle="title6">Hacked GPS</StyledText>
-              </View>
-              <View style={styles.optionSubtitleContainer}>
-                <View style={styles.optionSubtitleBadge}>
-                  <StyledText >US - NY - New York</StyledText>
+              <View style={{marginTop: 20}}>
+                <View style={styles.flex}>
+                  <CheckboxWithText label='Use Azure Programmable Connectivity Backend' checked={useAPC} onToggle={() => setUseAPC(!useAPC)} />
                 </View>
-                <View style={styles.optionSubtitleBadge}>
-                  <StyledText>40.61454, -73.82024</StyledText>
-                </View>
-              </View>
-            </View>
 
-            <View>
-              <View style={styles.flex}>
-                <RadioButton value="acp" />
-                <StyledText textStyle="title6">Azure Programmable Connectivity Backend</StyledText>
-              </View>
-
-              <View style={styles.optionSubtitleContainer}>
-                <View style={styles.optionSubtitleBadge}>
-                  <StyledText>US - Ohio - Massillon</StyledText>
-                </View>
-                <View style={styles.optionSubtitleBadge}>
-                  <StyledText>40.79161, -81.52079</StyledText>
+                <View style={styles.optionSubtitleContainer}>
+                  <View style={styles.optionSubtitleBadge}>
+                    <StyledText>US - Ohio - Massillon</StyledText>
+                  </View>
+                  <View style={styles.optionSubtitleBadge}>
+                    <StyledText>40.79161, -81.52079</StyledText>
+                  </View>
                 </View>
               </View>
-            </View>
-          </RadioButton.Group>
+            </RadioButton.Group>
+          </View>
+          <Button
+            title="Submit"
+            style={styles.button}
+            onPress={() => navigation.navigate('StarterPage')}
+          />
         </View>
-        <Button
-          title="Submit"
-          style={styles.button}
-          onPress={() => navigation.navigate('StarterPage')}
-        />
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </AppContainer>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 70,
     flex: 1,
     backgroundColor: Colors.primary300,
     // justifyContent: 'flex-start',
