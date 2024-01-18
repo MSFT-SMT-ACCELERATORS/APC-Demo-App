@@ -1,19 +1,19 @@
 using APC.Client;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+// Required for HttpClientFactory
+builder.Services.AddHttpClient();
 
 // Bind the section of appsettings.json to the APCClientSettings class
 builder.Services.Configure<APCClientSettings>(builder.Configuration.GetSection("APCClientSettings"));
+builder.Services.Configure<APCMockSettings>(builder.Configuration.GetSection("APCMockSettings"));
 
-// Register APCClient as a service
-builder.Services.AddHttpClient<APCClient>((serviceProvider, httpClient) =>
-{
-    var settings = serviceProvider.GetRequiredService<IOptions<APCClientSettings>>().Value;
-    httpClient.BaseAddress = new Uri(settings.APCBaseUri);
-});
+
+// Register APCClient and APCMockService
+builder.Services.AddSingleton<IAPCMockService, APCMockService>();
+builder.Services.AddScoped<IAPCClient, APCClient>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
