@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider as PaperProvider } from 'react-native-paper';
+import 'react-native-url-polyfill/auto';
 
 import Header from './app/components/Header';
 import Welcome from './app/screens/Welcome';

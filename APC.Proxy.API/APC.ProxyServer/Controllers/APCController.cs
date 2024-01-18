@@ -18,12 +18,16 @@ namespace APC.ProxyServer.Controllers
         }
 
         [HttpGet("test")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         public IActionResult Test(string yourIp)
         {
             return Ok(yourIp);
         }
 
         [HttpPost("verify-device-location")]
+        [ProducesResponseType(typeof(VerifyLocationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> VerifyDeviceLocation([FromBody] VerifyLocationRequest request)
         {
             if (!ModelState.IsValid)
@@ -46,6 +50,9 @@ namespace APC.ProxyServer.Controllers
         }
 
         [HttpPost("device-location")]
+        [ProducesResponseType(typeof(LocationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> RetrieveDeviceLocation([FromBody] LocationRequest request)
         {
             if (!ModelState.IsValid)

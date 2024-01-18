@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "openapigen": "npx @openapitools/openapi-generator-cli generate -i http://localhost:5009/swagger/v1/swagger.json -g typescript-axios -o ./app/api/generated"
   },
   "dependencies": {
     "@expo/webpack-config": "^19.0.0",
@@ -20,11 +21,14 @@
     "react-native-paper": "^5.12.1",
     "react-native-safe-area-context": "4.6.3",
     "react-native-screens": "~3.22.0",
+    "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "~0.19.6",
-    "react-navigation": "^5.0.0"
+    "react-navigation": "^5.0.0",
+    "url": "^0.11.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@openapitools/openapi-generator-cli": "^2.7.0",
     "@types/react": "~18.2.14",
     "@types/react-navigation": "^3.4.0",
     "typescript": "^5.1.3"

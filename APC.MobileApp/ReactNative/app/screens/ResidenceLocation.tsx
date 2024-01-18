@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { StyleSheet, Text, View, Image, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Image, ScrollView, GestureResponderEvent, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
-
+import { APCApi, Configuration } from '../api/generated';
 import Colors from '../themes/Colors';
 import Button from '../components/Button'
 import ProgressBar from '../components/ProgressBar';
@@ -14,8 +14,23 @@ import { useState } from 'react';
 import textStyles from '../themes/Texts';
 
 function ResidenceLocation() {
+  const configuration = new Configuration({ basePath: "https://apc-proxy-prv-001.azurewebsites.net" });
+  const apiClient = new APCApi(configuration);
+
   const navigation = useNavigation();
   const [value, setValue] = useState('hacked');
+  const [testResponse, setTestResponse] = useState('Click button to test APC proxy');
+
+  async function CallAPCTest(event: GestureResponderEvent) {
+    try {
+      var response = await apiClient.aPCTestGet("0.0.0.0");
+      console.log(response.data);
+      setTestResponse(response.data);
+    } catch (err) {
+      console.log(err);
+      setTestResponse(JSON.stringify(err));
+    }
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -26,7 +41,10 @@ function ResidenceLocation() {
         <StyledInputText labelText="Country" placeholder=""></StyledInputText>
         <StyledInputText labelText="State/Province" placeholder=""></StyledInputText>
         <StyledInputText labelText="City" placeholder=""></StyledInputText>
-
+        <View>
+          <Button title='Call APC proxy API test endpoint' onPress={CallAPCTest} />
+          <Text style={{ color: 'white' }}>{testResponse}</Text>
+        </View>
         <View style={styles.btnContainer}>
           <StyledText style={styles.comparisonTitle} textStyle="title6">Internal Comparison with:</StyledText>
           <RadioButton.Group onValueChange={newValue => setValue(newValue)} value={value}>
