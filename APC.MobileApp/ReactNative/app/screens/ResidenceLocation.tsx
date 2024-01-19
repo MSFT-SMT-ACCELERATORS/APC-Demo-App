@@ -10,23 +10,30 @@ import palette from '../themes/Colors';
 import StyledInputText from '../components/StyledInputText';
 import { RadioButton } from 'react-native-paper';
 import StyledText from '../components/StyledText';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import textStyles from '../themes/Texts';
 import { useApiClient } from '../api/ApiClientProvider';
 import AppContainer from '../components/AppContainer';
 import CheckboxWithText from '../components/CheckBox';
 
-function ResidenceLocation() {
+interface StepProps {
+  setProgress: (progress: number) => void;
+}
+
+const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
   const navigation = useNavigation();
   const apiClient = useApiClient();
   const [value, setValue] = useState('hacked');
   const [useAPC, setUseAPC] = useState(true);
+  // setProgress(25);
+  useEffect(() => {
+    setProgress(25);
+  }, [setProgress]);
 
   return (
     <AppContainer>
       <ScrollView style={styles.container}>
         <View>
-          <ProgressBar progress={10} height={15} />
           <Text style={{ 'fontSize': 30, 'color': '#FFF', fontWeight: "bold", alignSelf: "center" }}>Residence Location</Text>
           <Text style={{ 'fontSize': 16, 'color': '#AAA', fontWeight: "normal", alignSelf: "center", width: '100%', textAlign: 'center' }}>Please, select your country and state/province of residence</Text>
           <StyledInputText labelText="Country" placeholder=""></StyledInputText>
@@ -39,7 +46,7 @@ function ResidenceLocation() {
               <View >
                 <View>
                   <View style={styles.flex}>
-                    <RadioButton value="true" color={Colors.accent200}/>
+                    <RadioButton value="true" color={Colors.accent200} />
                     <StyledText textStyle="title6">True GPS</StyledText>
                   </View>
                   <View style={styles.optionSubtitleContainer}>
@@ -55,7 +62,7 @@ function ResidenceLocation() {
 
               <View>
                 <View style={styles.flex}>
-                  <RadioButton value="hacked" color={Colors.accent200}/>
+                  <RadioButton value="hacked" color={Colors.accent200} />
                   <StyledText textStyle="title6">Hacked GPS</StyledText>
                 </View>
                 <View style={styles.optionSubtitleContainer}>
@@ -68,7 +75,7 @@ function ResidenceLocation() {
                 </View>
               </View>
 
-              <View style={{marginTop: 20}}>
+              <View style={{ marginTop: 20 }}>
                 <View style={styles.flex}>
                   <CheckboxWithText label='Use Azure Programmable Connectivity Backend' checked={useAPC} onToggle={() => setUseAPC(!useAPC)} />
                 </View>
@@ -93,7 +100,7 @@ function ResidenceLocation() {
       </ScrollView>
     </AppContainer>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Animated, StyleSheet } from 'react-native';
+import { View, Animated, StyleSheet, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'
 
 interface ProgressBarProps {
@@ -7,14 +7,16 @@ interface ProgressBarProps {
   height: number;
   backgroundColor?: string;
   gradientColors?: string[];
+  style?: ViewStyle
 }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({ 
-  progress, 
-  height, 
-  backgroundColor = 'transparent', 
-  gradientColors = ['#00fdee', '#4ad896'] }) => {
-  
+const ProgressBar: React.FC<ProgressBarProps> = ({
+  progress,
+  height,
+  backgroundColor = 'transparent',
+  gradientColors = ['#00fdee', '#4ad896'],
+  style }) => {
+
   // Usamos useRef para mantener el valor animado
   const animatedProgress = useRef(new Animated.Value(0)).current;
 
@@ -33,29 +35,33 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   });
 
   return (
-    <View style={[styles.progressBar, { backgroundColor, height, borderRadius: height/2 }, ]}>
-      <Animated.View style={{ width: widthInterpolated, height: '100%' }}>
-        <LinearGradient
-          colors={gradientColors}
-          style={{ flex: 1 }}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-        />
-      </Animated.View>
+    <View style={[styles.container, { height }, style]}>
+      <View style={[styles.progressBar, { backgroundColor, borderRadius: height / 2 }]}>
+        <Animated.View style={{ width: widthInterpolated, flex: 1 }}>
+          <LinearGradient
+            colors={gradientColors}
+            style={{ flex: 1 }}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          />
+        </Animated.View>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+  },
   progressBar: {
-    width: '100%',
-    borderRadius: 5,
+    flex: 1,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#8e8e97',
   },
   progress: {
-    height: '100%',
+    flex: 1,
+    height: '100%'
   },
 });
 

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -13,14 +13,20 @@ import StyledText from '../components/StyledText';
 import palette from '../themes/Colors';
 import AppContainer from '../components/AppContainer';
 
-function ResidenceLocation() {
-  const navigation = useNavigation();
+interface StepProps {
+  setProgress: (progress: number) => void;
+}
 
+const Information: React.FC<StepProps> = ({ setProgress }) => {
+  const navigation = useNavigation();
+  // setProgress(75);
+  useEffect(() => {
+    setProgress(75);
+  }, [setProgress]);
   return (
     <AppContainer>
       <ScrollView>
         <View style={styles.container}>
-          <ProgressBar progress={10} height={15} />
           <Text style={{ 'fontSize': 30, 'color': '#FFF', fontWeight: "bold", alignSelf: "center" }}>Personal Information</Text>
           <Text style={{ 'fontSize': 16, 'color': '#AAA', fontWeight: "normal", alignSelf: "center", width: '100%', textAlign: 'center' }}> Please complete the required information fields</Text>
           <StyledInputText labelText="First Name" placeholder="First Name"></StyledInputText>
@@ -41,7 +47,7 @@ function ResidenceLocation() {
           <Button
             title="Submit"
             style={styles.button}
-            onPress={() => navigation.navigate('Success')}
+            onPress={() => { setProgress(100); navigation.navigate('Success') }}
           />
         </View>
       </ScrollView>
@@ -90,4 +96,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default ResidenceLocation;
+export default Information;

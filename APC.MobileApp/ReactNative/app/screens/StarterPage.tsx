@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -14,15 +14,19 @@ import palette from '../themes/Colors';
 import Slider from '../components/Slider';
 import AppContainer from '../components/AppContainer';
 
+interface StepProps {
+  setProgress: (progress: number) => void;
+}
 
-function ResidenceLocation() {
+const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
   const navigation = useNavigation();
-
+  // setProgress(50)
+  useEffect(() => {
+    setProgress(50);
+  }, [setProgress]);
   return (
-    <AppContainer>
       <ScrollView style={styles.container} >
         <View >
-          <ProgressBar progress={10} height={15} />
           <Text style={{ 'fontSize': 30, 'color': '#FFF', fontWeight: "bold", alignSelf: "center" }}>Let’s get started</Text>
           <Text style={{ 'fontSize': 16, 'color': '#AAA', fontWeight: "normal", alignSelf: "center", width: '100%', textAlign: 'center' }}>Please complete the form below.</Text>
           <StyledInputText labelText="Phone Number" placeholder="+1 365-478-8429" placeholderTextColor={palette.accent200}></StyledInputText>
@@ -63,7 +67,6 @@ function ResidenceLocation() {
           />
         </View>
       </ScrollView>
-    </AppContainer>
   );
 }
 
@@ -116,4 +119,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ResidenceLocation;
+export default StarterPage;

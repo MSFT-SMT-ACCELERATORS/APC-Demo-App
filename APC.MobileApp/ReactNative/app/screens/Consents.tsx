@@ -29,7 +29,7 @@ function Consents() {
         <Button
           title="Accept"
           style={styles.button}
-          onPress={() => navigation.navigate('ResidenceLocation')}
+          onPress={() => navigation.navigate('Steps')}
         />
       </View>
     </AppContainer>
