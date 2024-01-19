@@ -1,7 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+using APC.Client;
 using APC.DataModel;
-using APC.Client; 
+using Microsoft.AspNetCore.Mvc;
 
 namespace APC.ProxyServer.Controllers
 {
@@ -10,21 +9,25 @@ namespace APC.ProxyServer.Controllers
     public class APCController : ControllerBase
     {
         private readonly ILogger<APCController> _logger;
-        private readonly APCClient _apcClient;
+        private readonly IAPCClient _apcClient;
 
-        public APCController(ILogger<APCController> logger, APCClient apcClient)
+        public APCController(ILogger<APCController> logger, IAPCClient apcClient)
         {
             _logger = logger;
             _apcClient = apcClient;
         }
 
         [HttpGet("test")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         public IActionResult Test(string yourIp)
         {
             return Ok(yourIp);
         }
 
         [HttpPost("verify-device-location")]
+        [ProducesResponseType(typeof(VerifyLocationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> VerifyDeviceLocation([FromBody] VerifyLocationRequest request)
         {
             if (!ModelState.IsValid)
@@ -34,7 +37,9 @@ namespace APC.ProxyServer.Controllers
 
             try
             {
-                var response = await _apcClient.VerifyLocationAsync(request);
+                var useMock = HttpContext.Request.Headers.TryGetValue("X-Use-Mock", out var value)
+                    && value.ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
+                var response = await _apcClient.VerifyLocationAsync(request, useMock);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -45,6 +50,9 @@ namespace APC.ProxyServer.Controllers
         }
 
         [HttpPost("device-location")]
+        [ProducesResponseType(typeof(LocationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> RetrieveDeviceLocation([FromBody] LocationRequest request)
         {
             if (!ModelState.IsValid)
@@ -54,7 +62,9 @@ namespace APC.ProxyServer.Controllers
 
             try
             {
-                var response = await _apcClient.RetrieveLocationAsync(request);
+                var useMock = HttpContext.Request.Headers.TryGetValue("X-Use-Mock", out var value)
+                    && value.ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
+                var response = await _apcClient.RetrieveLocationAsync(request, useMock);
                 return Ok(response);
             }
             catch (Exception ex)
