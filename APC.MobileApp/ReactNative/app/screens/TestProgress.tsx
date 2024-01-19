@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import ProgressBar from '../components/ProgressBar';
 import Button from '../components/Button';
-import TextInput from '../components/TextInput';
+
 
 function TestProgress() {
   const [progress, setProgress] = useState(0);
@@ -20,7 +20,6 @@ function TestProgress() {
       <View style={styles.container}>
         <ProgressBar progress={progress} height={10} backgroundColor={'transparent'} gradientColors={['#00fdee', '#4ad896']} />
         <Button title="Aumentar Progresooo!" onPress={updateProgress} />
-        <TextInput />
       </View>
     </View>
   );

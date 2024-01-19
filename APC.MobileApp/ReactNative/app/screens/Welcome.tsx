@@ -4,18 +4,17 @@ import { StyleSheet, Text, View, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Button from '../components/Button'
 import Colors from '../themes/Colors';
+import StyledText from '../components/StyledText';
 
 function Welcome() {
   const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
-      <View style={[styles.imageContainer, {'padding': 3}]}>
-        <Image source={require('../../assets/logo.png')} style={styles.image} resizeMode="contain"/>
-      </View>
-      <Text style={{'fontSize': 40, 'color': '#FFF', fontWeight: "bold" }}>Your Loan, Just a Touch Away</Text>
-      <Text style={{'fontSize': 30, 'color': '#AAA', fontWeight: "100" }}>Get a Persolal Line of Credit Between</Text>
-      <Text style={{'fontSize': 30, 'color': Colors.accent200, fontWeight: "300" }}>$500 - $10000</Text>
+      <Image source={require('../../assets/images/logo.png')} style={styles.image} resizeMode="contain" />
+      <StyledText textStyle={['extrabold']}>Your Loan, Just a Touch Away</StyledText>
+      <StyledText >Get a Persolal Line of Credit Between</StyledText>
+      <StyledText  color='accent200'>$500 - $10000</StyledText>
       <StatusBar style="auto" />
       <Button
         title="Get Started"
@@ -38,15 +37,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'center',
     gap: 5,
-    padding: 15
-  },
-  imageContainer:{
-    width: '100%',
-    height: 90
+    padding: 15,
+    
   },
   image: {
-    width: '100%',
-    height: '100%'
+    width: '70%',
+    height: 80,
+    justifyContent: 'flex-start'
   },
   button: {
     marginTop: 30
