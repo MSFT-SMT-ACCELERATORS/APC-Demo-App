@@ -77,7 +77,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
 
               <View style={{ marginTop: 20 }}>
                 <View style={styles.flex}>
-                  <CheckboxWithText label='Use Azure Programmable Connectivity Backend' checked={useAPC} onToggle={() => setUseAPC(!useAPC)} />
+                  {/* <CheckboxWithText label='Use Azure Programmable Connectivity Backend' checked={useAPC} onToggle={() => setUseAPC(!useAPC)} /> */}
                 </View>
 
                 <View style={styles.optionSubtitleContainer}>

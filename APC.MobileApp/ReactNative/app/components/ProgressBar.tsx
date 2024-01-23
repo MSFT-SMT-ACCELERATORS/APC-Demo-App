@@ -37,13 +37,13 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   return (
     <View style={[styles.container, { height }, style]}>
       <View style={[styles.progressBar, { backgroundColor, borderRadius: height / 2 }]}>
-        <Animated.View style={{ width: widthInterpolated, flex: 1 }}>
-          <LinearGradient
+        <Animated.View style={{ width: widthInterpolated, flex: 1, backgroundColor: '#4ad896' }}>
+          {/* <LinearGradient
             colors={gradientColors}
             style={{ flex: 1 }}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-          />
+          /> */}
         </Animated.View>
       </View>
     </View>
