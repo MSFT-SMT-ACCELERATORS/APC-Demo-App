@@ -15,6 +15,7 @@ import textStyles from '../themes/Texts';
 import { useApiClient } from '../api/ApiClientProvider';
 import AppContainer from '../components/AppContainer';
 import CheckboxWithText from '../components/CheckBox';
+import { Controller, FieldValues, useForm } from 'react-hook-form';
 
 interface StepProps {
   setProgress: (progress: number) => void;
@@ -25,7 +26,20 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
   const apiClient = useApiClient();
   const [value, setValue] = useState('hacked');
   const [useAPC, setUseAPC] = useState(true);
-  // setProgress(25);
+    
+  const { control, handleSubmit, formState: { errors }, } = useForm({
+    defaultValues: {
+      Country: '',
+      City: '',
+      StateProvince: ''
+    }});
+
+  const onFormValid = (data: FieldValues) => {
+    console.log('Submitted Data:', data);
+
+    // navigation.navigate('StarterPage');
+  }
+
   useEffect(() => {
     setProgress(25);
   }, [setProgress]);
@@ -36,9 +50,54 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
         <View>
           <Text style={{ 'fontSize': 30, 'color': '#FFF', fontWeight: "bold", alignSelf: "center" }}>Residence Location</Text>
           <Text style={{ 'fontSize': 16, 'color': '#AAA', fontWeight: "normal", alignSelf: "center", width: '100%', textAlign: 'center' }}>Please, select your country and state/province of residence</Text>
-          <StyledInputText labelText="Country" placeholder=""></StyledInputText>
-          <StyledInputText labelText="State/Province" placeholder=""></StyledInputText>
-          <StyledInputText labelText="City" placeholder=""></StyledInputText>
+          <Controller
+            control={control}
+            rules={{
+              required: "This field is required",
+              pattern: {
+                value: /^[a-zA-Z ]*$/,
+                message: "No numbers allowed",
+              },
+            }}
+            render={({ field }) => (
+              <StyledInputText labelText="Country" placeholder="" {...field}></StyledInputText>
+            )}
+            name="Country"
+          />
+          {errors.Country && <StyledText textStyle="regular" color="danger200">{errors.Country.message}</StyledText>}
+
+          <Controller
+            control={control}
+            rules={{
+              required: "This field is required",
+              pattern: {
+                value: /^[a-zA-Z ]*$/,
+                message: "No numbers allowed",
+              },
+            }}
+            render={({ field }) => (
+              <StyledInputText labelText="State/Province" placeholder="" {...field}></StyledInputText>
+            )}
+            name="StateProvince"
+          />
+          {errors.StateProvince && <StyledText textStyle="regular" color="danger200">{errors.StateProvince.message}</StyledText>}
+
+
+          <Controller
+            control={control}
+            rules={{
+              required: "This field is required",
+              pattern: {
+                value: /^[a-zA-Z ]*$/,
+                message: "No numbers allowed",
+              },
+            }}
+            render={({ field }) => (
+              <StyledInputText labelText="City" placeholder="" {...field}></StyledInputText>
+            )}
+            name="City"
+          />
+          {errors.City && <StyledText textStyle="regular" color="danger200">{errors.City.message}</StyledText>}
 
           <View style={styles.btnContainer}>
             <StyledText style={styles.comparisonTitle} textStyle="title6">Internal Comparison with:</StyledText>
@@ -94,7 +153,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
           <Button
             title="Submit"
             style={styles.button}
-            onPress={() => navigation.navigate('StarterPage')}
+            onPress={handleSubmit(onFormValid)}
           />
         </View>
       </ScrollView>

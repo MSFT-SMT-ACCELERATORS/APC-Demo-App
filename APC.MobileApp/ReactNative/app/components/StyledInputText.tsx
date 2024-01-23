@@ -1,9 +1,9 @@
-import React, { ReactNode } from 'react';
-import { View, StyleSheet, StatusBar, ViewStyle, TextInput, TextInputProps } from 'react-native';
+import React, { forwardRef } from 'react';
+import { View, StyleSheet, TextInput, TextInputProps, ViewStyle } from 'react-native';
 import palette from "../themes/Colors";
 import StyledText from './StyledText';
 
-interface InputTextProps {
+interface InputTextProps extends TextInputProps {
     style?: ViewStyle;
     colors?: keyof typeof palette;
     labelText?: string;
@@ -25,24 +25,21 @@ const styles = StyleSheet.create({
     },
 });
 
-const StyledInputText: React.FC<InputTextProps & TextInputProps> = ({
-    style,
-    labelText,
-    placeholder,
-    placeholderTextColor = palette.placeholder,
-    children,
-    ...textInputProps
-}) => {
-    return (
+const StyledInputText = forwardRef<TextInput, InputTextProps>(
+    ({ style, labelText, placeholder, placeholderTextColor = palette.placeholder, ...textInputProps }, ref) => {
+      return (
         <View style={styles.container}>
-            <StyledText textStyle='bold'>{labelText}</StyledText>
-            <TextInput
-                style={[styles.input_properties, style]}
-                placeholder={placeholder}
-                placeholderTextColor={placeholderTextColor}
-                {...textInputProps}
-            />
+          <StyledText textStyle='bold'>{labelText}</StyledText>
+          <TextInput
+            style={[styles.input_properties, style]}
+            placeholder={placeholder}
+            placeholderTextColor={placeholderTextColor}
+            ref={ref}
+            {...textInputProps} // Esto pasará todas las props adicionales, incluyendo value, onChangeText (que es el equivalente de onChange en React Native), y onBlur
+          />
         </View>
-    );
-};
+      );
+    }
+);
+
 export default StyledInputText;
