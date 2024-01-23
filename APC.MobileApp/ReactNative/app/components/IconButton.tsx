@@ -8,7 +8,7 @@ interface CustomButtonProps {
   onPress?: () => void;
   style?: ViewStyle;
   textStyle?: TextStyle;
-  type?: 'image' | 'text' | 'imageAndText'; // Nuevo tipo para definir el estilo
+  type?: 'image' | 'text' | 'imageAndText';
 }
 
 const styles = StyleSheet.create({
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     text: {
       color: palette.neutral,
       fontWeight: 'bold',
-      fontSize: 18, // Tamaño del texto "big"
+      fontSize: 18,
     },
   });
 

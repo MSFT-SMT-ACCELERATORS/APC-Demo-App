@@ -17,10 +17,27 @@ import Demo from './app/screens/Demo';
 import Success from './app/screens/Success';
 import { ApiClientProvider } from './app/api/ApiClientProvider';
 import Steps from './app/screens/Steps';
+import axios from "axios";
+import { useEffect } from 'react';
 
 const Stack = createNativeStackNavigator();
 
 function App() {
+
+  const getData = async () => {
+    try {
+      const response = await axios.get('https://cors-anywhere.herokuapp.com/http://api.ipify.org/?format=text');
+      // const res = await axios.get("https://api.ipify.org/?format=json");
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error al obtener los datos:", error);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []); // El array vacío asegura que se ejecute solo una vez, en el montaje del componente
+
   return (
     <ApiClientProvider>
       <PaperProvider>

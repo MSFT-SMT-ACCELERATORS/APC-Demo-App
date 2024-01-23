@@ -12,9 +12,9 @@ function Welcome() {
   return (
     <View style={styles.container}>
       <Image source={require('../../assets/images/logo.png')} style={styles.image} resizeMode="contain" />
-      <StyledText textStyle={['extrabold']}>Your Loan, Just a Touch Away</StyledText>
-      <StyledText >Get a Persolal Line of Credit Between</StyledText>
-      <StyledText  color='accent200'>$500 - $10000</StyledText>
+      <StyledText customStyle={["title1", 'extrabold']}>Your Loan, Just a Touch Away</StyledText>
+      <StyledText customStyle={["title2", "light"]}>Get a Personal Line of Credit Between</StyledText>
+      <StyledText customStyle={["title2"]} color='accent200'>$500 - $10000</StyledText>
       <StatusBar style="auto" />
       <Button
         title="Get Started"
@@ -38,12 +38,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 5,
     padding: 15,
-    
+
   },
   image: {
-    width: '70%',
-    height: 80,
-    justifyContent: 'flex-start'
+    width: '100%',
+    height: undefined,
+    aspectRatio: 1,
+    maxWidth: 300, 
+    maxHeight: 100,
   },
   button: {
     marginTop: 30

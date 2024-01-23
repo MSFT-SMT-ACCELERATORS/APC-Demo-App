@@ -95,23 +95,23 @@ const customStyles = {
     },
     my1: {
         marginTop: 4,
-         marginBottom: 4
+        marginBottom: 4
     },
     my2: {
         marginTop: 8,
-         marginBottom: 8 
+        marginBottom: 8
     },
     my3: {
         marginTop: 12,
-         marginBottom: 12 
+        marginBottom: 12
     },
     my4: {
         marginTop: 16,
-         marginBottom: 16
+        marginBottom: 16
     },
     my5: {
         marginTop: 24,
-         marginBottom: 24
+        marginBottom: 24
     },
     mx0: {
         marginLeft: 0,
@@ -137,50 +137,72 @@ const customStyles = {
         marginLeft: 24,
         marginRight: 24
     },
+    p0: {
+        padding: 0
+    },
+    p1: {
+        padding: 4
+    },
+    p2: {
+        padding: 8
+    },
+    p3: {
+        padding: 12
+    },
+    p4: {
+        padding: 16
+    },
+    p5: {
+        padding: 24
+    },
     title1: {
         fontSize: 34,
-        lineHeight:40
-      },
-      title2: {
+        lineHeight: 40
+    },
+    title2: {
         fontSize: 30,
-        lineHeight:40
-      },
-      title3: {
+        lineHeight: 40
+    },
+    title3: {
         fontSize: 24,
-        lineHeight:40
-      },
-      title4: {
+        lineHeight: 40
+    },
+    title4: {
         fontSize: 20,
-        lineHeight:40
-      },
-      title5: {
+        lineHeight: 40
+    },
+    title5: {
         fontSize: 18,
-        lineHeight:40
-      },
-      title6: {
+        lineHeight: 40
+    },
+    title6: {
         fontSize: 16,
-        lineHeight:40
-      },
-      big: {
+        lineHeight: 40
+    },
+    big: {
         fontSize: 20,
-        lineHeight:40
-      },
+        lineHeight: 40
+    },
+    standar: {
+        fontSize: 12,
+        lineHeight: 40
+    },
       small: {
         fontSize: 10,
-        lineHeight:40
-      },
-      extrabold: {
+        lineHeight: 40
+    },
+    extrabold: {
         fontWeight: '700',
-      },
-      bold: {
+    },
+    bold: {
         fontWeight: '500',
-      },
-      regular: {
+    },
+    regular: {
         fontWeight: '400',
-      },
-      light: {
+    },
+    light: {
         fontWeight: '300',
-      },
+    },
 
 } as const;
 

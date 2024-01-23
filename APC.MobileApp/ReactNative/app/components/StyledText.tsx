@@ -21,7 +21,7 @@ const StyledText: React.FC<StyledTextProps> = ({
   color: colors = 'neutral',
   children,
 }) => {
-  const defaultStyles = [customStyles.title1, customStyles.light];
+  const defaultStyles = [customStyles.standar, customStyles.regular];
   const combinedStyles = [...defaultStyles, ...customStyle.map(key => customStyles[key])];
   const defaultColorStyle: TextStyle = { color: palette[colors] || palette.neutral }; 
   return (
