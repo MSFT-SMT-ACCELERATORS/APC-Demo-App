@@ -19,15 +19,15 @@ const Button: React.FC<ButtonProps> = ({
     gradientColors = ['#00fdee', '#4ad896']
   }) => {
   return (
-    <TouchableOpacity onPress={onPress} style={[styles.button, style]}>
-      <LinearGradient
+    <TouchableOpacity onPress={onPress} style={[styles.button, styles.gradient, style]}>
+      {/* <LinearGradient
         colors={gradientColors}
         style={styles.gradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
-      >
+      > */}
         <Text style={[styles.text, textStyle]}>{title}</Text>
-      </LinearGradient>
+      {/* </LinearGradient> */}
     </TouchableOpacity>
   );
 };
@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
   button: {
     borderRadius: 2,
     overflow: 'hidden',
+    backgroundColor: '#4ad896'
   },
   gradient: {
     padding: 15,
