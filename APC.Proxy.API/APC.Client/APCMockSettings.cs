@@ -32,6 +32,15 @@ namespace APC.Client
         {
             DevicePhoneNumber = "+1234567890"
         };
+        public SimSwapInfo MockSimSwapInfo { get; set; } = new SimSwapInfo
+        {
+            LatestSimChange = DateTime.UtcNow.AddDays(-30)
+        };
+
+        public CheckSimSwapInfo MockCheckSimSwapInfo { get; set; } = new CheckSimSwapInfo
+        {
+            Swapped = false
+        };
     }
 
 }

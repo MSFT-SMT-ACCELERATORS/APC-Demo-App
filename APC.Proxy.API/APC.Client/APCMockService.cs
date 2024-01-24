@@ -31,5 +31,15 @@ namespace APC.Client
         {
             return Task.FromResult(_settings.MockNumberRetrieveResponse);
         }
+
+        public Task<SimSwapInfo> RetrieveSimSwapDate(CreateSimSwapDate request)
+        {
+            return Task.FromResult(_settings.MockSimSwapInfo);
+        }
+
+        public Task<CheckSimSwapInfo> CheckSimSwap(CreateCheckSimSwap request)
+        {
+            return Task.FromResult(_settings.MockCheckSimSwapInfo);
+        }
     }
 }

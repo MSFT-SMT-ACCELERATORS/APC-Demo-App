@@ -96,5 +96,41 @@ namespace APC.Client
 
             return await response.Content.ReadFromJsonAsync<NumberRetrieveResponse>();
         }
+
+        public async Task<SimSwapInfo> RetrieveSimSwapDateAsync(CreateSimSwapDate request, bool useMock = false)
+        {
+            if (_isMockEnabled || useMock)
+                return await _mockService.RetrieveSimSwapDate(request);
+
+            // requestMessage.Headers.Add("X-Correlator", correlator);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "swap-date")
+            {
+                Content = JsonContent.Create(request)
+            };
+
+            var response = await _httpClient.SendAsync(requestMessage);
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadFromJsonAsync<SimSwapInfo>();
+        }
+
+        public async Task<CheckSimSwapInfo> CheckSimSwapAsync(CreateCheckSimSwap request, bool useMock = false)
+        {
+            if (_isMockEnabled || useMock)
+                return await _mockService.CheckSimSwap(request);
+
+            // requestMessage.Headers.Add("X-Correlator", correlator);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "check-swap")
+            {
+                Content = JsonContent.Create(request)
+            };
+
+            var response = await _httpClient.SendAsync(requestMessage);
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadFromJsonAsync<CheckSimSwapInfo>();
+        }
     }
 }

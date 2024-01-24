@@ -8,6 +8,8 @@ namespace APC.Client
         Task<LocationResponse> RetrieveLocationAsync(LocationRequest request);
         Task<NumberVerificationMatchResponse> VerifyPhoneNumber(NumberVerificationRequest request);
         Task<NumberRetrieveResponse> RetrievePhoneNumber(NumberRetrieveRequest request);
+        Task<SimSwapInfo> RetrieveSimSwapDate(CreateSimSwapDate request);
+        Task<CheckSimSwapInfo> CheckSimSwap(CreateCheckSimSwap request);
     }
 
 }
