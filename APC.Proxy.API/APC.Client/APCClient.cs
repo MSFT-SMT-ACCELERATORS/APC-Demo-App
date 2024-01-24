@@ -60,5 +60,41 @@ namespace APC.Client
 
             return await response.Content.ReadFromJsonAsync<LocationResponse>();
         }
+
+        public async Task<NumberVerificationMatchResponse> VerifyPhoneNumberAsync(NumberVerificationRequest request, bool useMock = false)
+        {
+            if (_isMockEnabled || useMock)
+                return await _mockService.VerifyPhoneNumber(request);
+
+            // requestMessage.Headers.Add("X-Correlator", correlator);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "verify")
+            {
+                Content = JsonContent.Create(request)
+            };
+
+            var response = await _httpClient.SendAsync(requestMessage);
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadFromJsonAsync<NumberVerificationMatchResponse>();
+        }
+
+        public async Task<NumberRetrieveResponse> RetrievePhoneNumberAsync(NumberRetrieveRequest request, bool useMock = false)
+        {
+            if (_isMockEnabled || useMock)
+                return await _mockService.RetrievePhoneNumber(request);
+
+            // requestMessage.Headers.Add("X-Correlator", correlator);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "phone-number")
+            {
+                Content = JsonContent.Create(request)
+            };
+
+            var response = await _httpClient.SendAsync(requestMessage);
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadFromJsonAsync<NumberRetrieveResponse>();
+        }
     }
 }

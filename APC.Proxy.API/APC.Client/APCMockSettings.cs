@@ -24,6 +24,14 @@ namespace APC.Client
                 }
             }
         };
+        public NumberVerificationMatchResponse MockNumberVerificationMatchResponse { get; set; } = new NumberVerificationMatchResponse
+        {
+            DevicePhoneNumberVerified = true
+        };
+        public NumberRetrieveResponse MockNumberRetrieveResponse { get; set; } = new NumberRetrieveResponse
+        {
+            DevicePhoneNumber = "+1234567890"
+        };
     }
 
 }

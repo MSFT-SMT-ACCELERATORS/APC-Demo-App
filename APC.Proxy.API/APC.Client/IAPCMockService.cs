@@ -6,6 +6,8 @@ namespace APC.Client
     {
         Task<VerifyLocationResponse> VerifyLocationAsync(VerifyLocationRequest request);
         Task<LocationResponse> RetrieveLocationAsync(LocationRequest request);
+        Task<NumberVerificationMatchResponse> VerifyPhoneNumber(NumberVerificationRequest request);
+        Task<NumberRetrieveResponse> RetrievePhoneNumber(NumberRetrieveRequest request);
     }
 
 }
