@@ -37,7 +37,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
   const onFormValid = (data: FieldValues) => {
     console.log('Submitted Data:', data);
 
-    // navigation.navigate('StarterPage');
+    navigation.navigate('StarterPage');
   }
 
   useEffect(() => {
@@ -48,65 +48,65 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
     <AppContainer>
       <ScrollView style={styles.container}>
         <View>
-          <Text style={{ 'fontSize': 30, 'color': '#FFF', fontWeight: "bold", alignSelf: "center" }}>Residence Location</Text>
-          <Text style={{ 'fontSize': 16, 'color': '#AAA', fontWeight: "normal", alignSelf: "center", width: '100%', textAlign: 'center' }}>Please, select your country and state/province of residence</Text>
+          <Text style={{ 'fontSize': 30, 'color': '#FFF', fontWeight: 'bold', alignSelf: 'center' }}>Residence Location</Text>
+          <Text style={{ 'fontSize': 16, 'color': '#AAA', fontWeight: 'normal', alignSelf: 'center', width: '100%', textAlign: 'center' }}>Please, select your country and state/province of residence</Text>
           <Controller
             control={control}
             rules={{
-              required: "This field is required",
+              required: 'This field is required',
               pattern: {
                 value: /^[a-zA-Z ]*$/,
-                message: "No numbers allowed",
+                message: 'No numbers allowed',
               },
             }}
             render={({ field }) => (
-              <StyledInputText labelText="Country" placeholder="" {...field}></StyledInputText>
+              <StyledInputText labelText='Country' placeholder='' {...field}></StyledInputText>
             )}
-            name="Country"
+            name='Country'
           />
-          {errors.Country && <StyledText textStyle="regular" color="danger200">{errors.Country.message}</StyledText>}
+          {errors.Country && <StyledText customStyle={['regular']} color='danger200'>{errors.Country.message}</StyledText>}
 
           <Controller
             control={control}
             rules={{
-              required: "This field is required",
+              required: 'This field is required',
               pattern: {
                 value: /^[a-zA-Z ]*$/,
-                message: "No numbers allowed",
+                message: 'No numbers allowed',
               },
             }}
             render={({ field }) => (
-              <StyledInputText labelText="State/Province" placeholder="" {...field}></StyledInputText>
+              <StyledInputText labelText='State/Province' placeholder='' {...field}></StyledInputText>
             )}
-            name="StateProvince"
+            name='StateProvince'
           />
-          {errors.StateProvince && <StyledText textStyle="regular" color="danger200">{errors.StateProvince.message}</StyledText>}
+          {errors.StateProvince && <StyledText color='danger200'>{errors.StateProvince.message}</StyledText>}
 
 
           <Controller
             control={control}
             rules={{
-              required: "This field is required",
+              required: 'This field is required',
               pattern: {
                 value: /^[a-zA-Z ]*$/,
-                message: "No numbers allowed",
+                message: 'No numbers allowed',
               },
             }}
             render={({ field }) => (
-              <StyledInputText labelText="City" placeholder="" {...field}></StyledInputText>
+              <StyledInputText labelText='City' placeholder='' {...field}></StyledInputText>
             )}
-            name="City"
+            name='City'
           />
-          {errors.City && <StyledText textStyle="regular" color="danger200">{errors.City.message}</StyledText>}
+          {errors.City && <StyledText color='danger200'>{errors.City.message}</StyledText>}
 
           <View style={styles.btnContainer}>
-            <StyledText style={styles.comparisonTitle} textStyle="title6">Internal Comparison with:</StyledText>
+            <StyledText style={styles.comparisonTitle}>Internal Comparison with:</StyledText>
             <RadioButton.Group onValueChange={newValue => setValue(newValue)} value={value}>
               <View >
                 <View>
                   <View style={styles.flex}>
-                    <RadioButton value="true" color={Colors.accent200} />
-                    <StyledText textStyle="title6">True GPS</StyledText>
+                    <RadioButton value='true' color={Colors.accent200} />
+                    <StyledText>True GPS</StyledText>
                   </View>
                   <View style={styles.optionSubtitleContainer}>
                     <View style={styles.optionSubtitleBadge}>
@@ -121,8 +121,8 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
 
               <View>
                 <View style={styles.flex}>
-                  <RadioButton value="hacked" color={Colors.accent200} />
-                  <StyledText textStyle="title6">Hacked GPS</StyledText>
+                  <RadioButton value='hacked' color={Colors.accent200} />
+                  <StyledText>Hacked GPS</StyledText>
                 </View>
                 <View style={styles.optionSubtitleContainer}>
                   <View style={styles.optionSubtitleBadge}>
@@ -151,10 +151,12 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
             </RadioButton.Group>
           </View>
           <Button
-            title="Submit"
+            title='Submit'
             style={styles.button}
+            useGradient={true}
             onPress={handleSubmit(onFormValid)}
           />
+
         </View>
       </ScrollView>
     </AppContainer>

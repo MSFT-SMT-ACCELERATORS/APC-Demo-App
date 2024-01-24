@@ -1,53 +1,134 @@
-import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, GestureResponderEvent, StyleProp, TextStyle, ViewStyle } from 'react-native';
+import React, { useState } from 'react';
+import { TouchableOpacity, Text, StyleSheet, GestureResponderEvent, StyleProp, TextStyle, ViewStyle, View, ImageSourcePropType } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import btnStyles from '../themes/BtnStyles';
+import StyledText from './StyledText';
+import palette from '../themes/Colors';
+import customStyles from '../themes/CustomStyles';
+import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+type ButtonSize = 'fit' | 'short' | 'normal' | 'long' | 'square';
+type IconName = 'attach-money' | 'truck-check-outline' | 'wallet-outline' | 'settings' | 'calendar-check-o';
 
 interface ButtonProps {
-    title: string;
-    onPress: (event: GestureResponderEvent) => void;
-    style?: StyleProp<ViewStyle>;
-    textStyle?: StyleProp<TextStyle>;
-    gradientColors?: string[];
+  title?: string;
+  titleSize?: any;
+  titleColor?: any;
+  onPress: (event: GestureResponderEvent) => void;
+  style?: StyleProp<ViewStyle>;
+  border? : boolean;
+  size?: ButtonSize;
+  showIcon?: boolean;
+  iconLib?: 'Ionicons' | 'FontAwesome' | 'MaterialIcons' | 'MaterialCommunity';
+  iconName?: any;
+  iconSize?: number;
+  iconColor?: string;
+  useGradient?: boolean;
+}
+
+const Button: React.FC<ButtonProps> = ({
+  title,
+  titleSize = "big",
+  titleColor = 'primary300',
+  onPress,
+  style,
+  border = false,
+  size = 'normal',
+  useGradient = false,
+  showIcon = false,
+  iconLib = 'FontAwesome',
+  iconName,
+  iconSize = 20,
+  iconColor = palette.neutral,
+}) => {
+
+  const [isPressed, setIsPressed] = useState(false);
+
+  // const buttonStyles = [styles.buttonPressed];
+  // if (isPressed) {
+  //   buttonStyles.push(styles.buttonPressed); // Agrega estilos para el estado "presionado"
+  // }
+  // const buttonStyle = ([btnStyles.buttonStyles[size]]);
+
+  const buttonStyle = [btnStyles.buttonStyles[size]];
+  const buttonBorder = border ? ([styles.border]): null;
+  let IconComponent;
+  switch (iconLib) {
+    case 'FontAwesome':
+      IconComponent = FontAwesome;
+      break;
+    case 'MaterialIcons':
+      IconComponent = MaterialIcons;
+      break;
+    case 'MaterialCommunity':
+      IconComponent = MaterialCommunityIcons;
+      break;
+    default:
+      IconComponent = Ionicons;
   }
-  
-const Button: React.FC<ButtonProps> = ({ 
-    title, 
-    onPress, 
-    style, 
-    textStyle, 
-    gradientColors = ['#00fdee', '#4ad896']
-  }) => {
+
+  const iconElement = showIcon && iconName ? (
+    <IconComponent name={iconName} size={iconSize} color={iconColor} />
+  ) : null;
+
+
+
+  const textElement =  title ? (
+    <StyledText customStyle={[titleSize]} color={titleColor} style={{lineHeight: 15}}>{title}</StyledText>
+  ) : null;
+
+  const content = (
+    <View  style={styles.content}>
+      {iconElement}
+      {textElement}
+    </View>
+  );
+
   return (
-    <TouchableOpacity onPress={onPress} style={[styles.button, styles.gradient, style]}>
-      {/* <LinearGradient
-        colors={gradientColors}
-        style={styles.gradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-      > */}
-        <Text style={[styles.text, textStyle]}>{title}</Text>
-      {/* </LinearGradient> */}
+    <TouchableOpacity onPress={onPress} onPressIn={() => setIsPressed(true)}
+      onPressOut={() => setIsPressed(false)} style={[buttonStyle, buttonBorder, style]}>
+      {useGradient? (
+        <LinearGradient
+          colors={[palette.accent100, palette.accent200]}
+          style={styles.content}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
+
+          {content}
+
+        </LinearGradient>
+      ) : (
+        content
+      )}
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 2,
     overflow: 'hidden',
-    backgroundColor: '#4ad896'
   },
-  gradient: {
-    padding: 15,
+   buttonPressed: {
+    // Estilos del botón cuando está presionado
+    backgroundColor: '#000',
+  },
+  border: {
+    borderStyle: 'solid',
+    borderWidth: 2,
+    borderRadius: 6,
+    borderColor: palette.accent200,
+    overflow: 'hidden',
+  },
+  content: {
+    width: '100%',
+    height: '100%',
     alignItems: 'center',
-    borderRadius: 2,
-  },
-  text: {
-    backgroundColor: 'transparent',
-    fontSize: 10,
-    color: '#000',
-  },
+    justifyContent: 'center'
+  }
 });
 
 export default Button;

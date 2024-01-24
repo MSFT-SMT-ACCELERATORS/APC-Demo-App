@@ -29,6 +29,7 @@ function Consents() {
         <Button
           title="Accept"
           style={styles.button}
+          useGradient={true}
           onPress={() => navigation.navigate('Steps')}
         />
       </View>
