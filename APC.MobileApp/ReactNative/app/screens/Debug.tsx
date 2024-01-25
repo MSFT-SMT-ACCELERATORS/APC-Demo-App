@@ -47,6 +47,7 @@ function Debug() {
                     <Button
                         title="Back"
                         style={styles.button}
+                        useGradient={true}
                         onPress={() => navigation.navigate('Welcome')}
                     />
                 </View>

@@ -42,7 +42,6 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
 
   const onFormValid = async (data: FieldValues) => {
     console.log('Submitted Data:', data);
-    // navigation.navigate('StarterPage');
 
     let coordsForm = await APCService.findCoords(data.Country, data.StateProvince, data.City);
 
@@ -57,13 +56,16 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
       const response = await APCService.matchesAPCLocation(apiClient, coords);
 
       if (!response.verificationResult)
-        throw "APC validation failed!!";
+        console.error("APC validation failed!!");
     }
     
     // Business validation
     if (!await APCService.matchesCoords(coords, coordsForm)) {
-      throw "Business validation failed!!";
+      console.error("Business validation failed!!");
     }
+
+    
+    navigation.navigate('StarterPage');
   }
 
   useEffect(() => {

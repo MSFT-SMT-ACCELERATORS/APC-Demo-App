@@ -32,7 +32,7 @@ function Steps() {
     return (
         <AppContainer>
             <ProgressBar progress={progress} height={20} style={{margin: 20}}/>
-            <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName='ResidenceLocation'>
                 <Stack.Screen
                     name="ResidenceLocation"
                     children={() => <ResidenceLocation setProgress={setProgress} />}
