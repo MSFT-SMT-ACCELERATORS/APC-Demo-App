@@ -4,35 +4,50 @@ import { StyleSheet, Text, View, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Button from '../components/Button'
 import Colors from '../themes/Colors';
+import StyledText from '../components/StyledText';
+import AppContainer from '../components/AppContainer';
+import customStyles from '../themes/CustomStyles';
+import palette from '../themes/Colors';
 
 function Welcome() {
   const navigation = useNavigation();
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.imageContainer, {'padding': 3}]}>
-        <Image source={require('../../assets/logo.png')} style={styles.image} resizeMode="contain"/>
+    <AppContainer>
+      <View style={styles.settings}>
+        <Button
+          showIcon={true}
+          size='fit'
+          iconLib='Ionicons'
+          iconName={'settings-outline'}
+          iconColor={palette.accent200}
+          iconSize={30}
+          style={[customStyles.mr2, customStyles.mt2]}
+          useGradient={false}
+          onPress={() => navigation.navigate('Demo')}
+        />
       </View>
-      <Text style={{'fontSize': 40, 'color': '#FFF', fontWeight: "bold" }}>Your Loan, Just a Touch Away</Text>
-      <Text style={{'fontSize': 30, 'color': '#AAA', fontWeight: "100" }}>Get a Persolal Line of Credit Between</Text>
-      <Text style={{'fontSize': 30, 'color': Colors.accent200, fontWeight: "300" }}>$500 - $10000</Text>
-      <StatusBar style="auto" />
-      <Button
-        title="Get Started"
-        style={styles.button}
-        onPress={() => navigation.navigate('Consents')}
-      />
-      <Button
-        title="DEMO"
-        style={styles.button}
-        onPress={() => navigation.navigate('Demo')}
-      />
-      <Button
-        title="Debug"
-        style={styles.button}
-        onPress={() => navigation.navigate('Debug')}
-      />
-    </View>
+      <View style={styles.container}>
+        <Image source={require('../../assets/images/logo.png')} style={styles.image} resizeMode='contain' />
+        <StyledText customStyle={['title1', 'extrabold']}>Your Loan, Just a Touch Away</StyledText>
+        <StyledText customStyle={['title2', 'light']}>Get a Personal Line of Credit Between</StyledText>
+        <StyledText customStyle={['title2']} color='accent200'>$500 - $10000</StyledText>
+        <StatusBar style='auto' />
+        <Button
+          title='Get Started'
+          style={customStyles.my3}
+          useGradient={true}
+          onPress={() => navigation.navigate('Consents')}
+        />
+        <Button
+          title="Debug"
+          style={customStyles.my3}
+          useGradient={true}
+          onPress={() => navigation.navigate('Debug')}
+        />
+
+      </View>
+    </AppContainer>
   );
 }
 
@@ -43,18 +58,20 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'center',
     gap: 5,
-    padding: 15
-  },
-  imageContainer:{
-    width: '100%',
-    height: 90
+    padding: 15,
   },
   image: {
     width: '100%',
-    height: '100%'
+    height: undefined,
+    aspectRatio: 1,
+    maxWidth: 300,
+    maxHeight: 100,
   },
-  button: {
-    marginTop: 30
+  settings: {
+    width: '100%',
+    alignItems: 'flex-end',
+    justifyContent: 'flex-start',
+    margin: 0
   }
 });
 

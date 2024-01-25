@@ -2,18 +2,17 @@ import React, { forwardRef } from 'react';
 import { View, StyleSheet, TextInput, TextInputProps, ViewStyle } from 'react-native';
 import palette from "../themes/Colors";
 import StyledText from './StyledText';
+import customStyles from '../themes/CustomStyles';
 
 interface InputTextProps extends TextInputProps {
     style?: ViewStyle;
+    customStyle?: Array<keyof typeof customStyles>;
     colors?: keyof typeof palette;
     labelText?: string;
     placeholder?: string;
 }
 
 const styles = StyleSheet.create({
-    container: {
-        margin: 10
-    },
     input_properties: {
         flexGrow: 1,
         backgroundColor: palette.transparent,
@@ -25,18 +24,24 @@ const styles = StyleSheet.create({
     },
 });
 
-const StyledInputText = forwardRef<TextInput, InputTextProps>(
-    ({ style, labelText, placeholder, placeholderTextColor = palette.placeholder, ...textInputProps }, ref) => {
-      return (
-        <View style={styles.container}>
-          <StyledText textStyle='bold'>{labelText}</StyledText>
-          <TextInput
-            style={[styles.input_properties, style]}
-            placeholder={placeholder}
-            placeholderTextColor={placeholderTextColor}
-            ref={ref}
-            {...textInputProps} // Esto pasará todas las props adicionales, incluyendo value, onChangeText (que es el equivalente de onChange en React Native), y onBlur
-          />
+const StyledInputText = forwardRef<TextInput, InputTextProps>(({
+    style,
+    labelText,
+    placeholder,
+    placeholderTextColor = palette.placeholder,
+    children,
+    ...textInputProps
+}, ref) => {
+    return (
+        <View style={customStyles.m3}>
+            <StyledText customStyle={['bold']}>{labelText}</StyledText>
+            <TextInput
+                style={[styles.input_properties, style]}
+                placeholder={placeholder}
+                placeholderTextColor={placeholderTextColor}
+		ref={ref}
+            	{...textInputProps}
+            />
         </View>
       );
     }

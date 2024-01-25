@@ -13,6 +13,7 @@ import StyledInputText from '../components/StyledInputText';
 import palette from '../themes/Colors';
 import Slider from '../components/Slider';
 import AppContainer from '../components/AppContainer';
+import customStyles from '../themes/CustomStyles';
 
 interface StepProps {
   setProgress: (progress: number) => void;
@@ -25,48 +26,86 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
     setProgress(50);
   }, [setProgress]);
   return (
-      <ScrollView style={styles.container} >
-        <View >
-          <Text style={{ 'fontSize': 30, 'color': '#FFF', fontWeight: "bold", alignSelf: "center" }}>Let’s get started</Text>
-          <Text style={{ 'fontSize': 16, 'color': '#AAA', fontWeight: "normal", alignSelf: "center", width: '100%', textAlign: 'center' }}>Please complete the form below.</Text>
-          <StyledInputText labelText="Phone Number" placeholder="+1 365-478-8429" placeholderTextColor={palette.accent200}></StyledInputText>
-          <StyledText textStyle='small'>I would like to formally request a loan for the following amount:</StyledText>
-          <Slider minValue={500} maxValue={10000} formatter={currencyFormatter} style={{ padding: 10 }} />
-          <StyledText textStyle='small'>Purpose:</StyledText>
-          <View style={styles.btn_Container}>
-            <View style={styles.row}>
-              <Button
-                title="Debt Consolidation"
-                style={styles.icon_button}
-                onPress={() => navigation.navigate('')}
-              />
-              <Button
-                title="Monthly Bills"
-                style={styles.icon_button}
-                onPress={() => navigation.navigate('')}
-              />
-            </View>
-            <View style={styles.row}>
-              <Button
-                title="Moving"
-                style={styles.icon_button}
-                onPress={() => navigation.navigate('')}
-              />
-              <Button
-                title="Other"
-                style={styles.icon_button}
-                onPress={() => navigation.navigate('')}
-              />
-            </View>
+    <ScrollView style={styles.container} >
+      <View >
+        <Text style={{ 'fontSize': 30, 'color': '#FFF', fontWeight: "bold", alignSelf: "center" }}>Let’s get started</Text>
+        <Text style={{ 'fontSize': 16, 'color': '#AAA', fontWeight: "normal", alignSelf: "center", width: '100%', textAlign: 'center' }}>Please complete the form below.</Text>
+        <StyledInputText labelText="Phone Number" placeholder="+1 365-478-8429" placeholderTextColor={palette.accent200}></StyledInputText>
+        <StyledText customStyle={['small']}>I would like to formally request a loan for the following amount:</StyledText>
+        <Slider minValue={500} maxValue={10000} formatter={currencyFormatter} style={{ padding: 10 }} />
+        <StyledText customStyle={['small']}>Purpose:</StyledText>
+        <View style={styles.btn_Container}>
+          <View style={styles.row}>
+            <Button
+              title='Debt Consolidation'
+              titleSize={customStyles.small}
+              titleColor={'accent200'}
+              style={[customStyles.my3]}
+              size='square'
+              showIcon={true}
+              border={true}
+              iconLib='MaterialIcons'
+              iconName={'attach-money'}
+              iconSize={50}
+              iconColor={palette.accent200}
+              onPress={() => navigation.navigate('#')}
+            />
+            <Button
+              title='Monthly Bills'
+              titleSize={customStyles.small}
+              titleColor={'accent200'}
+              style={[customStyles.my3]}
+              size='square'
+              showIcon={true}
+              border={true}
+              iconLib='Ionicons'
+              iconName={'calendar-outline'}
+              iconSize={50}
+              iconColor={palette.accent200}
+              onPress={() => navigation.navigate('#')}
+            />
           </View>
-
-          <Button
-            title="Submit"
-            style={styles.button}
-            onPress={() => navigation.navigate('Information')}
-          />
+          <View style={styles.row}>
+            <Button
+              title='Moving'
+              titleSize={customStyles.small}
+              titleColor={'accent200'}
+              style={[customStyles.my3]}
+              size='square'
+              showIcon={true}
+              border={true}
+              iconLib='MaterialCommunity'
+              iconName={'truck-check-outline'}
+              iconSize={45}
+              iconColor={palette.accent200}
+              onPress={() => navigation.navigate('#')}
+            />
+            <Button
+              title='Others'
+              titleSize={customStyles.small}
+              titleColor={'accent200'}
+              style={[customStyles.my3]}
+              size='square'
+              showIcon={true}
+              border={true}
+              iconLib='Ionicons'
+              iconName={'wallet-outline'}
+              iconSize={50}
+              iconColor={palette.accent200}
+              onPress={() => navigation.navigate('#')}
+            />
+          </View>
         </View>
-      </ScrollView>
+
+        <Button
+          title="Submit"
+          style={customStyles.my3}
+          useGradient={true}
+          size='long'
+          onPress={() => navigation.navigate('#')}
+        />
+      </View>
+    </ScrollView>
   );
 }
 

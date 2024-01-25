@@ -12,7 +12,7 @@ function Header() {
   return (
     <View style={styles.container}>
         <View style={styles.imageContainer}>
-          <Image source={require('../../assets/logo.png')} style={styles.image} resizeMode="contain"/>        
+          <Image source={require('../../assets/images/logo.png')} style={styles.image} resizeMode="contain"/>        
         </View>
         <View style={styles.separator}></View>
     </View>

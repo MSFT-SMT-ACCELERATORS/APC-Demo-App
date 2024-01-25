@@ -26,10 +26,10 @@ function Landing() {
   return (
     <AppContainer style={styles.container}>
       <StyledInputText labelText="Nombre:" placeholder="Introduce tu nombre"></StyledInputText>
-      <StyledText textStyle="title1">Título 1</StyledText>
-      <StyledText textStyle="title2">Título 2</StyledText>
-      <StyledText textStyle="big">Texto grande</StyledText>
-      <StyledText textStyle="title3" color="accent200">Título 3 en color primario 100</StyledText>
+      <StyledText>Título 1</StyledText>
+      <StyledText>Título 2</StyledText>
+      <StyledText>Texto grande</StyledText>
+      <StyledText>Título 3 en color primario 100</StyledText>
       <StatusBar style="auto" />
       <Slider minValue={500} maxValue={10000} formatter={currencyFormatter} />
       <Button

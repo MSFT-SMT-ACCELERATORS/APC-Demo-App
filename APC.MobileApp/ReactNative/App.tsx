@@ -18,23 +18,39 @@ import Success from './app/screens/Success';
 import { ApiClientProvider } from './app/api/ApiClientProvider';
 import Steps from './app/screens/Steps';
 import Debug from './app/screens/Debug';
+import axios from 'axios';
+import { useEffect } from 'react';
 
 const Stack = createNativeStackNavigator();
 
 function App() {
+
+  const getData = async () => {
+    try {
+      const res = await axios.get('https://api.ipify.org/?format=json');
+      console.log(res.data);
+    } catch (error) {
+      console.error('Error al obtener los datos:', error);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   return (
     <ApiClientProvider>
       <PaperProvider>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="Steps">
-            <Stack.Screen name="Landing" component={Landing} options={{ headerShown: false }} />
-            <Stack.Screen name="TestProgress" component={TestProgress} />
-            <Stack.Screen name="Demo" component={Demo} options={{ header: () => <Header /> }} />
-            <Stack.Screen name="Debug" component={Debug} options={{ header: () => <Header /> }} />
-            <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false }} />
-            <Stack.Screen name="Consents" component={Consents} options={{ header: () => <Header /> }} />
-            <Stack.Screen name="Steps" component={Steps} options={{ header: () => <Header /> }} />
-            <Stack.Screen name="Success" component={Success} options={{ headerShown: false }} />
+          <Stack.Navigator initialRouteName='Welcome'>
+            <Stack.Screen name='Landing' component={Landing} options={{ headerShown: false }} />
+            <Stack.Screen name='TestProgress' component={TestProgress} />
+            <Stack.Screen name='Demo' component={Demo} options={{ header: () => <Header /> }} />
+            <Stack.Screen name='Debug' component={Debug} options={{ header: () => <Header /> }} />
+            <Stack.Screen name='Welcome' component={Welcome} options={{ headerShown: false }} />
+            <Stack.Screen name='Consents' component={Consents} options={{ header: () => <Header /> }} />
+            <Stack.Screen name='Steps' component={Steps} options={{ header: () => <Header /> }} />
+            <Stack.Screen name='Success' component={Success} options={{ headerShown: false }} />
           </Stack.Navigator>
         </NavigationContainer>
       </PaperProvider>
