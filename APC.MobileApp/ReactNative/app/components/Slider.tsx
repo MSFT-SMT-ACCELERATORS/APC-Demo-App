@@ -10,6 +10,8 @@ interface Props {
     sliderColor?: string;
     gradientColors?: string[];
     formatter?: (value: number) => string;
+    value?: number;
+    onChange?: (value: number) => void;
 }
 
 const defaultFormatter = (value: number) => {
@@ -22,13 +24,22 @@ const Slider: React.FC<Props> = ({
     style,
     sliderColor = '#4ad896',
     gradientColors = ['#00fdee', '#4ad896'],
-    formatter = defaultFormatter
+    formatter = defaultFormatter,
+    value=minValue,
+    onChange
 }) => {
     const pan = useRef(new Animated.Value(0)).current;
     const lastPanValue = useRef(0);
     const [sliderWidth, setSliderWidth] = useState(minValue);
     const [sliderValue, setSliderValue] = useState(minValue);
     const [progressWidth, setProgressWidth] = useState(0);
+    
+    useEffect(() => {
+        if(onChange) {
+            const roundedValue = Math.round(sliderValue);
+            onChange(roundedValue);
+        }
+    }, [sliderValue, onChange]);
 
     useEffect(() => {
         const listenerId = pan.addListener((value) => {

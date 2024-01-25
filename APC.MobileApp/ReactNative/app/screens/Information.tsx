@@ -47,6 +47,7 @@ const Information: React.FC<StepProps> = ({ setProgress }) => {
           <Button
             title="Submit"
             style={styles.button}
+            useGradient={true}
             onPress={() => { setProgress(100); navigation.navigate('Success') }}
           />
         </View>

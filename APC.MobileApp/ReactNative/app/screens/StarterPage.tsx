@@ -102,7 +102,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
           style={customStyles.my3}
           useGradient={true}
           size='long'
-          onPress={() => navigation.navigate('#')}
+          onPress={() => navigation.navigate('Information')}
         />
       </View>
     </ScrollView>

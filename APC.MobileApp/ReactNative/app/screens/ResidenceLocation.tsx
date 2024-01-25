@@ -26,17 +26,17 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
   const navigation = useNavigation();
   const apiClient = useApiClient();
 
-  const [GPSType, setGPSType] = useState('true');
-  const [useAPC, setUseAPC] = useState(true);
   const [ip, setIP] = useState<string>();
   const [ipify, setIpify] = useState<string>();
   const [location, setLocation] = useState<LocationObjectCoords>();
 
-  const { control, handleSubmit, formState: { errors }, } = useForm({
+  const { control, handleSubmit, formState: { errors }, getValues } = useForm({
     defaultValues: {
       Country: '',
       City: '',
-      StateProvince: ''
+      StateProvince: '',
+      UseAPC: true,
+      GPSOption: "true"
     }
   });
 
@@ -46,25 +46,25 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
     let coordsForm = await APCService.findCoords(data.Country, data.StateProvince, data.City);
 
     let coords: LocationObjectCoords;
-    if (GPSType == 'true')
+    if (data.GPSOption == 'true')
       coords = (await APCService.getDeviceGPSLocation());
     else
       coords = coordsForm;
 
     // APC validation
-    if (useAPC) {
+    if (data.UseAPC) {
       const response = await APCService.matchesAPCLocation(apiClient, coords);
 
       if (!response.verificationResult)
         console.error("APC validation failed!!");
     }
-    
+
     // Business validation
     if (!await APCService.matchesCoords(coords, coordsForm)) {
       console.error("Business validation failed!!");
     }
 
-    
+
     navigation.navigate('StarterPage');
   }
 
@@ -94,6 +94,12 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
             //     value: /^[a-zA-Z ]*$/,
             //     message: "No numbers allowed",
             //   },
+            //   validate: {
+            //     startsWithCapital: (value: string) => {
+            //       const otherValue = getValues('StateProvince'); // we can check other field values
+            //       return value.charAt(0) === value.charAt(0).toUpperCase() || "City must start with a capital letter";
+            //     }
+            //   },
             // }}
             render={({ field }) => (
               <StyledInputText labelText='Country' placeholder='' {...field}></StyledInputText>
@@ -104,13 +110,6 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
 
           <Controller
             control={control}
-            // rules={{
-            //   required: "This field is required",
-            //   pattern: {
-            //     value: /^[a-zA-Z ]*$/,
-            //     message: "No numbers allowed",
-            //   },
-            // }}
             render={({ field }) => (
               <StyledInputText labelText='State/Province' placeholder='' {...field}></StyledInputText>
             )}
@@ -121,13 +120,6 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
 
           <Controller
             control={control}
-            // rules={{
-            //   required: "This field is required",
-            //   pattern: {
-            //     value: /^[a-zA-Z ]*$/,
-            //     message: "No numbers allowed",
-            //   },
-            // }}
             render={({ field }) => (
               <StyledInputText labelText='City' placeholder='' {...field}></StyledInputText>
             )}
@@ -137,54 +129,71 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
 
           <View style={styles.btnContainer}>
             <StyledText style={styles.comparisonTitle} textStyle="title6">Internal Comparison with:</StyledText>
-            <RadioButton.Group onValueChange={newValue => setGPSType(newValue)} value={GPSType}>
-              <View >
-                <View>
-                  <View style={styles.flex}>
-                    <RadioButton value='true' color={Colors.accent200} />
-                    <StyledText>True GPS</StyledText>
-                  </View>
-                  <View style={styles.optionSubtitleContainer}>
-                    <View style={styles.optionSubtitleBadge}>
-                      <StyledText>UUS - Ohio - Massillon</StyledText>
+            <Controller
+              control={control}
+              name="GPSOption"
+              rules={{ required: "Please select an option" }}
+              render={({ field: { onChange, value } }) => (
+                <RadioButton.Group onValueChange={onChange} value={value}>
+                  <View >
+                    <View>
+                      <View style={styles.flex}>
+                        <RadioButton value='true' color={Colors.accent200} />
+                        <StyledText>True GPS</StyledText>
+                      </View>
+                      <View style={styles.optionSubtitleContainer}>
+                        <View style={styles.optionSubtitleBadge}>
+                          <StyledText>UUS - Ohio - Massillon</StyledText>
+                        </View>
+                        <View style={styles.optionSubtitleBadge}>
+                          <StyledText>40.79434, -81.52214</StyledText>
+                        </View>
+                      </View>
                     </View>
-                    <View style={styles.optionSubtitleBadge}>
-                      <StyledText>40.79434, -81.52214</StyledText>
+                  </View>
+
+                  <View>
+                    <View style={styles.flex}>
+                      <RadioButton value='hacked' color={Colors.accent200} />
+                      <StyledText>Hacked GPS</StyledText>
+                    </View>
+                    <View style={styles.optionSubtitleContainer}>
+                      <View style={styles.optionSubtitleBadge}>
+                        <StyledText >US - NY - New York</StyledText>
+                      </View>
+                      <View style={styles.optionSubtitleBadge}>
+                        <StyledText>40.61454, -73.82024</StyledText>
+                      </View>
                     </View>
                   </View>
-                </View>
-              </View>
 
-              <View>
-                <View style={styles.flex}>
-                  <RadioButton value='hacked' color={Colors.accent200} />
-                  <StyledText>Hacked GPS</StyledText>
-                </View>
-                <View style={styles.optionSubtitleContainer}>
-                  <View style={styles.optionSubtitleBadge}>
-                    <StyledText >US - NY - New York</StyledText>
-                  </View>
-                  <View style={styles.optionSubtitleBadge}>
-                    <StyledText>40.61454, -73.82024</StyledText>
-                  </View>
-                </View>
-              </View>
+                  <View style={{ marginTop: 20 }}>
+                    <View style={styles.flex}>
+                      <Controller
+                        control={control}
+                        name="UseAPC"
+                        render={({ field: { onChange, value } }) => (
+                          <CheckboxWithText
+                            label="Use Azure Programmable Connectivity Backend"
+                            checked={value}
+                            onToggle={() => onChange(!value)}
+                          />
+                        )}
+                      />
+                    </View>
 
-              <View style={{ marginTop: 20 }}>
-                <View style={styles.flex}>
-                  <CheckboxWithText label='Use Azure Programmable Connectivity Backend' checked={useAPC} onToggle={() => setUseAPC(!useAPC)} />
-                </View>
-
-                <View style={styles.optionSubtitleContainer}>
-                  <View style={styles.optionSubtitleBadge}>
-                    <StyledText>US - Ohio - Massillon</StyledText>
+                    <View style={styles.optionSubtitleContainer}>
+                      <View style={styles.optionSubtitleBadge}>
+                        <StyledText>US - Ohio - Massillon</StyledText>
+                      </View>
+                      <View style={styles.optionSubtitleBadge}>
+                        <StyledText>40.79161, -81.52079</StyledText>
+                      </View>
+                    </View>
                   </View>
-                  <View style={styles.optionSubtitleBadge}>
-                    <StyledText>40.79161, -81.52079</StyledText>
-                  </View>
-                </View>
-              </View>
-            </RadioButton.Group>
+                </RadioButton.Group>
+              )}
+            />
           </View>
           <Button
             title='Submit'
