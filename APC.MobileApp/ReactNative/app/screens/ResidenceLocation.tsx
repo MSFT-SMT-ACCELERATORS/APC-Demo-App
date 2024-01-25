@@ -42,6 +42,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
 
   const onFormValid = async (data: FieldValues) => {
     console.log('Submitted Data:', data);
+    navigation.navigate('StarterPage');
 
     let coordsForm = await APCService.findCoords(data.Country, data.StateProvince, data.City);
 
@@ -65,7 +66,6 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
     }
 
 
-    navigation.navigate('StarterPage');
   }
 
   useEffect(() => {
