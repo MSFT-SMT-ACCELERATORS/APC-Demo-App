@@ -4,8 +4,8 @@ import { Float } from 'react-native/Libraries/Types/CodegenTypes';
 export type AppConfiguration = {
   offlineMode: boolean;
   offlineSimSwapDetected: boolean;
-  offlineCoordsX: string;
-  offlineCoordsY: string;  
+  offlineLatitude: number;
+  offlineLongitude: number;  
 
   apcMockMode: boolean;
 
@@ -24,6 +24,7 @@ export const storeConfigurations = async (configurations: AppConfiguration) => {
 };
 
 export const readConfigurations = async (): Promise<AppConfiguration | null> => {
+  // await AsyncStorage.clear();
   try {
     const jsonValue = await AsyncStorage.getItem(CONFIG_KEY);
     return jsonValue != null ? JSON.parse(jsonValue) : null;

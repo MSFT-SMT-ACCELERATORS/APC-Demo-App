@@ -17,6 +17,7 @@ import Demo from './app/screens/Demo';
 import Success from './app/screens/Success';
 import { ApiClientProvider } from './app/api/ApiClientProvider';
 import Steps from './app/screens/Steps';
+import Debug from './app/screens/Debug';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,10 +26,11 @@ function App() {
     <ApiClientProvider>
       <PaperProvider>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="Welcome">
+          <Stack.Navigator initialRouteName="Steps">
             <Stack.Screen name="Landing" component={Landing} options={{ headerShown: false }} />
             <Stack.Screen name="TestProgress" component={TestProgress} />
             <Stack.Screen name="Demo" component={Demo} options={{ header: () => <Header /> }} />
+            <Stack.Screen name="Debug" component={Debug} options={{ header: () => <Header /> }} />
             <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false }} />
             <Stack.Screen name="Consents" component={Consents} options={{ header: () => <Header /> }} />
             <Stack.Screen name="Steps" component={Steps} options={{ header: () => <Header /> }} />

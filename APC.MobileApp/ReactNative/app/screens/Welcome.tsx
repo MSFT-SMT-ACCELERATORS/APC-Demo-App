@@ -27,6 +27,11 @@ function Welcome() {
         style={styles.button}
         onPress={() => navigation.navigate('Demo')}
       />
+      <Button
+        title="Debug"
+        style={styles.button}
+        onPress={() => navigation.navigate('Debug')}
+      />
     </View>
   );
 }

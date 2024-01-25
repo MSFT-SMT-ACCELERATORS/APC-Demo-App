@@ -12,11 +12,12 @@ import { RadioButton } from 'react-native-paper';
 import StyledText from '../components/StyledText';
 import { useEffect, useState } from 'react';
 import textStyles from '../themes/Texts';
-import { useApiClient } from '../api/ApiClientProvider';
 import AppContainer from '../components/AppContainer';
 import CheckboxWithText from '../components/CheckBox';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
-
+import { LocationObject, LocationObjectCoords } from 'expo-location';
+import * as APCService from '../utils/APCService'
+import { useApiClient } from '../api/ApiClientProvider';
 interface StepProps {
   setProgress: (progress: number) => void;
 }
@@ -24,41 +25,74 @@ interface StepProps {
 const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
   const navigation = useNavigation();
   const apiClient = useApiClient();
-  const [value, setValue] = useState('hacked');
+
+  const [GPSType, setGPSType] = useState('true');
   const [useAPC, setUseAPC] = useState(true);
-    
+  const [ip, setIP] = useState<string>();
+  const [ipify, setIpify] = useState<string>();
+  const [location, setLocation] = useState<LocationObjectCoords>();
+
   const { control, handleSubmit, formState: { errors }, } = useForm({
     defaultValues: {
       Country: '',
       City: '',
       StateProvince: ''
-    }});
+    }
+  });
 
-  const onFormValid = (data: FieldValues) => {
+  const onFormValid = async (data: FieldValues) => {
     console.log('Submitted Data:', data);
-
     // navigation.navigate('StarterPage');
+
+    let coordsForm = await APCService.findCoords(data.Country, data.StateProvince, data.City);
+
+    let coords: LocationObjectCoords;
+    if (GPSType == 'true')
+      coords = (await APCService.getDeviceGPSLocation());
+    else
+      coords = coordsForm;
+
+    // APC validation
+    if (useAPC) {
+      const response = await APCService.matchesAPCLocation(apiClient, coords);
+
+      if (!response.verificationResult)
+        throw "APC validation failed!!";
+    }
+    
+    // Business validation
+    if (!await APCService.matchesCoords(coords, coordsForm)) {
+      throw "Business validation failed!!";
+    }
   }
 
   useEffect(() => {
     setProgress(25);
+
+    APCService.ipify().then(setIpify)
+    APCService.getIPAddress().then(setIP).catch(setIP);
+    APCService.getDeviceGPSLocation().then(setLocation);
+
   }, [setProgress]);
 
   return (
     <AppContainer>
       <ScrollView style={styles.container}>
+        <Text>Location: {location?.latitude}, {location?.longitude}</Text>
+        <Text>Network IP: {ip}</Text>
+        <Text>Ipify IP: {ipify}</Text>
         <View>
           <Text style={{ 'fontSize': 30, 'color': '#FFF', fontWeight: "bold", alignSelf: "center" }}>Residence Location</Text>
           <Text style={{ 'fontSize': 16, 'color': '#AAA', fontWeight: "normal", alignSelf: "center", width: '100%', textAlign: 'center' }}>Please, select your country and state/province of residence</Text>
           <Controller
             control={control}
-            rules={{
-              required: "This field is required",
-              pattern: {
-                value: /^[a-zA-Z ]*$/,
-                message: "No numbers allowed",
-              },
-            }}
+            // rules={{
+            //   required: "This field is required",
+            //   pattern: {
+            //     value: /^[a-zA-Z ]*$/,
+            //     message: "No numbers allowed",
+            //   },
+            // }}
             render={({ field }) => (
               <StyledInputText labelText="Country" placeholder="" {...field}></StyledInputText>
             )}
@@ -68,13 +102,13 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
 
           <Controller
             control={control}
-            rules={{
-              required: "This field is required",
-              pattern: {
-                value: /^[a-zA-Z ]*$/,
-                message: "No numbers allowed",
-              },
-            }}
+            // rules={{
+            //   required: "This field is required",
+            //   pattern: {
+            //     value: /^[a-zA-Z ]*$/,
+            //     message: "No numbers allowed",
+            //   },
+            // }}
             render={({ field }) => (
               <StyledInputText labelText="State/Province" placeholder="" {...field}></StyledInputText>
             )}
@@ -85,13 +119,13 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
 
           <Controller
             control={control}
-            rules={{
-              required: "This field is required",
-              pattern: {
-                value: /^[a-zA-Z ]*$/,
-                message: "No numbers allowed",
-              },
-            }}
+            // rules={{
+            //   required: "This field is required",
+            //   pattern: {
+            //     value: /^[a-zA-Z ]*$/,
+            //     message: "No numbers allowed",
+            //   },
+            // }}
             render={({ field }) => (
               <StyledInputText labelText="City" placeholder="" {...field}></StyledInputText>
             )}
@@ -101,7 +135,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
 
           <View style={styles.btnContainer}>
             <StyledText style={styles.comparisonTitle} textStyle="title6">Internal Comparison with:</StyledText>
-            <RadioButton.Group onValueChange={newValue => setValue(newValue)} value={value}>
+            <RadioButton.Group onValueChange={newValue => setGPSType(newValue)} value={GPSType}>
               <View >
                 <View>
                   <View style={styles.flex}>
