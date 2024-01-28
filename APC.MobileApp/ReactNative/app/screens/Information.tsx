@@ -56,7 +56,7 @@ const Information: React.FC<StepProps> = ({ setProgress }) => {
 
       <View style={[styles.footer]}>
         <Button
-          title="Accept"
+          title="Request"
           style={[styles.button]}
           size='long'
           useGradient={true}
