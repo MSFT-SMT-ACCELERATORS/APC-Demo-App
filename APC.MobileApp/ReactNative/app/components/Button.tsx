@@ -19,7 +19,7 @@ interface ButtonProps {
   titleColor?: any;
   onPress: (event: GestureResponderEvent) => void;
   style?: StyleProp<ViewStyle>;
-  border? : boolean;
+  outline? : boolean;
   size?: ButtonSize;
   showIcon?: boolean;
   iconLib?: 'Ionicons' | 'FontAwesome' | 'MaterialIcons' | 'MaterialCommunity';
@@ -35,7 +35,7 @@ const Button: React.FC<ButtonProps> = ({
   titleColor = 'primary300',
   onPress,
   style,
-  border = false,
+  outline = false,
   size = 'normal',
   useGradient = false,
   showIcon = false,
@@ -54,7 +54,7 @@ const Button: React.FC<ButtonProps> = ({
   // const buttonStyle = ([btnStyles.buttonStyles[size]]);
 
   const buttonStyle = [btnStyles.buttonStyles[size]];
-  const buttonBorder = border ? ([styles.border]): null;
+  const buttonBorder = outline ? ([styles.outline]): null;
   let IconComponent;
   switch (iconLib) {
     case 'FontAwesome':
@@ -77,7 +77,7 @@ const Button: React.FC<ButtonProps> = ({
 
 
   const textElement =  title ? (
-    <StyledText customStyle={[titleSize]} color={titleColor} style={{lineHeight: 15}}>{title}</StyledText>
+    <StyledText customStyle={[titleSize]} color={titleColor} style={{}}>{title}</StyledText>
   ) : null;
 
   const content = (
@@ -89,11 +89,11 @@ const Button: React.FC<ButtonProps> = ({
 
   return (
     <TouchableOpacity onPress={onPress} onPressIn={() => setIsPressed(true)}
-      onPressOut={() => setIsPressed(false)} style={[buttonStyle, buttonBorder, style]}>
+      onPressOut={() => setIsPressed(false)}>
       {useGradient? (
         <LinearGradient
           colors={[palette.accent100, palette.accent200]}
-          style={styles.content}
+          style={[buttonStyle, buttonBorder, style]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
         >
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     // Estilos del botón cuando está presionado
     backgroundColor: '#000',
   },
-  border: {
+  outline: {
     borderStyle: 'solid',
     borderWidth: 2,
     borderRadius: 6,
@@ -125,7 +125,8 @@ const styles = StyleSheet.create({
   },
   content: {
     width: '100%',
-    height: '100%',
+    height: undefined,
+    padding: 10,
     alignItems: 'center',
     justifyContent: 'center'
   }

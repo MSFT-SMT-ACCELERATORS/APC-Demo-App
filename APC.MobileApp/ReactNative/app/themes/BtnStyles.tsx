@@ -18,7 +18,7 @@ export const btnStyles = {
 
     },
     long: {
-      height: 50,
+      height: 80,
       width: '100%',
       alignItems: 'center',
       justifyContent: 'center',

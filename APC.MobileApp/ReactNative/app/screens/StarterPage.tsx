@@ -43,7 +43,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
               style={[customStyles.my3]}
               size='square'
               showIcon={true}
-              border={true}
+              outline={true}
               iconLib='MaterialIcons'
               iconName={'attach-money'}
               iconSize={50}
@@ -57,7 +57,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
               style={[customStyles.my3]}
               size='square'
               showIcon={true}
-              border={true}
+              outline={true}
               iconLib='Ionicons'
               iconName={'calendar-outline'}
               iconSize={50}
@@ -73,7 +73,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
               style={[customStyles.my3]}
               size='square'
               showIcon={true}
-              border={true}
+              outline={true}
               iconLib='MaterialCommunity'
               iconName={'truck-check-outline'}
               iconSize={45}
@@ -87,7 +87,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
               style={[customStyles.my3]}
               size='square'
               showIcon={true}
-              border={true}
+              outline={true}
               iconLib='Ionicons'
               iconName={'wallet-outline'}
               iconSize={50}
