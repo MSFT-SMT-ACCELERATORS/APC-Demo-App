@@ -1,13 +1,9 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image, ScrollView } from 'react-native';
+import { useEffect } from 'react';
+import { StyleSheet, View, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Constants from 'expo-constants';
 
-import Colors from '../themes/Colors';
 import Button from '../components/Button'
-import ProgressBar from '../components/ProgressBar';
 import StyledInputText from '../components/StyledInputText';
 import StyledText from '../components/StyledText';
 import palette from '../themes/Colors';
@@ -69,7 +65,8 @@ const Information: React.FC<StepProps> = ({ setProgress }) => {
 
 const styles = StyleSheet.create({
   parent: {
-    width:' 100%',
+    flex: 1,
+    width: '100%',
     backgroundColor: palette.primary300
   },
   title: {
@@ -85,7 +82,7 @@ const styles = StyleSheet.create({
     marginBottom: 100
   },
   bodyContent: {
-    width:' 100%',
+    width: ' 100%',
     justifyContent: 'center',
     gap: 25,
     marginBottom: 30

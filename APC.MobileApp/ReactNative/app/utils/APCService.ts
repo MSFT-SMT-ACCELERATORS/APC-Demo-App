@@ -112,17 +112,11 @@ export const matchesAPCLocation = async (client: APCApi, coords: Location.Locati
     return response.data;
 }
 
-export const findCoords = async (country: string, state: string, city: string): Promise<Location.LocationObjectCoords> => {
-    const config = await readConfigurations();
-
-    if (!config) {
-        throw "Config is not defined";
-    }
-
+export const getLocationCoords = (latitude: number, longitude: number, accuracy: number = 1000) => {
     return {
-        latitude: 39.4801,
-        longitude: -0.3634,
-        accuracy: 1000,
+        latitude: latitude,
+        longitude: longitude,
+        accuracy: accuracy,
         altitude: null,
         altitudeAccuracy: null,
         heading: null,

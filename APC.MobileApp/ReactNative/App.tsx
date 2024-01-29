@@ -15,24 +15,12 @@ import Steps from './app/screens/Steps';
 import Debug from './app/screens/Debug';
 import axios from 'axios';
 import { useEffect } from 'react';
+import * as BingService from './app/utils/BingService'
+import { LocationObjectCoords } from 'expo-location';
 
 const Stack = createNativeStackNavigator();
 
 function App() {
-
-  const getData = async () => {
-    try {
-      const res = await axios.get('https://api.ipify.org/?format=json');
-      console.log(res.data);
-    } catch (error) {
-      console.error('Error al obtener los datos:', error);
-    }
-  };
-
-  useEffect(() => {
-    getData();
-  }, []);
-
   return (
     <ApiClientProvider>
       <PaperProvider>
