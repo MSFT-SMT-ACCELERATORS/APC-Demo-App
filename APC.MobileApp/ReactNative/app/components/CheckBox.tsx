@@ -19,8 +19,8 @@ interface CheckboxWithTextProps {
 const defaultStyles = StyleSheet.create({
   flex: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
+    // justifyContent: 'flex-start',
+    // alignItems: 'center',
   },
   checkbox: {
     marginTop: 5,
@@ -35,11 +35,12 @@ const defaultStyles = StyleSheet.create({
     backgroundColor: palette.accent200,
   },
   text: {
-    color: '#FFF',
+    color: palette.neutral,
     flex: 1,
     textAlign: 'justify',
   },
 });
+
 
 const CheckboxWithText: React.FC<CheckboxWithTextProps> = ({ label, checked, onToggle, styles = {} }) => {
   return (
@@ -47,10 +48,10 @@ const CheckboxWithText: React.FC<CheckboxWithTextProps> = ({ label, checked, onT
       <Checkbox
         status={checked ? 'checked' : 'unchecked'}
         onPress={onToggle}
-        uncheckedColor={palette.accent200} // Personaliza el color no seleccionado
-        color={palette.accent200} // Personaliza el color seleccionado
+        uncheckedColor={palette.accent200}
+        color={palette.accent200}  
       />
-      <StyledText>{label}</StyledText>
+      <StyledText style={defaultStyles.text}>{label}</StyledText>
     </View>
   );
 };

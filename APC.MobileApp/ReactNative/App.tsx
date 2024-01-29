@@ -1,5 +1,3 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider as PaperProvider } from 'react-native-paper';
@@ -9,10 +7,7 @@ import Header from './app/components/Header';
 import Welcome from './app/screens/Welcome';
 import Landing from './app/screens/Landing';
 import Consents from './app/screens/Consents';
-import ResidenceLocation from './app/screens/ResidenceLocation';
-import StarterPage from './app/screens/StarterPage';
 import TestProgress from './app/screens/TestProgress';
-import Information from './app/screens/Information';
 import Demo from './app/screens/Demo';
 import Success from './app/screens/Success';
 import { ApiClientProvider } from './app/api/ApiClientProvider';
