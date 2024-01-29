@@ -11,13 +11,16 @@ import StyledInputText from '../components/StyledInputText';
 import { RadioButton } from 'react-native-paper';
 import StyledText from '../components/StyledText';
 import { useEffect, useState } from 'react';
-import textStyles from '../themes/Texts';
 import AppContainer from '../components/AppContainer';
 import CheckboxWithText from '../components/CheckBox';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
 import { LocationObject, LocationObjectCoords } from 'expo-location';
 import * as APCService from '../utils/APCService'
+import * as BingService from '../utils/BingService'
 import { useApiClient } from '../api/ApiClientProvider';
+import { Picker } from '@react-native-picker/picker';
+import cities from '../utils/cities.json'
+
 interface StepProps {
   setProgress: (progress: number) => void;
 }
@@ -25,26 +28,48 @@ interface StepProps {
 const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
   const navigation = useNavigation();
   const apiClient = useApiClient();
+  const [hackedGPS, setHackedGPS] = useState<LocationObjectCoords>();
+  const [gpsCoords, setGPSCoords] = useState<LocationObjectCoords>();
+  const [apcCoords, setAPCCoords] = useState<LocationObjectCoords>();
+  const [gpsLocation, setGPSLocation] = useState<BingService.Location | null>();
+  const [apcLocation, setAPCLocation] = useState<BingService.Location | null>();
 
-  const [ip, setIP] = useState<string>();
-  const [ipify, setIpify] = useState<string>();
-  const [location, setLocation] = useState<LocationObjectCoords>();
-
-  const { control, handleSubmit, formState: { errors }, getValues } = useForm({
+  const { control, handleSubmit, formState: { errors }, getValues, watch, setValue } = useForm({
     defaultValues: {
       Country: '',
       City: '',
       StateProvince: '',
       UseAPC: true,
-      GPSOption: "true"
+      GPSOption: 'true'
     }
   });
+
+  const handleCountryChange = (country: string) => {
+    setValue('Country', country);
+    const firstStateOption = cities.filter(item => item.country === country).map(item => item.state)[0] || '';
+    setValue('StateProvince', firstStateOption);
+    handleStateChange(firstStateOption)
+  };
+  const handleStateChange = (state: string) => {
+    setValue('StateProvince', state);
+    const firstCityOption = cities.filter(item => item.country == getValues('Country') && item.state === state).map(item => item.city)[0] || '';
+    setValue('City', firstCityOption);
+    handleCityChange(firstCityOption);
+  };
+  const handleCityChange = (city: string) => {
+    setValue('City', city);
+
+    const selectedCity = cities.filter(d => d.country == getValues('Country') && d.state == getValues('StateProvince') && d.city == city)[0];
+
+    setHackedGPS(APCService.getLocationCoords(selectedCity.latitude, selectedCity.longitude));
+  }
 
   const onFormValid = async (data: FieldValues) => {
     console.log('Submitted Data:', data);
     navigation.navigate('StarterPage');
+    const selectedCity = cities.filter(d => d.country == data.Country && d.state == data.StateProvince && d.city == data.City)[0];
 
-    let coordsForm = await APCService.findCoords(data.Country, data.StateProvince, data.City);
+    let coordsForm = await APCService.getLocationCoords(selectedCity.latitude, selectedCity.longitude);
 
     let coords: LocationObjectCoords;
     if (data.GPSOption == 'true')
@@ -57,82 +82,127 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
       const response = await APCService.matchesAPCLocation(apiClient, coords);
 
       if (!response.verificationResult)
-        console.error("APC validation failed!!");
+        console.error('APC validation failed!!');
     }
 
     // Business validation
     if (!await APCService.matchesCoords(coords, coordsForm)) {
-      console.error("Business validation failed!!");
+      console.error('Business validation failed!!');
     }
 
 
   }
-
   useEffect(() => {
     setProgress(25);
+    APCService.getDeviceGPSLocation().then((coords) => {
+      setGPSCoords(coords);
+      return BingService.translateCoordsToLocation(coords)
+    })
+      .then(setGPSLocation);
 
-    APCService.ipify().then(setIpify)
-    APCService.getIPAddress().then(setIP).catch(setIP);
-    APCService.getDeviceGPSLocation().then(setLocation);
+    APCService.getAPCLocation(apiClient).then((coords) => {
 
+      setAPCCoords(coords);
+      return BingService.translateCoordsToLocation(coords)
+    })
+      .then(setAPCLocation);
+
+    const firstCountry = cities
+      .map(item => item.country)
+      .filter((value, index, self) => self.indexOf(value) === index)[0];
+    handleCountryChange(firstCountry);
   }, [setProgress]);
 
   return (
     <AppContainer>
       <ScrollView style={styles.container}>
-        <Text>Location: {location?.latitude}, {location?.longitude}</Text>
-        <Text>Network IP: {ip}</Text>
-        <Text>Ipify IP: {ipify}</Text>
         <View>
           <Text style={{ 'fontSize': 30, 'color': '#FFF', fontWeight: 'bold', alignSelf: 'center' }}>Residence Location</Text>
           <Text style={{ 'fontSize': 16, 'color': '#AAA', fontWeight: 'normal', alignSelf: 'center', width: '100%', textAlign: 'center' }}>Please, select your country and state/province of residence</Text>
           <Controller
+            name='Country'
             control={control}
             // rules={{
-            //   required: "This field is required",
+            //   required: 'This field is required',
             //   pattern: {
             //     value: /^[a-zA-Z ]*$/,
-            //     message: "No numbers allowed",
+            //     message: 'No numbers allowed',
             //   },
             //   validate: {
             //     startsWithCapital: (value: string) => {
             //       const otherValue = getValues('StateProvince'); // we can check other field values
-            //       return value.charAt(0) === value.charAt(0).toUpperCase() || "City must start with a capital letter";
+            //       return value.charAt(0) === value.charAt(0).toUpperCase() || 'City must start with a capital letter';
             //     }
             //   },
             // }}
             render={({ field }) => (
-              <StyledInputText labelText='Country' placeholder='' {...field}></StyledInputText>
+              <Picker
+                selectedValue={field.value}
+                onValueChange={handleCountryChange}
+              >
+                {cities
+                  .map(item => item.country)
+                  .filter((value, index, self) => self.indexOf(value) === index)
+                  .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }))
+                  .map((item, index) => (
+                    <Picker.Item key={index} label={item} value={item} />
+                  ))}
+              </Picker>
             )}
-            name='Country'
           />
           {errors.Country && <StyledText customStyle={['regular']} color='danger200'>{errors.Country.message}</StyledText>}
 
           <Controller
+            name='StateProvince'
             control={control}
             render={({ field }) => (
-              <StyledInputText labelText='State/Province' placeholder='' {...field}></StyledInputText>
+              <Picker
+                selectedValue={field.value}
+                onValueChange={handleStateChange}
+                enabled={!!getValues('Country')}
+              >
+                {cities
+                  .filter(item => item.country === getValues('Country'))
+                  .map(item => item.state)
+                  .filter((value, index, self) => self.indexOf(value) === index)
+                  .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }))
+                  .map((state, index) => (
+                    <Picker.Item key={index} label={state} value={state} />
+                  ))}
+              </Picker>
             )}
-            name='StateProvince'
           />
           {errors.StateProvince && <StyledText color='danger200'>{errors.StateProvince.message}</StyledText>}
 
 
           <Controller
+            name='City'
             control={control}
             render={({ field }) => (
-              <StyledInputText labelText='City' placeholder='' {...field}></StyledInputText>
+              <Picker
+                selectedValue={field.value}
+                onValueChange={handleCityChange}
+                enabled={!!getValues('StateProvince')}
+              >
+                {cities
+                  .filter(item => item.country == getValues('Country') && item.state === getValues('StateProvince'))
+                  .map(item => item.city)
+                  .filter((value, index, self) => self.indexOf(value) === index)                  
+                  .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }))
+                  .map((city, index) => (
+                    <Picker.Item key={index} label={city} value={city} />
+                  ))}
+              </Picker>
             )}
-            name='City'
           />
           {errors.City && <StyledText color='danger200'>{errors.City.message}</StyledText>}
 
           <View style={styles.btnContainer}>
-            <StyledText style={styles.comparisonTitle} textStyle="title6">Internal Comparison with:</StyledText>
+            <StyledText style={styles.comparisonTitle} textStyle='title6'>Internal Comparison with:</StyledText>
             <Controller
               control={control}
-              name="GPSOption"
-              rules={{ required: "Please select an option" }}
+              name='GPSOption'
+              rules={{ required: 'Please select an option' }}
               render={({ field: { onChange, value } }) => (
                 <RadioButton.Group onValueChange={onChange} value={value}>
                   <View >
@@ -143,10 +213,10 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
                       </View>
                       <View style={styles.optionSubtitleContainer}>
                         <View style={styles.optionSubtitleBadge}>
-                          <StyledText>UUS - Ohio - Massillon</StyledText>
+                          <StyledText>{gpsLocation?.country} - {gpsLocation?.state} - {gpsLocation?.city}</StyledText>
                         </View>
                         <View style={styles.optionSubtitleBadge}>
-                          <StyledText>40.79434, -81.52214</StyledText>
+                          <StyledText>{gpsCoords?.latitude}, {gpsCoords?.longitude}</StyledText>
                         </View>
                       </View>
                     </View>
@@ -157,24 +227,28 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
                       <RadioButton value='hacked' color={Colors.accent200} />
                       <StyledText>Hacked GPS</StyledText>
                     </View>
-                    <View style={styles.optionSubtitleContainer}>
-                      <View style={styles.optionSubtitleBadge}>
-                        <StyledText >US - NY - New York</StyledText>
-                      </View>
-                      <View style={styles.optionSubtitleBadge}>
-                        <StyledText>40.61454, -73.82024</StyledText>
-                      </View>
-                    </View>
+                    {
+                      getValues('Country') && getValues('StateProvince') && getValues('City') ? (
+                        <View style={styles.optionSubtitleContainer}>
+                          <View style={[styles.optionSubtitleBadge]}>
+                            <StyledText>{getValues('Country')} - {getValues('StateProvince')} - {getValues('City')}</StyledText>
+                          </View>
+                          <View style={styles.optionSubtitleBadge}>
+                            <StyledText>{hackedGPS?.latitude}, {hackedGPS?.longitude}</StyledText>
+                          </View>
+                        </View>
+                      ) : null
+                    }
                   </View>
 
                   <View style={{ marginTop: 20 }}>
                     <View style={styles.flex}>
                       <Controller
                         control={control}
-                        name="UseAPC"
+                        name='UseAPC'
                         render={({ field: { onChange, value } }) => (
                           <CheckboxWithText
-                            label="Use Azure Programmable Connectivity Backend"
+                            label='Use Azure Programmable Connectivity Backend'
                             checked={value}
                             onToggle={() => onChange(!value)}
                           />
@@ -184,10 +258,10 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
 
                     <View style={styles.optionSubtitleContainer}>
                       <View style={styles.optionSubtitleBadge}>
-                        <StyledText>US - Ohio - Massillon</StyledText>
+                        <StyledText>{apcLocation?.country} - {apcLocation?.state} - {apcLocation?.city}</StyledText>
                       </View>
                       <View style={styles.optionSubtitleBadge}>
-                        <StyledText>40.79161, -81.52079</StyledText>
+                        <StyledText>{apcCoords?.latitude}, {apcCoords?.longitude}</StyledText>
                       </View>
                     </View>
                   </View>
