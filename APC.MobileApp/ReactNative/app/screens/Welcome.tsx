@@ -15,10 +15,10 @@ function Welcome() {
   const navigation = useNavigation();
 
   return (
-    <AppContainer>
+    <AppContainer >
       <StatusBar style='light' />
-      <View style={[styles.settings]}>
-        <View >
+      <View style={[styles.container]}>
+        <View style={styles.settings}>
           <Button
             showIcon={true}
             size='fit'
@@ -26,12 +26,12 @@ function Welcome() {
             iconName={'settings-outline'}
             iconColor={palette.accent200}
             iconSize={30}
-            style={[customStyles.mr2]}
+            style={[customStyles.mr1]}
             useGradient={false}
             onPress={() => navigation.navigate('Demo')}
           />
         </View>
-        <View style={[styles.container]}>
+        <View style={[styles.bodyContainer]}>
           <Image source={require('../../assets/images/logo.png')} style={styles.image} resizeMode='contain' />
           <StyledText customStyle={['title1', 'extrabold']}>Your Loan, Just a Touch Away</StyledText>
           <StyledText customStyle={['title2', 'light']}>Get a Personal Line of Credit Between</StyledText>
@@ -50,9 +50,10 @@ function Welcome() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  bodyContainer: {
     flex: 1,
     backgroundColor: Colors.primary300,
+    width: '100%',
     alignItems: 'flex-start',
     justifyContent: 'center',
     gap: 15,
@@ -65,12 +66,16 @@ const styles = StyleSheet.create({
     maxWidth: 300,
     maxHeight: 100,
   },
-  settings: {
+  container: {
     flex: 1,
     backgroundColor: palette.primary300,
     justifyContent: 'flex-start',
-    alignItems: 'flex-end',
-    paddingTop: Constants.statusBarHeight + 10
+    alignItems: 'flex-start',
+    paddingTop: Constants.statusBarHeight + 10,
+    width: '100%'
+  },
+  settings: {
+    alignSelf: 'flex-end'
   }
 });
 

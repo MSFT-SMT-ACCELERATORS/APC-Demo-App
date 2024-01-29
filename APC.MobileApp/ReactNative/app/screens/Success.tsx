@@ -32,8 +32,8 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         justifyContent: 'center',
         alignItems: "center",
-        margin: 30,
-        gap: 20
+        gap: 20,
+        width: '100%'
     },
     textCentered:{
         textAlign: 'center'
