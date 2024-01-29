@@ -11,14 +11,10 @@ import StyledInputText from '../components/StyledInputText';
 import { RadioButton } from 'react-native-paper';
 import StyledText from '../components/StyledText';
 import { useEffect, useState } from 'react';
-import textStyles from '../themes/Texts';
 import { useApiClient } from '../api/ApiClientProvider';
 import AppContainer from '../components/AppContainer';
 import CheckboxWithText from '../components/CheckBox';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
-import { LocationObject, LocationObjectCoords } from 'expo-location';
-import * as APCService from '../utils/APCService'
-import { useApiClient } from '../api/ApiClientProvider';
 import customStyles from '../themes/CustomStyles';
 
 interface StepProps {
@@ -28,56 +24,25 @@ interface StepProps {
 const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
   const navigation = useNavigation();
   const apiClient = useApiClient();
+  const [value, setValue] = useState('hacked');
+  const [useAPC, setUseAPC] = useState(true);
 
-  const [ip, setIP] = useState<string>();
-  const [ipify, setIpify] = useState<string>();
-  const [location, setLocation] = useState<LocationObjectCoords>();
-
-  const { control, handleSubmit, formState: { errors }, getValues } = useForm({
+  const { control, handleSubmit, formState: { errors }, } = useForm({
     defaultValues: {
       Country: '',
       City: '',
-      StateProvince: '',
-      UseAPC: true,
-      GPSOption: "true"
+      StateProvince: ''
     }
   });
 
-  const onFormValid = async (data: FieldValues) => {
+  const onFormValid = (data: FieldValues) => {
     console.log('Submitted Data:', data);
-
-    let coordsForm = await APCService.findCoords(data.Country, data.StateProvince, data.City);
-
-    let coords: LocationObjectCoords;
-    if (data.GPSOption == 'true')
-      coords = (await APCService.getDeviceGPSLocation());
-    else
-      coords = coordsForm;
-
-    // APC validation
-    if (data.UseAPC) {
-      const response = await APCService.matchesAPCLocation(apiClient, coords);
-
-      if (!response.verificationResult)
-        console.error("APC validation failed!!");
-    }
-
-    // Business validation
-    if (!await APCService.matchesCoords(coords, coordsForm)) {
-      console.error("Business validation failed!!");
-    }
-
 
     navigation.navigate('StarterPage');
   }
 
   useEffect(() => {
     setProgress(25);
-
-    APCService.ipify().then(setIpify)
-    APCService.getIPAddress().then(setIP).catch(setIP);
-    APCService.getDeviceGPSLocation().then(setLocation);
-
   }, [setProgress]);
 
   return (
@@ -154,127 +119,11 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
             style={[styles.button]}
             size='long'
             useGradient={true}
-            onPress={() => { setProgress(100); navigation.navigate('Information') }} />
+            onPress={() => { setProgress(100); navigation.navigate('StarterPage') }} />
         </View>
       </View>
     </AppContainer>
 
-
-    // <AppContainer>
-    //   <ScrollView style={styles.container}>
-    //     <View>
-    //       <Text style={{ 'fontSize': 30, 'color': '#FFF', fontWeight: 'bold', alignSelf: 'center' }}>Residence Location</Text>
-    //       <Text style={{ 'fontSize': 16, 'color': '#AAA', fontWeight: 'normal', alignSelf: 'center', width: '100%', textAlign: 'center' }}>Please, select your country and state/province of residence</Text>
-    //       <Controller
-    //         control={control}
-    //         rules={{
-    //           required: 'This field is required',
-    //           pattern: {
-    //             value: /^[a-zA-Z ]*$/,
-    //             message: 'No numbers allowed',
-    //           },
-    //         }}
-    //         render={({ field }) => (
-    //           <StyledInputText labelText='Country' placeholder='' {...field}></StyledInputText>
-    //         )}
-    //         name='Country'
-    //       />
-    //       {errors.Country && <StyledText customStyle={['regular']} color='danger200'>{errors.Country.message}</StyledText>}
-
-    //       <Controller
-    //         control={control}
-    //         rules={{
-    //           required: 'This field is required',
-    //           pattern: {
-    //             value: /^[a-zA-Z ]*$/,
-    //             message: 'No numbers allowed',
-    //           },
-    //         }}
-    //         render={({ field }) => (
-    //           <StyledInputText labelText='State/Province' placeholder='' {...field}></StyledInputText>
-    //         )}
-    //         name='StateProvince'
-    //       />
-    //       {errors.StateProvince && <StyledText color='danger200'>{errors.StateProvince.message}</StyledText>}
-
-
-    //       <Controller
-    //         control={control}
-    //         rules={{
-    //           required: 'This field is required',
-    //           pattern: {
-    //             value: /^[a-zA-Z ]*$/,
-    //             message: 'No numbers allowed',
-    //           },
-    //         }}
-    //         render={({ field }) => (
-    //           <StyledInputText labelText='City' placeholder='' {...field}></StyledInputText>
-    //         )}
-    //         name='City'
-    //       />
-    //       {errors.City && <StyledText color='danger200'>{errors.City.message}</StyledText>}
-
-    //       <View style={styles.btnContainer}>
-    //         <StyledText style={styles.comparisonTitle}>Internal Comparison with:</StyledText>
-    //         <RadioButton.Group onValueChange={newValue => setValue(newValue)} value={value}>
-    //           <View >
-    //             <View>
-    //               <View style={styles.flex}>
-    //                 <RadioButton value='true' color={Colors.accent200} />
-    //                 <StyledText>True GPS</StyledText>
-    //               </View>
-    //               <View style={styles.optionSubtitleContainer}>
-    //                 <View style={styles.optionSubtitleBadge}>
-    //                   <StyledText>UUS - Ohio - Massillon</StyledText>
-    //                 </View>
-    //                 <View style={styles.optionSubtitleBadge}>
-    //                   <StyledText>40.79434, -81.52214</StyledText>
-    //                 </View>
-    //               </View>
-    //             </View>
-    //           </View>
-
-    //           <View>
-    //             <View style={styles.flex}>
-    //               <RadioButton value='hacked' color={Colors.accent200} />
-    //               <StyledText>Hacked GPS</StyledText>
-    //             </View>
-    //             <View style={styles.optionSubtitleContainer}>
-    //               <View style={styles.optionSubtitleBadge}>
-    //                 <StyledText >US - NY - New York</StyledText>
-    //               </View>
-    //               <View style={styles.optionSubtitleBadge}>
-    //                 <StyledText>40.61454, -73.82024</StyledText>
-    //               </View>
-    //             </View>
-    //           </View>
-
-    //           <View style={{ marginTop: 20 }}>
-    //             <View style={styles.flex}>
-    //               <CheckboxWithText label='Use Azure Programmable Connectivity Backend' checked={useAPC} onToggle={() => setUseAPC(!useAPC)} />
-    //             </View>
-
-    //             <View style={styles.optionSubtitleContainer}>
-    //               <View style={styles.optionSubtitleBadge}>
-    //                 <StyledText>US - Ohio - Massillon</StyledText>
-    //               </View>
-    //               <View style={styles.optionSubtitleBadge}>
-    //                 <StyledText>40.79161, -81.52079</StyledText>
-    //               </View>
-    //             </View>
-    //           </View>
-    //         </RadioButton.Group>
-    //       </View>
-    //       <Button
-    //         title='Submit'
-    //         style={styles.button}
-    //         useGradient={true}
-    //         onPress={handleSubmit(onFormValid)}
-    //       />
-
-    //     </View>
-    //   </ScrollView>
-    // </AppContainer>
   );
 };
 
