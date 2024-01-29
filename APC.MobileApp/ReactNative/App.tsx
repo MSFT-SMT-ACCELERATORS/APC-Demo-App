@@ -36,7 +36,7 @@ function App() {
     <ApiClientProvider>
       <PaperProvider>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName='Success'>
+          <Stack.Navigator initialRouteName='Welcome'>
             <Stack.Screen name='Landing' component={Landing} options={{ headerShown: false }} />
             <Stack.Screen name='TestProgress' component={TestProgress} />
             <Stack.Screen name='Demo' component={Demo} options={{ header: () => <Header /> }} />

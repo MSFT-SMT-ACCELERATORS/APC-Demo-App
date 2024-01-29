@@ -3,7 +3,6 @@ import { StatusBar } from 'expo-status-bar';
 import Constants from 'expo-constants';
 import { StyleSheet, Text, View, Image, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Button from '../components/Button'
 import palette from '../themes/Colors';
 
 function Header() {

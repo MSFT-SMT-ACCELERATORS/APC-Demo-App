@@ -69,6 +69,7 @@ const Information: React.FC<StepProps> = ({ setProgress }) => {
 
 const styles = StyleSheet.create({
   parent: {
+    width:' 100%',
     backgroundColor: palette.primary300
   },
   title: {
@@ -84,6 +85,7 @@ const styles = StyleSheet.create({
     marginBottom: 100
   },
   bodyContent: {
+    width:' 100%',
     justifyContent: 'center',
     gap: 25,
     marginBottom: 30

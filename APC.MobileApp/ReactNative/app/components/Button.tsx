@@ -88,7 +88,7 @@ const Button: React.FC<ButtonProps> = ({
   );
 
   return (
-    <TouchableOpacity onPress={onPress} onPressIn={() => setIsPressed(true)}
+    <TouchableOpacity style={[buttonStyle, buttonBorder, style]} onPress={onPress} onPressIn={() => setIsPressed(true)}
       onPressOut={() => setIsPressed(false)}>
       {useGradient? (
         <LinearGradient
