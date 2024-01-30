@@ -17,7 +17,7 @@ import * as BingService from '../utils/BingService'
 import { Picker } from '@react-native-picker/picker';
 import cities from '../utils/cities.json'
 import customStyles from '../themes/CustomStyles';
-import RNPickerSelect from 'react-native-picker-select';
+import RNPickerSelect, { PickerStyle } from 'react-native-picker-select';
 
 
 interface StepProps {
@@ -148,6 +148,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
               // }}
               render={({ field }) => (
                 <RNPickerSelect
+                  style={pickerStyle}
                   value={field.value}
                   onValueChange={handleCountryChange}
                   items={cities
@@ -165,12 +166,13 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
               )}
             />
             {errors.Country && <StyledText customStyle={['regular']} color='danger200'>{errors.Country.message}</StyledText>}
-            
+
             <Controller
               name='StateProvince'
               control={control}
               render={({ field }) => (
                 <RNPickerSelect
+                  style={pickerStyle}
                   value={field.value}
                   disabled={!getValues('Country')}
                   onValueChange={handleStateChange}
@@ -195,6 +197,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
               control={control}
               render={({ field }) => (
                 <RNPickerSelect
+                  style={pickerStyle}
                   value={field.value}
                   disabled={!getValues('StateProvince')}
                   onValueChange={handleCityChange}
@@ -398,5 +401,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
+const pickerStyle: PickerStyle = {
+  inputIOS: {
+    color: 'white'
+  }
+};
 
 export default ResidenceLocation;
