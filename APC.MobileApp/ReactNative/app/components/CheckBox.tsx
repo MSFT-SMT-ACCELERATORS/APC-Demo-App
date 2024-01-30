@@ -6,6 +6,8 @@ import StyledText from './StyledText';
 
 interface CheckboxWithTextProps {
   label: string;
+  checked: boolean;
+  onToggle: () => void;
   styles?: {
     container?: object;
     checkbox?: object;
@@ -17,8 +19,8 @@ interface CheckboxWithTextProps {
 const defaultStyles = StyleSheet.create({
   flex: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
+    // justifyContent: 'flex-start',
+    // alignItems: 'center',
   },
   checkbox: {
     marginTop: 5,
@@ -33,30 +35,23 @@ const defaultStyles = StyleSheet.create({
     backgroundColor: palette.accent200,
   },
   text: {
-    color: '#FFF',
+    color: palette.neutral,
     flex: 1,
     textAlign: 'justify',
   },
 });
 
-const CheckboxWithText: React.FC<CheckboxWithTextProps> = ({ label, styles = {} }) => {
-  const [checked, setChecked] = useState(false);
 
-  const handleCheckboxToggle = () => {
-    setChecked(!checked);
-  };
-
-
-
+const CheckboxWithText: React.FC<CheckboxWithTextProps> = ({ label, checked, onToggle, styles = {} }) => {
   return (
-    <View style={defaultStyles.flex }>
+    <View style={defaultStyles.flex}>
       <Checkbox
         status={checked ? 'checked' : 'unchecked'}
-        onPress={handleCheckboxToggle}
-        uncheckedColor={palette.accent200} // Personaliza el color no seleccionado
-        color={palette.accent200} // Personaliza el color seleccionado
+        onPress={onToggle}
+        uncheckedColor={palette.accent200}
+        color={palette.accent200}  
       />
-      <StyledText>{label}</StyledText>
+      <StyledText style={defaultStyles.text}>{label}</StyledText>
     </View>
   );
 };

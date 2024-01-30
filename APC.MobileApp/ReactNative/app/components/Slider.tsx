@@ -10,6 +10,9 @@ interface Props {
     sliderColor?: string;
     gradientColors?: string[];
     formatter?: (value: number) => string;
+    value?: number;
+    onChange?: (value: number) => void;
+    stepSize?: number;
 }
 
 const defaultFormatter = (value: number) => {
@@ -22,13 +25,28 @@ const Slider: React.FC<Props> = ({
     style,
     sliderColor = '#4ad896',
     gradientColors = ['#00fdee', '#4ad896'],
-    formatter = defaultFormatter
+    formatter = defaultFormatter,
+    value=minValue,
+    onChange,
+    stepSize = 50,
 }) => {
     const pan = useRef(new Animated.Value(0)).current;
     const lastPanValue = useRef(0);
     const [sliderWidth, setSliderWidth] = useState(minValue);
     const [sliderValue, setSliderValue] = useState(minValue);
     const [progressWidth, setProgressWidth] = useState(0);
+    
+    useEffect(() => {
+        if(onChange) {
+            const roundedValue = roundToStepSize(sliderValue, stepSize);
+            onChange(roundedValue);
+        }
+    }, [sliderValue, onChange, stepSize]);
+
+    const roundToStepSize = (value: number, stepSize: number) => {
+        const rounded = Math.round(value / stepSize) * stepSize;
+        return Math.max(minValue, Math.min(maxValue, rounded));
+    }
 
     useEffect(() => {
         const listenerId = pan.addListener((value) => {
@@ -41,14 +59,16 @@ const Slider: React.FC<Props> = ({
                     value.value = sliderWidth;
 
                 setProgressWidth(value.value);
-                setSliderValue(interpolate(value.value, 0, sliderWidth, minValue, maxValue));
+                const unroundedValue = interpolate(value.value, 0, sliderWidth, minValue, maxValue);
+                const roundedValue = roundToStepSize(unroundedValue, stepSize);
+                setSliderValue(roundedValue);
             }
         });
 
         return () => {
             pan.removeListener(listenerId);
         };
-    }, [pan, sliderWidth]);
+    }, [pan, sliderWidth, minValue, maxValue, stepSize]);
 
     const panResponder = useRef(PanResponder.create({
         onStartShouldSetPanResponder: () => true,

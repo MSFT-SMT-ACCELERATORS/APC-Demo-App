@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "MSCORP_ACP_Demo",
-    "slug": "MSCORP_ACP_Demo",
+    "name": "MSCORP_APC_Demo",
+    "slug": "MSCORP_APC_Demo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icons/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#3c3c52"
     },
@@ -15,16 +15,23 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.javierginerturing.MSCORP-APC-Demo"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icons/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.javierginerturing.MSCORP_APC_Demo"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icons/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "de29987e-c61b-427b-9a75-6938d9b3b56c"
+      }
     }
   }
 }
