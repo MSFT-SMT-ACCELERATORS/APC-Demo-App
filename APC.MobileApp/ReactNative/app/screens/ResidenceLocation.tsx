@@ -227,7 +227,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
                       <View>
                         <View style={styles.flex}>
                           <RadioButton value='true' color={Colors.accent200} />
-                          <StyledText>True GPS</StyledText>
+                          <StyledText>Device GPS</StyledText>
                         </View>
                         <View style={styles.optionSubtitleContainer}>
                           <View style={styles.optionSubtitleBadge}>
