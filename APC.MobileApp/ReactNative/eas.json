@@ -11,5 +11,14 @@
       "distribution": "internal"
     },
     "production": {}
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "jrbosch92@gmail.com",
+        "ascAppId": "6476621804",
+        "appleTeamId": "UMD9433CYS"
+      }
+    }
   }
 }
