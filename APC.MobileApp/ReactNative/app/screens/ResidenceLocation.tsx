@@ -17,6 +17,9 @@ import * as BingService from '../utils/BingService'
 import { Picker } from '@react-native-picker/picker';
 import cities from '../utils/cities.json'
 import customStyles from '../themes/CustomStyles';
+import RNPickerSelect from 'react-native-picker-select';
+
+
 interface StepProps {
   setProgress: (progress: number) => void;
 }
@@ -41,22 +44,29 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
   });
 
   const handleCountryChange = (country: string) => {
+    if (!country)
+      return;
+
     setValue('Country', country);
     const firstStateOption = cities.filter(item => item.country === country).map(item => item.state)[0] || '';
     setValue('StateProvince', firstStateOption);
     handleStateChange(firstStateOption)
   };
   const handleStateChange = (state: string) => {
+    if (!state)
+      return;
+
     setValue('StateProvince', state);
     const firstCityOption = cities.filter(item => item.country == getValues('Country') && item.state === state).map(item => item.city)[0] || '';
     setValue('City', firstCityOption);
     handleCityChange(firstCityOption);
   };
   const handleCityChange = (city: string) => {
+    if (!city)
+      return;
+
     setValue('City', city);
-
     const selectedCity = cities.filter(d => d.country == getValues('Country') && d.state == getValues('StateProvince') && d.city == city)[0];
-
     setHackedGPS(APCService.getLocationCoords(selectedCity.latitude, selectedCity.longitude));
   }
 
@@ -109,7 +119,6 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
   }, [setProgress]);
 
   return (
-
     <AppContainer>
       <View style={[styles.parent]}>
         <ScrollView style={[styles.contentContainer]}>
@@ -138,40 +147,46 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
               //   },
               // }}
               render={({ field }) => (
-                <Picker
-                  selectedValue={field.value}
+                <RNPickerSelect
+                  value={field.value}
                   onValueChange={handleCountryChange}
-                >
-                  {cities
+                  items={cities
                     .map(item => item.country)
                     .filter((value, index, self) => self.indexOf(value) === index)
                     .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }))
-                    .map((item, index) => (
-                      <Picker.Item key={index} label={item} value={item} />
-                    ))}
-                </Picker>
+                    .map((item) => {
+                      return {
+                        label: item,
+                        value: item
+                      }
+                    })
+                  }
+                />
               )}
             />
             {errors.Country && <StyledText customStyle={['regular']} color='danger200'>{errors.Country.message}</StyledText>}
-
+            
             <Controller
               name='StateProvince'
               control={control}
               render={({ field }) => (
-                <Picker
-                  selectedValue={field.value}
+                <RNPickerSelect
+                  value={field.value}
+                  disabled={!getValues('Country')}
                   onValueChange={handleStateChange}
-                  enabled={!!getValues('Country')}
-                >
-                  {cities
+                  items={cities
                     .filter(item => item.country === getValues('Country'))
                     .map(item => item.state)
                     .filter((value, index, self) => self.indexOf(value) === index)
                     .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }))
-                    .map((state, index) => (
-                      <Picker.Item key={index} label={state} value={state} />
-                    ))}
-                </Picker>
+                    .map((item) => {
+                      return {
+                        label: item,
+                        value: item
+                      }
+                    })
+                  }
+                />
               )}
             />
             {errors.StateProvince && <StyledText color='danger200'>{errors.StateProvince.message}</StyledText>}
@@ -179,20 +194,23 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
               name='City'
               control={control}
               render={({ field }) => (
-                <Picker
-                  selectedValue={field.value}
+                <RNPickerSelect
+                  value={field.value}
+                  disabled={!getValues('StateProvince')}
                   onValueChange={handleCityChange}
-                  enabled={!!getValues('StateProvince')}
-                >
-                  {cities
+                  items={cities
                     .filter(item => item.country == getValues('Country') && item.state === getValues('StateProvince'))
                     .map(item => item.city)
                     .filter((value, index, self) => self.indexOf(value) === index)
                     .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }))
-                    .map((city, index) => (
-                      <Picker.Item key={index} label={city} value={city} />
-                    ))}
-                </Picker>
+                    .map((item) => {
+                      return {
+                        label: item,
+                        value: item
+                      }
+                    })
+                  }
+                />
               )}
             />
             {errors.City && <StyledText color='danger200'>{errors.City.message}</StyledText>}
