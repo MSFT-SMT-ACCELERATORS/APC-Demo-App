@@ -3,15 +3,25 @@ import AppContainer from "../components/AppContainer";
 import StyledText from "../components/StyledText";
 import { FontAwesome5 } from '@expo/vector-icons';
 import Colors from "../themes/Colors";
+import { StatusBar } from 'expo-status-bar';
 
 function Success() {
     return (
         <AppContainer >
-            <View style={styles.container}>
-                <FontAwesome5 name="check-circle" size={200} color={Colors.accent200} />
-                <StyledText textStyle="title1" color="accent200">Credit Approved</StyledText>
-                <StyledText textStyle="title5" color="accent200" style={{textAlign: "center"}}>Congratulations! Your credit has been approved</StyledText>
-            </View>
+            <StatusBar style='light' />
+                <View style={[styles.container]}>
+                    <FontAwesome5 name="check-circle" size={200} color={Colors.accent200} />
+                    <StyledText customStyle={['title2']} color='accent200'>Credit Approved</StyledText>
+                    <StyledText style={styles.textCentered} customStyle={['title4']} color='accent200'>Congratulations! Your credit has been approved</StyledText>
+                    {/* <Button
+                        title='Get Started'
+                        size='normal'
+                        style={customStyles.my4}
+                        useGradient={true}
+                        onPress={() => navigation.navigate('Consents')}
+                    /> */}
+                </View>
+
         </AppContainer>
     );
 };
@@ -20,10 +30,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexGrow: 1,
-        justifyContent: 'center', 
+        justifyContent: 'center',
         alignItems: "center",
-        margin: 30,
-        gap: 20
+        gap: 20,
+        width: '100%'
+    },
+    textCentered:{
+        textAlign: 'center'
     }
 });
 

@@ -15,15 +15,14 @@ import textStyles from '../themes/Texts';
 import Checkbox from '../components/CheckBox';
 import AppContainer from '../components/AppContainer';
 
-
 function Demo() {
     const navigation = useNavigation();
     const [config, setConfig] = useState<AppConfiguration>({
         offlineMode: false,
-        offlineCoordsX: "",
-        offlineCoordsY: "",
+        offlineLatitude: 0,
+        offlineLongitude: 0,
         offlineSimSwapDetected: false,
-        radiusKm: 100,
+        radiusKm: 10,
         apcMockMode: false
     });
 
@@ -31,7 +30,8 @@ function Demo() {
         const loadConfig = async () => {
             const savedConfig = await readConfigurations();
             if (savedConfig) {
-                setConfig(savedConfig);
+                const mergedConfig = { ...config, ...savedConfig };
+                setConfig(mergedConfig);
             }
         };
 
@@ -44,21 +44,27 @@ function Demo() {
         setConfig(prevConfig => ({ ...prevConfig, [key]: value }));
     };
 
+    const parseFloat = (value: string) => {
+        return value === '' ? 0 : (Number.parseFloat(value) || 0);
+    }
+
     return (
         <AppContainer>
             <ScrollView style={styles.container}>
                 <View>
+                    <StyledInputText labelText='Radius Km (allowed gps deviation)' value={config.radiusKm.toString()} onChangeText={(newText) => handleConfigurationChange('radiusKm', parseFloat(newText))}></StyledInputText>
+
                     <Checkbox label={'Offline Mode'}
                         checked={config.offlineMode}
                         onToggle={() => handleConfigurationChange('offlineMode', !config.offlineMode)} />
 
-                    <View style={[{ marginLeft: 20, marginTop: 20 }, !config.offlineMode && { display: 'none' }]}>
+                    <View style={[{ marginHorizontal: 20, marginTop: 5 }, !config.offlineMode && { display: 'none' }]}>
                         <Checkbox label={'SIM swap detected'}
                             checked={config.offlineSimSwapDetected}
                             onToggle={() => handleConfigurationChange('offlineSimSwapDetected', !config.offlineSimSwapDetected)} />
 
-                        <StyledInputText labelText='X Coords' value={config.offlineCoordsX} onChangeText={(newText) => handleConfigurationChange('offlineCoordsX', newText)}>{config.offlineCoordsX}</StyledInputText>
-                        <StyledInputText labelText='Y Coords' value={config.offlineCoordsY} onChangeText={(newText) => handleConfigurationChange('offlineCoordsY', newText)}>{config.offlineCoordsY}</StyledInputText>
+                        <StyledInputText labelText='X Coords' value={config.offlineLatitude.toString()} onChangeText={(newText) => handleConfigurationChange('offlineLatitude', parseFloat(newText))}></StyledInputText>
+                        <StyledInputText labelText='Y Coords' value={config.offlineLongitude.toString()} onChangeText={(newText) => handleConfigurationChange('offlineLongitude', parseFloat(newText))}></StyledInputText>
                     </View>
 
                     <Checkbox label={'APC Mock mode'}
@@ -68,6 +74,7 @@ function Demo() {
                     <Button
                         title="Back"
                         style={styles.button}
+                        useGradient={true}
                         onPress={() => navigation.navigate('Welcome')}
                     />
                 </View>

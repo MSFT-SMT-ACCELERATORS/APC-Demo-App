@@ -24,6 +24,23 @@ namespace APC.Client
                 }
             }
         };
+        public NumberVerificationMatchResponse MockNumberVerificationMatchResponse { get; set; } = new NumberVerificationMatchResponse
+        {
+            DevicePhoneNumberVerified = true
+        };
+        public NumberRetrieveResponse MockNumberRetrieveResponse { get; set; } = new NumberRetrieveResponse
+        {
+            DevicePhoneNumber = "+1234567890"
+        };
+        public SimSwapInfo MockSimSwapInfo { get; set; } = new SimSwapInfo
+        {
+            LatestSimChange = DateTime.UtcNow.AddDays(-30)
+        };
+
+        public CheckSimSwapInfo MockCheckSimSwapInfo { get; set; } = new CheckSimSwapInfo
+        {
+            Swapped = false
+        };
     }
 
 }

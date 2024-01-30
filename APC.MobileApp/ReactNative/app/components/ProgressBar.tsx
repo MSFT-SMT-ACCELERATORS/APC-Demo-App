@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Animated, StyleSheet, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'
+import customStyles from '../themes/CustomStyles';
 
 interface ProgressBarProps {
   progress: number; // Cambia a number ya que recibiremos un valor directo
@@ -35,7 +36,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   });
 
   return (
-    <View style={[styles.container, { height }, style]}>
+    <View style={[customStyles.my5, customStyles.mx4, { height }, style]}>
       <View style={[styles.progressBar, { backgroundColor, borderRadius: height / 2 }]}>
         <Animated.View style={{ width: widthInterpolated, flex: 1, backgroundColor: '#4ad896' }}>
           {/* <LinearGradient

@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
+import Constants from 'expo-constants';
 import palette from "../themes/Colors";
 
 interface AppContainerProps {
@@ -11,6 +12,8 @@ interface AppContainerProps {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
+      backgroundColor: palette.primary300,
+      alignItems: 'flex-start'
     },
   });
   

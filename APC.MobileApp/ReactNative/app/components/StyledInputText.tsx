@@ -1,19 +1,18 @@
-import React, { ReactNode } from 'react';
-import { View, StyleSheet, StatusBar, ViewStyle, TextInput, TextInputProps } from 'react-native';
+import React, { forwardRef } from 'react';
+import { View, StyleSheet, TextInput, TextInputProps, ViewStyle } from 'react-native';
 import palette from "../themes/Colors";
 import StyledText from './StyledText';
+import customStyles from '../themes/CustomStyles';
 
-interface InputTextProps {
+interface InputTextProps extends TextInputProps {
     style?: ViewStyle;
+    customStyle?: Array<keyof typeof customStyles>;
     colors?: keyof typeof palette;
     labelText?: string;
     placeholder?: string;
 }
 
 const styles = StyleSheet.create({
-    container: {
-        margin: 10
-    },
     input_properties: {
         flexGrow: 1,
         backgroundColor: palette.transparent,
@@ -25,24 +24,27 @@ const styles = StyleSheet.create({
     },
 });
 
-const StyledInputText: React.FC<InputTextProps & TextInputProps> = ({
+const StyledInputText = forwardRef<TextInput, InputTextProps>(({
     style,
     labelText,
     placeholder,
     placeholderTextColor = palette.placeholder,
     children,
     ...textInputProps
-}) => {
+}, ref) => {
     return (
-        <View style={styles.container}>
-            <StyledText textStyle='bold'>{labelText}</StyledText>
+        <View style={customStyles.m3}>
+            <StyledText customStyle={['bold']}>{labelText}</StyledText>
             <TextInput
                 style={[styles.input_properties, style]}
                 placeholder={placeholder}
                 placeholderTextColor={placeholderTextColor}
-                {...textInputProps}
+		ref={ref}
+            	{...textInputProps}
             />
         </View>
-    );
-};
+      );
+    }
+);
+
 export default StyledInputText;

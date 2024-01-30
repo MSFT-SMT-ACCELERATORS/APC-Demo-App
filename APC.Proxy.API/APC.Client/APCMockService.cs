@@ -21,5 +21,25 @@ namespace APC.Client
         {
             return Task.FromResult(_settings.MockLocationResponse);
         }
+
+        public Task<NumberVerificationMatchResponse> VerifyPhoneNumber(NumberVerificationRequest request)
+        {
+            return Task.FromResult(_settings.MockNumberVerificationMatchResponse);
+        }
+
+        public Task<NumberRetrieveResponse> RetrievePhoneNumber(NumberRetrieveRequest request)
+        {
+            return Task.FromResult(_settings.MockNumberRetrieveResponse);
+        }
+
+        public Task<SimSwapInfo> RetrieveSimSwapDate(CreateSimSwapDate request)
+        {
+            return Task.FromResult(_settings.MockSimSwapInfo);
+        }
+
+        public Task<CheckSimSwapInfo> CheckSimSwap(CreateCheckSimSwap request)
+        {
+            return Task.FromResult(_settings.MockCheckSimSwapInfo);
+        }
     }
 }
