@@ -1,45 +1,44 @@
 import * as React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import Constants from 'expo-constants';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Button from '../components/Button'
-import Colors from '../themes/Colors';
+import palette from '../themes/Colors';
 
 function Header() {
   const navigation = useNavigation();
 
   return (
-    <View style={styles.container}>
-        <View style={styles.imageContainer}>
-          <Image source={require('../../assets/logo.png')} style={styles.image} resizeMode="contain"/>        
-        </View>
-        <View style={styles.separator}></View>
+    <View style={styles.header}>
+      <View style={[styles.content]}>
+        <Image source={require('../../assets/images/logo.png')} style={[styles.logo]} />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.primary200,
+  header: {
+    flexDirection: 'row',
+    paddingTop: Constants.statusBarHeight,
     height: Constants.statusBarHeight + 70,
-    paddingTop: Constants.statusBarHeight
+    backgroundColor: palette.primary200,
+    borderBottomWidth : 3,
+    borderBottomColor: palette.primary100
   },
-  imageContainer: {
-    backgroundColor: Colors.primary200,
-    padding: 10,
-    height: 70,
-    width: '100%'
-  },
-  image: {
+  content: {
+    backgroundColor: palette.primary200,
     height: '100%',
-    width: '100%'
+    width: '50%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10
   },
-  separator: {    
-    backgroundColor: Colors.primary100,
-    height: 2
-  }
+  logo: {
+    width: '100%',
+    resizeMode: "contain",
+    height: 50,
+  },
 });
 
 export default Header;

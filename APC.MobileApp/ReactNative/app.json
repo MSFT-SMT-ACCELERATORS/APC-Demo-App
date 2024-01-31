@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "MSCORP_ACP_Demo",
-    "slug": "MSCORP_ACP_Demo",
-    "version": "1.0.0",
+    "name": "MicrosoftAPCDemo",
+    "slug": "MicrosoftAPCDemo",
+    "version": "1.0.2",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icons/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#3c3c52"
     },
@@ -15,16 +15,23 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.turingchallenge.MicrosoftAPCDemo"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icons/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.turingchallenge.MicrosoftAPCDemo"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icons/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d695a223-bfe6-47d7-99dd-5ab020065e57"
+      }
     }
   }
 }
