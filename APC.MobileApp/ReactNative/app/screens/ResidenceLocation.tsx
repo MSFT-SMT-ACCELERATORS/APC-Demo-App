@@ -13,11 +13,11 @@ import { Controller, FieldValues, useForm } from 'react-hook-form';
 import { LocationObjectCoords } from 'expo-location';
 import * as APCService from '../utils/APCService'
 import { useApiClient } from '../api/ApiClientProvider';
-import * as BingService from '../utils/BingService'
-import { Picker } from '@react-native-picker/picker';
 import cities from '../utils/cities.json'
 import customStyles from '../themes/CustomStyles';
 import RNPickerSelect, { PickerStyle } from 'react-native-picker-select';
+import { Position } from '../utils/APCService';
+import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration, defaultConfig } from '../utils/SettingsService'
 
 
 interface StepProps {
@@ -28,12 +28,11 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
   const navigation = useNavigation();
   const apiClient = useApiClient();
   const [hackedGPS, setHackedGPS] = useState<LocationObjectCoords>();
-  const [gpsCoords, setGPSCoords] = useState<LocationObjectCoords>();
-  const [apcCoords, setAPCCoords] = useState<LocationObjectCoords>();
-  const [gpsLocation, setGPSLocation] = useState<BingService.Location | null>();
-  const [apcLocation, setAPCLocation] = useState<BingService.Location | null>();
+  const [gpsPosition, setGPSPosition] = useState<Position>();
+  const [apcPosition, setAPCPosition] = useState<Position>();
+  const [config, setConfig] = useState<AppConfiguration>();
 
-  const { control, handleSubmit, formState: { errors }, getValues, watch, setValue } = useForm({
+  const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm({
     defaultValues: {
       Country: '',
       City: '',
@@ -75,48 +74,49 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
     navigation.navigate('StarterPage');
 
     const selectedCity = cities.filter(d => d.country == data.Country && d.state == data.StateProvince && d.city == data.City)[0];
-
-    let coordsForm = await APCService.getLocationCoords(selectedCity.latitude, selectedCity.longitude);
+    let coordsForm = APCService.getLocationCoords(selectedCity.latitude, selectedCity.longitude);
+    let coordsGPS = await APCService.getDeviceGPSLocation();
 
     let coords: LocationObjectCoords;
     if (data.GPSOption == 'true')
-      coords = (await APCService.getDeviceGPSLocation());
+      coords = coordsGPS.coords;
     else
       coords = coordsForm;
 
     // APC validation
     if (data.UseAPC) {
       const response = await APCService.matchesAPCLocation(apiClient, coords);
-
-      if (!response.verificationResult)
+      if (!response.verificationResult) {
         console.error('APC validation failed!!');
+      } else {
+        console.log('APC validation success!!')
+      }
     }
 
     // Business validation
     if (!await APCService.matchesCoords(coords, coordsForm)) {
       console.error('Business validation failed!!');
+    } else {
+      console.log('Business validation success!!')
     }
   }
+
   useEffect(() => {
+    readConfigurations().then(setConfig);
+
     setProgress(25);
-    APCService.getDeviceGPSLocation().then((coords) => {
-      setGPSCoords(coords);
-      return BingService.translateCoordsToLocation(coords)
-    })
-      .then(setGPSLocation);
+    APCService.getDeviceGPSLocation()
+      .then(setGPSPosition);
 
-    APCService.getAPCLocation(apiClient).then((coords) => {
-
-      setAPCCoords(coords);
-      return BingService.translateCoordsToLocation(coords)
-    })
-      .then(setAPCLocation);
+    APCService.getAPCLocation(apiClient)
+      .then(setAPCPosition);
 
     const firstCountry = cities
       .map(item => item.country)
       .filter((value, index, self) => self.indexOf(value) === index)[0];
+
     handleCountryChange(firstCountry);
-  }, [setProgress]);
+  }, []);
 
   return (
     <AppContainer>
@@ -192,6 +192,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
               )}
             />
             {errors.StateProvince && <StyledText color='danger200'>{errors.StateProvince.message}</StyledText>}
+
             <Controller
               name='City'
               control={control}
@@ -230,15 +231,23 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
                       <View>
                         <View style={styles.flex}>
                           <RadioButton value='true' color={Colors.accent200} />
-                          <StyledText>True GPS</StyledText>
+                          <StyledText>Device GPS</StyledText>
                         </View>
                         <View style={styles.optionSubtitleContainer}>
-                          <View style={styles.optionSubtitleBadge}>
-                            <StyledText>{gpsLocation?.country} - {gpsLocation?.state} - {gpsLocation?.city}</StyledText>
-                          </View>
-                          <View style={styles.optionSubtitleBadge}>
-                            <StyledText>{gpsCoords?.latitude}, {gpsCoords?.longitude}</StyledText>
-                          </View>
+                          {
+                            gpsPosition && gpsPosition.location ?
+                              <View style={styles.optionSubtitleBadge}>
+                                <StyledText>{gpsPosition.location.country} - {gpsPosition.location.state} - {gpsPosition.location.city}</StyledText>
+                              </View>
+                              : null
+                          }
+                          {
+                            gpsPosition && gpsPosition.coords ?
+                              <View style={styles.optionSubtitleBadge}>
+                                <StyledText>{gpsPosition.coords.latitude}, {gpsPosition.coords.longitude}</StyledText>
+                              </View>
+                              : null
+                          }
                         </View>
                       </View>
                     </View>
@@ -250,9 +259,13 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
                       {
                         getValues('Country') && getValues('StateProvince') && getValues('City') ? (
                           <View style={styles.optionSubtitleContainer}>
-                            <View style={[styles.optionSubtitleBadge]}>
-                              <StyledText>{getValues('Country')} - {getValues('StateProvince')} - {getValues('City')}</StyledText>
-                            </View>
+                            {
+                              !config?.offlineMode ?
+                                <View style={[styles.optionSubtitleBadge]}>
+                                  <StyledText>{getValues('Country')} - {getValues('StateProvince')} - {getValues('City')}</StyledText>
+                                </View>
+                                : null
+                            }
                             <View style={styles.optionSubtitleBadge}>
                               <StyledText>{hackedGPS?.latitude}, {hackedGPS?.longitude}</StyledText>
                             </View>
@@ -275,12 +288,20 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
                         />
                       </View>
                       <View style={styles.optionSubtitleContainer}>
-                        <View style={styles.optionSubtitleBadge}>
-                          <StyledText>{apcLocation?.country} - {apcLocation?.state} - {apcLocation?.city}</StyledText>
-                        </View>
-                        <View style={styles.optionSubtitleBadge}>
-                          <StyledText>{apcCoords?.latitude}, {apcCoords?.longitude}</StyledText>
-                        </View>
+                        {
+                          apcPosition && apcPosition.location ?
+                            <View style={styles.optionSubtitleBadge}>
+                              <StyledText>{apcPosition.location.country} - {apcPosition.location.state} - {apcPosition.location.city}</StyledText>
+                            </View>
+                            : null
+                        }
+                        {
+                          apcPosition && apcPosition.coords ?
+                            <View style={styles.optionSubtitleBadge}>
+                              <StyledText>{apcPosition.coords.latitude}, {apcPosition.coords.longitude}</StyledText>
+                            </View>
+                            : null
+                        }
                       </View>
                     </View>
                   </RadioButton.Group>
@@ -404,6 +425,9 @@ const styles = StyleSheet.create({
 
 const pickerStyle: PickerStyle = {
   inputIOS: {
+    color: 'white'
+  },
+  inputAndroid: {
     color: 'white'
   }
 };

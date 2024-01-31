@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "MSCORP_APC_Demo",
-    "slug": "MSCORP_APC_Demo",
-    "version": "1.0.0",
+    "name": "MicrosoftAPCDemo",
+    "slug": "MicrosoftAPCDemo",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icons/icon.png",
     "userInterfaceStyle": "light",
@@ -16,21 +16,21 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.javierginerturing.MSCORP-APC-Demo"
+      "bundleIdentifier": "com.turingchallenge.MicrosoftAPCDemo"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.javierginerturing.MSCORP_APC_Demo"
+      "package": "com.turingchallenge.MicrosoftAPCDemo"
     },
     "web": {
       "favicon": "./assets/icons/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "de29987e-c61b-427b-9a75-6938d9b3b56c"
+        "projectId": "d695a223-bfe6-47d7-99dd-5ab020065e57"
       }
     }
   }
