@@ -26,135 +26,69 @@ namespace APC.ProxyServer.Controllers
 
         [HttpPost("verify-device-location")]
         [ProducesResponseType(typeof(VerifyLocationResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> VerifyDeviceLocation([FromBody] VerifyLocationRequest request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            try
-            {
-                var useMock = HttpContext.Request.Headers.TryGetValue("X-Use-Mock", out var value)
-                    && value.ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
-                var response = await _apcClient.VerifyLocationAsync(request, useMock);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while verifying device location.");
-                return StatusCode(500, "Internal Server Error");
-            }
+            return await HandleRequest(
+                request,
+                _apcClient.VerifyLocationAsync,
+                "Error occurred while verifying device location.");
         }
 
         [HttpPost("device-location")]
         [ProducesResponseType(typeof(LocationResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> RetrieveDeviceLocation([FromBody] LocationRequest request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            try
-            {
-                var useMock = HttpContext.Request.Headers.TryGetValue("X-Use-Mock", out var value)
-                    && value.ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
-                var response = await _apcClient.RetrieveLocationAsync(request, useMock);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while retrieving device location.");
-                return StatusCode(500, "Internal Server Error");
-            }
+            return await HandleRequest(
+                request,
+                _apcClient.RetrieveLocationAsync,
+                "Error occurred while retrieving device location.");
         }
 
         [HttpPost("verify")]
         [ProducesResponseType(typeof(NumberVerificationMatchResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> VerifyPhoneNumber([FromBody] NumberVerificationRequest request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            try
-            {
-                var useMock = HttpContext.Request.Headers.TryGetValue("X-Use-Mock", out var value)
-                    && value.ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
-                var response = await _apcClient.VerifyPhoneNumberAsync(request, useMock);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while verifying phone number.");
-                return StatusCode(500, "Internal Server Error");
-            }
+            return await HandleRequest(
+                request,
+                _apcClient.VerifyPhoneNumberAsync,
+                "Error occurred while verifying phone number.");
         }
 
         [HttpGet("phone-number")]
         [ProducesResponseType(typeof(NumberRetrieveResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> RetrievePhoneNumber([FromQuery] NumberRetrieveRequest request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            try
-            {
-                var useMock = HttpContext.Request.Headers.TryGetValue("X-Use-Mock", out var value)
-                    && value.ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
-                var response = await _apcClient.RetrievePhoneNumberAsync(request, useMock);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while retrieving phone number.");
-                return StatusCode(500, "Internal Server Error");
-            }
+            return await HandleRequest(
+                request,
+                _apcClient.RetrievePhoneNumberAsync,
+                "Error occurred while retrieving phone number.");
         }
-
 
         [HttpPost("swap-date")]
         [ProducesResponseType(typeof(SimSwapInfo), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ErrorInfo), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ErrorInfo), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> RetrieveSimSwapDate([FromBody] CreateSimSwapDate request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            try
-            {
-                var useMock = HttpContext.Request.Headers.TryGetValue("X-Use-Mock", out var value)
-                    && value.ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
-                var response = await _apcClient.RetrieveSimSwapDateAsync(request, useMock);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while retrieving SIM swap date.");
-                return StatusCode(500, "Internal Server Error");
-            }
+            return await HandleRequest(
+                request,
+                _apcClient.RetrieveSimSwapDateAsync,
+                "Error occurred while retrieving SIM swap date.");
         }
 
         [HttpPost("check-swap")]
         [ProducesResponseType(typeof(CheckSimSwapInfo), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ErrorInfo), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ErrorInfo), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CheckSimSwap([FromBody] CreateCheckSimSwap request)
+        {
+            return await HandleRequest(
+                request,
+                _apcClient.CheckSimSwapAsync,
+                "Error occurred while checking SIM swap.");
+        }
+
+        // Generic method to handle common logic
+        private async Task<IActionResult> HandleRequest<TRequest, TResponse>(
+            TRequest request,
+            Func<TRequest, bool, Task<TResponse>> action,
+            string errorMessage)
         {
             if (!ModelState.IsValid)
             {
@@ -164,13 +98,13 @@ namespace APC.ProxyServer.Controllers
             try
             {
                 var useMock = HttpContext.Request.Headers.TryGetValue("X-Use-Mock", out var value)
-                    && value.ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
-                var response = await _apcClient.CheckSimSwapAsync(request, useMock);
+                              && value.ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
+                var response = await action(request, useMock);
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while checking SIM swap.");
+                _logger.LogError(ex, errorMessage);
                 return StatusCode(500, "Internal Server Error");
             }
         }

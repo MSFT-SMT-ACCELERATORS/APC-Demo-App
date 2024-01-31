@@ -6,8 +6,10 @@ namespace APC.Client
     {
         Task<VerifyLocationResponse> VerifyLocationAsync(VerifyLocationRequest request, bool useMock = false);
         Task<LocationResponse> RetrieveLocationAsync(LocationRequest request, bool useMock = false);
+
         Task<NumberVerificationMatchResponse> VerifyPhoneNumberAsync(NumberVerificationRequest request, bool useMock = false);
         Task<NumberRetrieveResponse> RetrievePhoneNumberAsync(NumberRetrieveRequest request, bool useMock = false);
+
         Task<SimSwapInfo> RetrieveSimSwapDateAsync(CreateSimSwapDate request, bool useMock = false);
         Task<CheckSimSwapInfo> CheckSimSwapAsync(CreateCheckSimSwap request, bool useMock = false);
     }
