@@ -28,7 +28,7 @@ function Welcome() {
             iconSize={30}
             style={[customStyles.mr1]}
             useGradient={false}
-            onPress={() => navigation.navigate('Demo')}
+            onPress={() => navigation.navigate('Settings')}
           />
         </View>
         <View style={[styles.bodyContainer]}>
