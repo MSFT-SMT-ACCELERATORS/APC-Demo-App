@@ -36,16 +36,16 @@ const Information: React.FC<StepProps> = ({ setProgress }) => {
             <StyledInputText labelText="Street Address" placeholder="Start typing your street... (e.g. 28 Mai...)"></StyledInputText>
             <StyledInputText labelText="Unit/Apt Number (optional)" placeholder="Address Line 2"></StyledInputText>
             <StyledInputText labelText="City" placeholder="City"></StyledInputText>
-            <StyledInputText labelText="State" placeholder="Ohio" placeholderTextColor={palette.accent200}></StyledInputText>
+            <StyledInputText labelText="State" placeholder="State" ></StyledInputText>
             <StyledInputText labelText="Zip Code" placeholder="Zip Code"></StyledInputText>
             <View style={[styles.idContainer]}>
               <StyledText>Identity Verification</StyledText>
               <StyledInputText labelText="Your Date of Birth" placeholder="MM/DD/YYYY"></StyledInputText>
-              <StyledInputText labelText="Your Social Security Number (SSN)" placeholder="9 digit number"></StyledInputText>
+              <StyledInputText labelText="Your Social Security Number (SSN)" placeholder="9 digit number" isSensitiveData={true}></StyledInputText>
             </View>
             <StyledText color='accent200'>By selecting the 'Confirm Operation' option, you are agreeing to our terms and conditions, and will proceed with the account creation process.</StyledText>
             <StyledInputText labelText="Email" placeholder="Email"></StyledInputText>
-            <StyledInputText labelText="Password" placeholder="Password"></StyledInputText>
+            <StyledInputText labelText="Password" placeholder="Password" isSensitiveData={true}></StyledInputText>
           </View>
         </ScrollView>
       </View>
