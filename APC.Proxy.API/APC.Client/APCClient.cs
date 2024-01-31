@@ -104,7 +104,7 @@ namespace APC.Client
 
             // requestMessage.Headers.Add("X-Correlator", correlator);
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "swap-date")
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "sim-swap/swap-date")
             {
                 Content = JsonContent.Create(request)
             };
@@ -122,7 +122,7 @@ namespace APC.Client
 
             // requestMessage.Headers.Add("X-Correlator", correlator);
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "check-swap")
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "sim-swap/check-swap")
             {
                 Content = JsonContent.Create(request)
             };

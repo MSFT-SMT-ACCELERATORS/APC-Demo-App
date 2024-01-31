@@ -64,7 +64,7 @@ namespace APC.ProxyServer.Controllers
                 "Error occurred while retrieving phone number.");
         }
 
-        [HttpPost("swap-date")]
+        [HttpPost("sim-swap/swap-date")]
         [ProducesResponseType(typeof(SimSwapInfo), StatusCodes.Status200OK)]
         public async Task<IActionResult> RetrieveSimSwapDate([FromBody] CreateSimSwapDate request)
         {
@@ -74,7 +74,7 @@ namespace APC.ProxyServer.Controllers
                 "Error occurred while retrieving SIM swap date.");
         }
 
-        [HttpPost("check-swap")]
+        [HttpPost("sim-swap/check-swap")]
         [ProducesResponseType(typeof(CheckSimSwapInfo), StatusCodes.Status200OK)]
         public async Task<IActionResult> CheckSimSwap([FromBody] CreateCheckSimSwap request)
         {
