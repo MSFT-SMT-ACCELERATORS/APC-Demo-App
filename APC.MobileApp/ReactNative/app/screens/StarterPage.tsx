@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { StyleSheet, View, ScrollView, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import Button from '../components/Button'
@@ -15,6 +15,13 @@ interface StepProps {
   setProgress: (progress: number) => void;
 }
 
+enum ButtonNames {
+  consolidation,
+  bills,
+  moving,
+  others
+}
+
 const screenWidth = Dimensions.get('window').width;
 const isSmallScreen = screenWidth < 200;
 
@@ -24,6 +31,23 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
   useEffect(() => {
     setProgress(50);
   }, [setProgress]);
+
+  const [activeButton, setActiveButton] = useState<ButtonNames | null>(null);
+
+  const handleButtonPress = (buttonName: ButtonNames) => {
+    setActiveButton(buttonName);
+  };
+
+  const buttonStyleVariant = (buttonElement: 'title' | 'icon', buttonName: ButtonNames) => {
+    switch (buttonElement) {
+      case "title":
+        return activeButton === buttonName ? 'primary300' : 'accent200'
+      
+      case "icon":
+        return activeButton === buttonName ? palette.primary300 : palette.accent200
+    }
+  }
+
   return (
     <AppContainer>
       <View style={[styles.parent]}>
@@ -45,7 +69,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
                 <Button
                   title='Debt Consolidation'
                   titleSize={customStyles.small}
-                  titleColor={'accent200'}
+                  titleColor={buttonStyleVariant('title', ButtonNames.consolidation)}
                   style={[customStyles.my3, customStyles.mr1, isSmallScreen ? styles.largeIconButton : styles.smallIconButton]}
                   size='square'
                   showIcon={true}
@@ -53,13 +77,14 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
                   iconLib='MaterialIcons'
                   iconName={'attach-money'}
                   iconSize={50}
-                  iconColor={palette.accent200}
-                  onPress={() => navigation.navigate('#')}
+                  iconColor={buttonStyleVariant('icon', ButtonNames.consolidation)}
+                  onPress={() => handleButtonPress(ButtonNames.consolidation)}
+                  isActive={activeButton === ButtonNames.consolidation}
                 />
                 <Button
                   title='Monthly Bills'
                   titleSize={customStyles.small}
-                  titleColor={'accent200'}
+                  titleColor={buttonStyleVariant('title', ButtonNames.bills)}
                   style={[customStyles.my2, isSmallScreen ? styles.largeIconButton : styles.smallIconButton]}
                   size='square'
                   showIcon={true}
@@ -67,15 +92,16 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
                   iconLib='Ionicons'
                   iconName={'calendar-outline'}
                   iconSize={50}
-                  iconColor={palette.accent200}
-                  onPress={() => navigation.navigate('#')}
+                  iconColor={buttonStyleVariant('icon', ButtonNames.bills)}
+                  onPress={() => handleButtonPress(ButtonNames.bills)}
+                  isActive={activeButton === ButtonNames.bills}
                 />
               </View>
               <View style={styles.row}>
                 <Button
                   title='Moving'
                   titleSize={customStyles.small}
-                  titleColor={'accent200'}
+                  titleColor={buttonStyleVariant('title', ButtonNames.moving)}
                   style={[customStyles.my3, customStyles.mr1, isSmallScreen ? styles.largeIconButton : styles.smallIconButton]}
                   size='square'
                   showIcon={true}
@@ -83,13 +109,14 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
                   iconLib='MaterialCommunity'
                   iconName={'truck-check-outline'}
                   iconSize={45}
-                  iconColor={palette.accent200}
-                  onPress={() => navigation.navigate('#')}
+                  iconColor={buttonStyleVariant('icon', ButtonNames.moving)}
+                  onPress={() => handleButtonPress(ButtonNames.moving)}
+                  isActive={activeButton === ButtonNames.moving}
                 />
                 <Button
                   title='Others'
                   titleSize={customStyles.small}
-                  titleColor={'accent200'}
+                  titleColor={buttonStyleVariant('title', ButtonNames.others)}
                   style={[customStyles.my3, isSmallScreen ? styles.largeIconButton : styles.smallIconButton]}
                   size='square'
                   showIcon={true}
@@ -97,8 +124,9 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
                   iconLib='Ionicons'
                   iconName={'wallet-outline'}
                   iconSize={50}
-                  iconColor={palette.accent200}
-                  onPress={() => navigation.navigate('#')}
+                  iconColor={buttonStyleVariant('icon', ButtonNames.others)}
+                  onPress={() => handleButtonPress(ButtonNames.others)}
+                  isActive={activeButton === ButtonNames.others}
                 />
               </View>
             </View>
