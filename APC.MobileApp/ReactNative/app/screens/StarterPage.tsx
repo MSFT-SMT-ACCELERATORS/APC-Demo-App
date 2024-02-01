@@ -1,13 +1,9 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Constants from 'expo-constants';
 
-import Colors from '../themes/Colors';
 import Button from '../components/Button'
-import ProgressBar from '../components/ProgressBar';
 import StyledText from '../components/StyledText';
 import StyledInputText from '../components/StyledInputText';
 import palette from '../themes/Colors';
@@ -40,11 +36,11 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
 
           <View style={[styles.separatorContainer, customStyles.mb4]}></View>
           <View style={styles.bodyContent}>
-            <StyledInputText labelText="Phone Number" placeholder="+1 365-478-8429" placeholderTextColor={palette.accent200}></StyledInputText>
+            <StyledInputText labelText="Phone Number" placeholder="+1 365-478-8429" inputType='tel'></StyledInputText>
             <StyledText customStyle={['standar']}>I would like to formally request a loan for the following amount:</StyledText>
             <Slider minValue={500} maxValue={10000} stepSize={100} formatter={currencyFormatter} style={{ padding: 10 }} />
             <StyledText customStyle={['standar']}>Purpose:</StyledText>
-            <View style={styles.btn_Container}>
+            <View>
               <View style={styles.row}>
                 <Button
                   title='Debt Consolidation'

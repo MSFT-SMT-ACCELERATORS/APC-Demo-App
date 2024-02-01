@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { StyleSheet, Text, View, Image, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration } from '../utils/ConfigStorage'
+import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration } from '../utils/SettingsService'
 
 import Colors from '../themes/Colors';
 import Button from '../components/Button'
