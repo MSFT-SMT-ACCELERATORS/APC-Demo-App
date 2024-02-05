@@ -10,6 +10,7 @@ import palette from '../themes/Colors';
 import Slider from '../components/Slider';
 import AppContainer from '../components/AppContainer';
 import customStyles from '../themes/CustomStyles';
+import { Controller, FieldValues, useForm } from 'react-hook-form';
 
 interface StepProps {
   setProgress: (progress: number) => void;
@@ -27,10 +28,11 @@ const isSmallScreen = screenWidth < 200;
 
 const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
   const navigation = useNavigation();
-  // setProgress(50)
+  const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm();
+
   useEffect(() => {
     setProgress(50);
-  }, [setProgress]);
+  }, []);
 
   const [activeButton, setActiveButton] = useState<ButtonNames | null>(null);
 
@@ -42,10 +44,16 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
     switch (buttonElement) {
       case "title":
         return activeButton === buttonName ? 'primary300' : 'accent200'
-      
+
       case "icon":
         return activeButton === buttonName ? palette.primary300 : palette.accent200
     }
+  }
+
+
+  const onFormValid = async (data: FieldValues) => {
+    console.log(data);
+    navigation.navigate('Information');
   }
 
   return (
@@ -60,9 +68,21 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
 
           <View style={[styles.separatorContainer, customStyles.mb4]}></View>
           <View style={styles.bodyContent}>
-            <StyledInputText labelText="Phone Number" placeholder="+1 365-478-8429" inputType='tel'></StyledInputText>
+
+            <Controller
+              name='phonenumber'
+              control={control}
+              render={({ field }) => (
+                <StyledInputText labelText="Phone Number" placeholder="+1 365-478-8429" inputType='tel' onChangeText={field.onChange}></StyledInputText>
+              )} />
             <StyledText customStyle={['standar']}>I would like to formally request a loan for the following amount:</StyledText>
-            <Slider minValue={500} maxValue={10000} stepSize={100} formatter={currencyFormatter} style={{ padding: 10 }} />
+
+            <Controller
+              name='amount'
+              control={control}
+              render={({ field }) => (
+                <Slider minValue={500} maxValue={10000} stepSize={100} formatter={currencyFormatter} onChange={field.onChange} value={field.value} style={{ padding: 10 }} />
+              )} />
             <StyledText customStyle={['standar']}>Purpose:</StyledText>
             <View>
               <View style={styles.row}>
@@ -139,7 +159,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
             style={[styles.button]}
             size='long'
             useGradient={true}
-            onPress={() => { setProgress(100); navigation.navigate('Information') }}          />
+            onPress={handleSubmit(onFormValid)} />
         </View>
       </View>
     </AppContainer>
@@ -148,7 +168,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
 
 const currencyFormatter = (value: number) => {
   return "$" + new Intl.NumberFormat('en-US', {
-    maximumFractionDigits: 0, // Esto asegura que no haya decimales
+    maximumFractionDigits: 0,
   }).format(value);
 }
 
@@ -210,7 +230,7 @@ const styles = StyleSheet.create({
   smallIconButton: {
     flex: .5
   },
-  largeIconButton:{
+  largeIconButton: {
     flex: 1
   }
 });
