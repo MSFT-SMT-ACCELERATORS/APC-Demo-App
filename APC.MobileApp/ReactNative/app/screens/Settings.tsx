@@ -48,7 +48,7 @@ function Settings() {
                         control={control}
                         rules={{
                             validate: {
-                                isNumber: value => !isNaN(value) || "Este campo debe ser un número con o sin decimales."
+                                isNumber: value => !isNaN(value) || "The value must be a number."
                             }
                         }}
                         render={({ field }) => (
@@ -101,7 +101,8 @@ function Settings() {
                                 control={control}
                                 rules={{
                                     validate: {
-                                        isNumber: value => !isNaN(value) || "Este campo debe ser un número con o sin decimales."
+                                        isNumber: value => !isNaN(value) || "The value must be a number.",
+                                        isValidLatitude: value => (-90 <= value && value <= 90) || "The value must be a number between -90 and 90."
                                     }
                                 }}
                                 render={({ field }) => (
@@ -119,7 +120,8 @@ function Settings() {
                                 control={control}
                                 rules={{
                                     validate: {
-                                        isNumber: value => !isNaN(value) || "Este campo debe ser un número con o sin decimales."
+                                        isNumber: value => !isNaN(value) || "The value must be a number.",
+                                        isValidLongitude: value => (-180 <= value && value <= 180) || "The value must be a number between -180 and 180."
                                     }
                                 }}
                                 render={({ field }) => (
