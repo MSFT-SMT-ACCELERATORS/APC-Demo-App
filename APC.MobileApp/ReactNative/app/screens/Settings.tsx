@@ -43,7 +43,109 @@ function Settings() {
         <AppContainer>
             <ScrollView style={styles.container}>
                 <View>
-                    
+                    <Controller
+                        name="radiusKm"
+                        control={control}
+                        rules={{
+                            validate: {
+                                isNumber: value => !isNaN(value) || "Este campo debe ser un número con o sin decimales."
+                            }
+                        }}
+                        render={({ field }) => (
+                            <StyledInputText
+                                labelText="Radius Km (allowed gps deviation)"
+                                value={field.value?.toString() || ''}
+                                onChangeText={field.onChange}
+                            />
+                        )}
+                    />
+                    {errors.radiusKm && <StyledText customStyle={['regular']} color='danger200'>{errors.radiusKm.message}</StyledText>}
+
+                    <Controller
+                        control={control}
+                        name='connectionMode'
+                        rules={{ required: 'Please select an option' }}
+                        render={({ field: { onChange, value } }) => (
+                            <RadioButton.Group onValueChange={onChange} value={value}>
+                                <View style={styles.group}>
+                                    <StyledText>Connection Mode</StyledText>
+                                    <View style={styles.flex}>
+                                        <RadioButton value={ConnectionMode.Online} color={Colors.accent200} />
+                                        <StyledText>Full online</StyledText>
+                                    </View>
+                                    <View style={styles.flex}>
+                                        <RadioButton value={ConnectionMode.Mock} color={Colors.accent200} />
+                                        <StyledText>Mock APC</StyledText>
+                                    </View>
+                                    <View style={styles.flex}>
+                                        <RadioButton value={ConnectionMode.Offline} color={Colors.accent200} />
+                                        <StyledText>Offline</StyledText>
+                                    </View>
+                                </View>
+                            </RadioButton.Group>
+                        )}
+                    />
+
+                    { true || connectionMode == "offline" ?
+                        <View style={[{ marginHorizontal: 30, marginTop: 5 }]}>
+                            <Controller
+                                name='offlineLastSimChange'
+                                control={control}
+                                render={({ field }) => (
+                                    <StyledInputText labelText='Last sim swap' value={field.value}></StyledInputText>
+                                )}
+                            />
+
+                            <Controller
+                                name='offlineLatitude'
+                                control={control}
+                                rules={{
+                                    validate: {
+                                        isNumber: value => !isNaN(value) || "Este campo debe ser un número con o sin decimales."
+                                    }
+                                }}
+                                render={({ field }) => (
+                                    <StyledInputText
+                                        labelText='APC Latitude'
+                                        value={field.value?.toString() || ''}
+                                        onChangeText={field.onChange}
+                                    />
+                                )}
+                            />
+                            {errors.offlineLatitude && <StyledText customStyle={['regular']} color='danger200'>{errors.offlineLatitude.message}</StyledText>}
+
+                            <Controller
+                                name='offlineLongitude'
+                                control={control}
+                                rules={{
+                                    validate: {
+                                        isNumber: value => !isNaN(value) || "Este campo debe ser un número con o sin decimales."
+                                    }
+                                }}
+                                render={({ field }) => (
+                                    <StyledInputText
+                                        labelText='APC Longitude'
+                                        value={field.value?.toString() || ''}
+                                        onChangeText={field.onChange}
+                                    />
+                                )}
+                            />
+                            {errors.offlineLongitude && <StyledText customStyle={['regular']} color='danger200'>{errors.offlineLongitude.message}</StyledText>}
+
+                            <Controller
+                                name='offlinePhoneNumber'
+                                control={control}
+                                render={({ field }) => (
+                                    <StyledInputText
+                                        labelText='APC Phone Number'
+                                        value={field.value}
+                                        onChangeText={field.onChange}
+                                    />
+                                )}
+                            />
+                        </View>
+                        : null}
+
                     <Button
                         title="Save"
                         style={styles.button}
