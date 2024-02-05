@@ -5,10 +5,7 @@ import 'react-native-url-polyfill/auto';
 
 import Header from './app/components/Header';
 import Welcome from './app/screens/Welcome';
-import Landing from './app/screens/Landing';
 import Consents from './app/screens/Consents';
-import TestProgress from './app/screens/TestProgress';
-import Demo from './app/screens/Settings';
 import Success from './app/screens/Success';
 import Steps from './app/screens/Steps';
 import Debug from './app/screens/Debug';

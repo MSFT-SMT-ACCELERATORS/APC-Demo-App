@@ -17,7 +17,7 @@ import cities from '../utils/cities.json'
 import customStyles from '../themes/CustomStyles';
 import RNPickerSelect, { PickerStyle } from 'react-native-picker-select';
 import { Position } from '../utils/APCService';
-import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration, defaultConfig } from '../utils/SettingsService'
+import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration, defaultConfig, ConnectionMode } from '../utils/SettingsService'
 
 
 interface StepProps {
@@ -260,7 +260,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
                         getValues('Country') && getValues('StateProvince') && getValues('City') ? (
                           <View style={styles.optionSubtitleContainer}>
                             {
-                              !config?.offlineMode ?
+                              config?.connectionMode != ConnectionMode.Offline ?
                                 <View style={[styles.optionSubtitleBadge]}>
                                   <StyledText>{getValues('Country')} - {getValues('StateProvince')} - {getValues('City')}</StyledText>
                                 </View>

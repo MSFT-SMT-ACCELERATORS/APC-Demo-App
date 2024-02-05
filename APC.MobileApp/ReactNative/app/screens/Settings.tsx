@@ -4,67 +4,51 @@ import { StyleSheet, View, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import Colors from '../themes/Colors';
-import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration, defaultConfig } from '../utils/SettingsService'
+import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration, defaultConfig, ConnectionMode } from '../utils/SettingsService'
 
 import AppContainer from '../components/AppContainer';
 import Button from '../components/Button'
-import CheckboxWithText from '../components/CheckBox';
 import StyledInputText from '../components/StyledInputText';
+import { Controller, FieldValues, SubmitHandler, useForm } from 'react-hook-form';
+import StyledText from '../components/StyledText';
+import { RadioButton } from 'react-native-paper';
 
 function Settings() {
     const navigation = useNavigation();
-    const [config, setConfig] = useState<AppConfiguration>(defaultConfig);
+    const { control, handleSubmit, watch, formState: { errors }, reset } = useForm<AppConfiguration>({ defaultValues: defaultConfig })
+    const connectionMode = watch('connectionMode');
 
     useEffect(() => {
         const loadConfig = async () => {
-            const savedConfig = await readConfigurations();
-            const mergedConfig = { ...config, ...savedConfig };
-            setConfig(mergedConfig);
+            const config = await readConfigurations();
+            reset(config);
         };
 
         loadConfig();
     }, []);
 
-    const handleConfigurationChange = async <T extends keyof AppConfiguration>(key: T, value: AppConfiguration[T]) => {
-        await updateConfiguration(key, value);
+    const saveConfig: SubmitHandler<AppConfiguration> = async (data) => {
+        const formattedData = {
+            ...data,
+            radiusKm: typeof data.radiusKm === 'string' ? parseFloat(data.radiusKm) : data.radiusKm,
+            offlineLatitude: typeof data.offlineLatitude === 'string' ? parseFloat(data.offlineLatitude) : data.offlineLatitude,
+            offlineLongitude: typeof data.offlineLongitude === 'string' ? parseFloat(data.offlineLongitude) : data.offlineLongitude,
 
-        setConfig(prevConfig => ({ ...prevConfig, [key]: value }));
-    };
-
-    const parseFloat = (value: string) => {
-        return value === '' ? 0 : (Number.parseFloat(value) || 0);
+        };
+        console.log(formattedData);
+        storeConfigurations(data);
     }
 
     return (
         <AppContainer>
             <ScrollView style={styles.container}>
                 <View>
-                    <StyledInputText labelText='Radius Km (allowed gps deviation)' value={config.radiusKm.toString()} onChangeText={(newText) => handleConfigurationChange('radiusKm', parseFloat(newText))}></StyledInputText>
-
-                    <CheckboxWithText label={'Offline Mode'}
-                        checked={config.offlineMode}
-                        onToggle={() => handleConfigurationChange('offlineMode', !config.offlineMode)} />
-
-                    {
-                        config.offlineMode ?
-                            <View style={[{ marginHorizontal: 30, marginTop: 5 }]}>
-                                <StyledInputText labelText='Last sim swap' value={config.offlineLastSimChange} onChangeText={(newText) => handleConfigurationChange('offlineLastSimChange', newText)}></StyledInputText>
-                                <StyledInputText labelText='APC Latitude' value={config.offlineLatitude.toString()} onChangeText={(newText) => handleConfigurationChange('offlineLatitude', parseFloat(newText))}></StyledInputText>
-                                <StyledInputText labelText='APC Longitude' value={config.offlineLongitude.toString()} onChangeText={(newText) => handleConfigurationChange('offlineLongitude', parseFloat(newText))}></StyledInputText>
-                                <StyledInputText labelText='APC Phone Number' value={config.offlinePhoneNumber} onChangeText={(newText) => handleConfigurationChange('offlinePhoneNumber', newText)}></StyledInputText>
-                            </View>
-                            : null
-                    }
-
-                    <CheckboxWithText label={'APC Mock mode'}
-                        checked={config.apcMockMode}
-                        onToggle={() => handleConfigurationChange('apcMockMode', !config.apcMockMode)} />
-
+                    
                     <Button
                         title="Save"
                         style={styles.button}
                         useGradient={true}
-                        onPress={() => {}}
+                        onPress={handleSubmit(saveConfig)}
                     />
                     <Button
                         title="Back"
@@ -90,6 +74,14 @@ const styles = StyleSheet.create({
         marginTop: 30,
         alignSelf: 'flex-end',
         width: '100%'
+    },
+    flex: {
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+    },
+    group: {
+        padding: 10
     }
 });
 

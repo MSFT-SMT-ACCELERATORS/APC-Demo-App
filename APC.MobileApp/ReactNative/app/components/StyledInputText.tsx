@@ -65,7 +65,7 @@ const StyledInputText = forwardRef<TextInput, InputTextProps>(({
     const iconVariants = {
         valid: { name: 'check', color: palette.accent200 },
         invalid: { name: 'remove', color: palette.danger200 },
-        passwordVisible:'eye-slash',
+        passwordVisible: 'eye-slash',
         passwordNotVisible: 'eye',
     };
 
@@ -105,8 +105,8 @@ const StyledInputText = forwardRef<TextInput, InputTextProps>(({
         });
     }
 
-    const togglePasswordVisibility = () => setInputState({...inputState, isPasswordVisible: !inputState.isPasswordVisible})
-    
+    const togglePasswordVisibility = () => setInputState({ ...inputState, isPasswordVisible: !inputState.isPasswordVisible })
+
     return (
         <View style={customStyles.m3}>
             <StyledText customStyle={['bold']}>{labelText}</StyledText>
@@ -114,7 +114,10 @@ const StyledInputText = forwardRef<TextInput, InputTextProps>(({
                 <TextInput
                     inputMode={inputType}
                     onBlur={checkInputValue}
-                    onChangeText={(value) => setInputState({ ...inputState, value })}
+                    onChangeText={(value) => {
+                        setInputState({ ...inputState, value });
+                        textInputProps.onChangeText && textInputProps.onChangeText(value);
+                    }}
                     style={[styles.input_properties, style, !inputState.isValid && styles.input_invalid]}
                     placeholder={placeholder}
                     placeholderTextColor={placeholderTextColor}
@@ -133,8 +136,8 @@ const StyledInputText = forwardRef<TextInput, InputTextProps>(({
                 )}
             </View>
         </View>
-      );
-    }
+    );
+}
 );
 
 export default StyledInputText;

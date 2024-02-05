@@ -21,9 +21,5 @@ export const translateCoordsToLocation = async (coords: LocationObjectCoords, ve
         } as Location
     } 
 
-    return {
-        country: '',
-        state: '',
-        city: ''
-    };
+    return undefined;
 }
