@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import Colors from '../themes/Colors';
@@ -69,24 +69,27 @@ function Settings() {
                             <RadioButton.Group onValueChange={onChange} value={value}>
                                 <View style={styles.group}>
                                     <StyledText>Connection Mode</StyledText>
-                                    <View style={styles.flex}>
-                                        <RadioButton value={ConnectionMode.Online} color={Colors.accent200} />
+
+                                    <TouchableOpacity style={styles.flex} onPress={() => onChange(ConnectionMode.Online)}>
+                                        <RadioButton.Android value={ConnectionMode.Online} color={Colors.accent200} />
                                         <StyledText>Full online</StyledText>
-                                    </View>
-                                    <View style={styles.flex}>
-                                        <RadioButton value={ConnectionMode.Mock} color={Colors.accent200} />
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity style={styles.flex} onPress={() => onChange(ConnectionMode.Mock)}>
+                                        <RadioButton.Android value={ConnectionMode.Mock} color={Colors.accent200} />
                                         <StyledText>Mock APC</StyledText>
-                                    </View>
-                                    <View style={styles.flex}>
-                                        <RadioButton value={ConnectionMode.Offline} color={Colors.accent200} />
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity style={styles.flex} onPress={() => onChange(ConnectionMode.Offline)}>
+                                        <RadioButton.Android value={ConnectionMode.Offline} color={Colors.accent200} />
                                         <StyledText>Offline</StyledText>
-                                    </View>
+                                    </TouchableOpacity>
                                 </View>
                             </RadioButton.Group>
                         )}
                     />
 
-                    { true || connectionMode == "offline" ?
+                    {true || connectionMode == ConnectionMode.Offline ?
                         <View style={[{ marginHorizontal: 30, marginTop: 5 }]}>
                             <Controller
                                 name='offlineLastSimChange'
