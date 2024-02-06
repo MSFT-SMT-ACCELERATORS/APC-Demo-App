@@ -38,6 +38,7 @@ const defaultStyles = StyleSheet.create({
     color: palette.neutral,
     flex: 1,
     textAlign: 'justify',
+    alignSelf: 'center',
   },
 });
 
@@ -47,11 +48,11 @@ const CheckboxWithText: React.FC<CheckboxWithTextProps> = ({ label, checked, onT
     <TouchableOpacity style={defaultStyles.flex} onPress={onToggle}>
       <Checkbox.Android
         status={checked ? 'checked' : 'unchecked'}
-        onPress={onToggle} // Esta llamada es opcional si el TouchableOpacity ya maneja el toggle
+        onPress={onToggle}
         uncheckedColor={palette.accent200}
         color={palette.accent200}
       />
-      <StyledText style={styles.text}>{label}</StyledText>
+      <StyledText style={defaultStyles.text}>{label}</StyledText>
     </TouchableOpacity>
   );
 };
