@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, ScrollView, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import Colors from '../themes/Colors';
@@ -70,20 +70,20 @@ function Settings() {
                                 <View style={styles.group}>
                                     <StyledText>Connection Mode</StyledText>
 
-                                    <TouchableOpacity style={styles.flex} onPress={() => onChange(ConnectionMode.Online)}>
+                                    <Pressable style={styles.flex} onPress={() => onChange(ConnectionMode.Online)}>
                                         <RadioButton.Android value={ConnectionMode.Online} color={Colors.accent200} />
                                         <StyledText>Full online</StyledText>
-                                    </TouchableOpacity>
+                                    </Pressable>
 
-                                    <TouchableOpacity style={styles.flex} onPress={() => onChange(ConnectionMode.Mock)}>
+                                    <Pressable style={styles.flex} onPress={() => onChange(ConnectionMode.Mock)}>
                                         <RadioButton.Android value={ConnectionMode.Mock} color={Colors.accent200} />
                                         <StyledText>Mock APC</StyledText>
-                                    </TouchableOpacity>
+                                    </Pressable>
 
-                                    <TouchableOpacity style={styles.flex} onPress={() => onChange(ConnectionMode.Offline)}>
+                                    <Pressable style={styles.flex} onPress={() => onChange(ConnectionMode.Offline)}>
                                         <RadioButton.Android value={ConnectionMode.Offline} color={Colors.accent200} />
                                         <StyledText>Offline</StyledText>
-                                    </TouchableOpacity>
+                                    </Pressable>
                                 </View>
                             </RadioButton.Group>
                         )}

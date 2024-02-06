@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { Pressable, StyleSheet } from 'react-native';
 import { Checkbox } from 'react-native-paper';
 import palette from '../themes/Colors';
 import StyledText from './StyledText';
@@ -45,7 +45,7 @@ const defaultStyles = StyleSheet.create({
 
 const CheckboxWithText: React.FC<CheckboxWithTextProps> = ({ label, checked, onToggle, styles = {} }) => {
   return (
-    <TouchableOpacity style={defaultStyles.flex} onPress={onToggle}>
+    <Pressable style={defaultStyles.flex} onPress={onToggle}>
       <Checkbox.Android
         status={checked ? 'checked' : 'unchecked'}
         onPress={onToggle}
@@ -53,7 +53,7 @@ const CheckboxWithText: React.FC<CheckboxWithTextProps> = ({ label, checked, onT
         color={palette.accent200}
       />
       <StyledText style={defaultStyles.text}>{label}</StyledText>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
