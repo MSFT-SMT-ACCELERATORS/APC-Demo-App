@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { StyleSheet, View, ScrollView, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -34,19 +34,14 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
     setProgress(50);
   }, []);
 
-  const [activeButton, setActiveButton] = useState<ButtonNames | null>(null);
 
-  const handleButtonPress = (buttonName: ButtonNames) => {
-    setActiveButton(buttonName);
-  };
-
-  const buttonStyleVariant = (buttonElement: 'title' | 'icon', buttonName: ButtonNames) => {
+  const buttonStyleVariant = (buttonElement: 'title' | 'icon', isSelected: boolean) => {
     switch (buttonElement) {
       case "title":
-        return activeButton === buttonName ? 'primary300' : 'accent200'
+        return isSelected ? 'primary300' : 'accent200'
 
       case "icon":
-        return activeButton === buttonName ? palette.primary300 : palette.accent200
+        return isSelected ? palette.primary300 : palette.accent200
     }
   }
 
@@ -84,72 +79,78 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
                 <Slider minValue={500} maxValue={10000} stepSize={100} formatter={currencyFormatter} onChange={field.onChange} value={field.value} style={{ padding: 10 }} />
               )} />
             <StyledText customStyle={['standar']}>Purpose:</StyledText>
-            <View>
-              <View style={styles.row}>
-                <Button
-                  title='Debt Consolidation'
-                  titleSize={customStyles.small}
-                  titleColor={buttonStyleVariant('title', ButtonNames.consolidation)}
-                  style={[customStyles.my3, customStyles.mr1, isSmallScreen ? styles.largeIconButton : styles.smallIconButton]}
-                  size='square'
-                  showIcon={true}
-                  outline={true}
-                  iconLib='MaterialIcons'
-                  iconName={'attach-money'}
-                  iconSize={50}
-                  iconColor={buttonStyleVariant('icon', ButtonNames.consolidation)}
-                  onPress={() => handleButtonPress(ButtonNames.consolidation)}
-                  isActive={activeButton === ButtonNames.consolidation}
-                />
-                <Button
-                  title='Monthly Bills'
-                  titleSize={customStyles.small}
-                  titleColor={buttonStyleVariant('title', ButtonNames.bills)}
-                  style={[customStyles.my2, isSmallScreen ? styles.largeIconButton : styles.smallIconButton]}
-                  size='square'
-                  showIcon={true}
-                  outline={true}
-                  iconLib='Ionicons'
-                  iconName={'calendar-outline'}
-                  iconSize={50}
-                  iconColor={buttonStyleVariant('icon', ButtonNames.bills)}
-                  onPress={() => handleButtonPress(ButtonNames.bills)}
-                  isActive={activeButton === ButtonNames.bills}
-                />
-              </View>
-              <View style={styles.row}>
-                <Button
-                  title='Moving'
-                  titleSize={customStyles.small}
-                  titleColor={buttonStyleVariant('title', ButtonNames.moving)}
-                  style={[customStyles.my3, customStyles.mr1, isSmallScreen ? styles.largeIconButton : styles.smallIconButton]}
-                  size='square'
-                  showIcon={true}
-                  outline={true}
-                  iconLib='MaterialCommunity'
-                  iconName={'truck-check-outline'}
-                  iconSize={45}
-                  iconColor={buttonStyleVariant('icon', ButtonNames.moving)}
-                  onPress={() => handleButtonPress(ButtonNames.moving)}
-                  isActive={activeButton === ButtonNames.moving}
-                />
-                <Button
-                  title='Others'
-                  titleSize={customStyles.small}
-                  titleColor={buttonStyleVariant('title', ButtonNames.others)}
-                  style={[customStyles.my3, isSmallScreen ? styles.largeIconButton : styles.smallIconButton]}
-                  size='square'
-                  showIcon={true}
-                  outline={true}
-                  iconLib='Ionicons'
-                  iconName={'wallet-outline'}
-                  iconSize={50}
-                  iconColor={buttonStyleVariant('icon', ButtonNames.others)}
-                  onPress={() => handleButtonPress(ButtonNames.others)}
-                  isActive={activeButton === ButtonNames.others}
-                />
-              </View>
-            </View>
+
+            <Controller
+              name='purpose'
+              control={control}
+              render={({ field }) => (
+                <View>
+                  <View style={styles.row}>
+                    <Button
+                      title='Debt Consolidation'
+                      titleSize={customStyles.small}
+                      titleColor={buttonStyleVariant('title', field.value === ButtonNames.consolidation)}
+                      style={[customStyles.my3, customStyles.mr1, isSmallScreen ? styles.largeIconButton : styles.smallIconButton]}
+                      size='square'
+                      showIcon={true}
+                      outline={true}
+                      iconLib='MaterialIcons'
+                      iconName={'attach-money'}
+                      iconSize={50}
+                      iconColor={buttonStyleVariant('icon', field.value === ButtonNames.consolidation)}
+                      onPress={() => field.onChange(ButtonNames.consolidation)}
+                      isActive={field.value === ButtonNames.consolidation}
+                    />
+                    <Button
+                      title='Monthly Bills'
+                      titleSize={customStyles.small}
+                      titleColor={buttonStyleVariant('title', field.value === ButtonNames.bills)}
+                      style={[customStyles.my2, isSmallScreen ? styles.largeIconButton : styles.smallIconButton]}
+                      size='square'
+                      showIcon={true}
+                      outline={true}
+                      iconLib='Ionicons'
+                      iconName={'calendar-outline'}
+                      iconSize={50}
+                      iconColor={buttonStyleVariant('icon', field.value === ButtonNames.bills)}
+                      onPress={() => field.onChange(ButtonNames.bills)}
+                      isActive={field.value === ButtonNames.bills}
+                    />
+                  </View>
+                  <View style={styles.row}>
+                    <Button
+                      title='Moving'
+                      titleSize={customStyles.small}
+                      titleColor={buttonStyleVariant('title', field.value === ButtonNames.moving)}
+                      style={[customStyles.my3, customStyles.mr1, isSmallScreen ? styles.largeIconButton : styles.smallIconButton]}
+                      size='square'
+                      showIcon={true}
+                      outline={true}
+                      iconLib='MaterialCommunity'
+                      iconName={'truck-check-outline'}
+                      iconSize={45}
+                      iconColor={buttonStyleVariant('icon', field.value === ButtonNames.moving)}
+                      onPress={() => field.onChange(ButtonNames.moving)}
+                      isActive={field.value === ButtonNames.moving}
+                    />
+                    <Button
+                      title='Others'
+                      titleSize={customStyles.small}
+                      titleColor={buttonStyleVariant('title', field.value === ButtonNames.others)}
+                      style={[customStyles.my3, isSmallScreen ? styles.largeIconButton : styles.smallIconButton]}
+                      size='square'
+                      showIcon={true}
+                      outline={true}
+                      iconLib='Ionicons'
+                      iconName={'wallet-outline'}
+                      iconSize={50}
+                      iconColor={buttonStyleVariant('icon', field.value === ButtonNames.others)}
+                      onPress={() => field.onChange(ButtonNames.others)}
+                      isActive={field.value === ButtonNames.others}
+                    />
+                  </View>
+                </View>
+              )} />
           </View>
         </ScrollView>
 

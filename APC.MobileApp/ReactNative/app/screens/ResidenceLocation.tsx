@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, ScrollView, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Colors from '../themes/Colors';
 import Button from '../components/Button'
@@ -230,7 +230,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
                     <View>
                       <View>
 
-                        <TouchableOpacity onPress={() => onChange('true')}>
+                        <Pressable onPress={() => onChange('true')}>
                           <View style={styles.flex}>
                             <RadioButton.Android value='true' color={Colors.accent200} />
                             <StyledText>Device GPS</StyledText>
@@ -251,11 +251,11 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
                                 : null
                             }
                           </View>
-                        </TouchableOpacity>
+                        </Pressable>
                       </View>
                     </View>
                     <View>
-                      <TouchableOpacity onPress={() => onChange('hacked')}>
+                      <Pressable onPress={() => onChange('hacked')}>
                         <View style={styles.flex}>
                           <RadioButton.Android value='hacked' color={Colors.accent200} />
                           <StyledText>Hacked GPS</StyledText>
@@ -276,40 +276,40 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
                             </View>
                           ) : null
                         }
-                      </TouchableOpacity>
+                      </Pressable>
                     </View>
                     <View style={{ marginTop: 20 }}>
-                      <View style={styles.flex}>
-                        <Controller
-                          control={control}
-                          name='UseAPC'
-                          render={({ field: { onChange, value } }) => (
-                            <TouchableOpacity onPress={() => onChange(!value)}>
+                      <Controller
+                        control={control}
+                        name='UseAPC'
+                        render={({ field: { onChange, value } }) => (
+                          <Pressable onPress={() => onChange(!value)}>
+                            <View style={styles.flex}>
                               <CheckboxWithText
                                 label='Use Azure Programmable Connectivity Backend'
                                 checked={value}
                                 onToggle={() => onChange(!value)}
                               />
-                              <View style={styles.optionSubtitleContainer}>
-                                {
-                                  apcPosition && apcPosition.location ?
-                                    <View style={styles.optionSubtitleBadge}>
-                                      <StyledText>{apcPosition.location.country} - {apcPosition.location.state} - {apcPosition.location.city}</StyledText>
-                                    </View>
-                                    : null
-                                }
-                                {
-                                  apcPosition && apcPosition.coords ?
-                                    <View style={styles.optionSubtitleBadge}>
-                                      <StyledText>{apcPosition.coords.latitude}, {apcPosition.coords.longitude}</StyledText>
-                                    </View>
-                                    : null
-                                }
-                              </View>
-                            </TouchableOpacity>
-                          )}
-                        />
-                      </View>
+                            </View>
+                            <View style={styles.optionSubtitleContainer}>
+                              {
+                                apcPosition && apcPosition.location ?
+                                  <View style={styles.optionSubtitleBadge}>
+                                    <StyledText>{apcPosition.location.country} - {apcPosition.location.state} - {apcPosition.location.city}</StyledText>
+                                  </View>
+                                  : null
+                              }
+                              {
+                                apcPosition && apcPosition.coords ?
+                                  <View style={styles.optionSubtitleBadge}>
+                                    <StyledText>{apcPosition.coords.latitude}, {apcPosition.coords.longitude}</StyledText>
+                                  </View>
+                                  : null
+                              }
+                            </View>
+                          </Pressable>
+                        )}
+                      />
                     </View>
                   </RadioButton.Group>
                 )}
