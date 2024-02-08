@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Constants from 'expo-constants';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Button from '../components/Button'
 import Colors from '../themes/Colors';
@@ -9,6 +9,8 @@ import customStyles from '../themes/CustomStyles';
 import palette from '../themes/Colors';
 import StyledText from '../components/StyledText';
 import { StatusBar } from 'expo-status-bar';
+import CustomModal from '../components/Modal';
+import { useState } from 'react';
 
 
 function Welcome() {
@@ -43,7 +45,9 @@ function Welcome() {
             useGradient={true}
             onPress={() => navigation.navigate('Consents')}
           />
+
         </View>
+
       </View>
     </AppContainer>
   );

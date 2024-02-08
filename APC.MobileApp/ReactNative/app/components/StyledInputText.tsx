@@ -18,6 +18,7 @@ interface InputTextProps extends TextInputProps {
 const styles = StyleSheet.create({
     input_properties: {
         flexGrow: 1,
+        fontSize: 18,
         backgroundColor: palette.transparent,
         padding: 10,
         marginTop: 10,

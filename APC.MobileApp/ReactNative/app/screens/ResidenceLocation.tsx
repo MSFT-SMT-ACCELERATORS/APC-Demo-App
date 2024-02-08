@@ -18,7 +18,8 @@ import customStyles from '../themes/CustomStyles';
 import RNPickerSelect, { PickerStyle } from 'react-native-picker-select';
 import { Position } from '../utils/APCService';
 import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration, defaultConfig, ConnectionMode } from '../utils/SettingsService'
-
+import CustomModal from '../components/Modal';
+import { Ionicons } from '@expo/vector-icons';
 
 interface StepProps {
   setProgress: (progress: number) => void;
@@ -31,6 +32,16 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
   const [gpsPosition, setGPSPosition] = useState<Position>();
   const [apcPosition, setAPCPosition] = useState<Position>();
   const [config, setConfig] = useState<AppConfiguration>();
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalText, setModalText] = useState('');
+
+  const handleModalToggle = (title: string, text: string) => {
+    setModalTitle(title);
+    setModalText(text);
+    setModalVisible(!modalVisible);
+  };
 
   const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm({
     defaultValues: {
@@ -71,7 +82,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
 
   const onFormValid = async (data: FieldValues) => {
     console.log('Submitted Data:', data);
-    navigation.navigate('StarterPage');
+    // navigation.navigate('StarterPage');
 
     const selectedCity = cities.filter(d => d.country == data.Country && d.state == data.StateProvince && d.city == data.City)[0];
     let coordsForm = APCService.getLocationCoords(selectedCity.latitude, selectedCity.longitude);
@@ -87,14 +98,18 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
     if (data.UseAPC) {
       const response = await APCService.matchesAPCLocation(apiClient, coords);
       if (!response.verificationResult) {
+        handleModalToggle("Wrong GPS location", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence (APC)");
         console.error('APC validation failed!!');
       } else {
         console.log('APC validation success!!')
       }
     }
-
+    
     // Business validation
     if (!await APCService.matchesCoords(coords, coordsForm)) {
+      handleModalToggle("Wrong GPS location", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence (APC)");
+
+      // handleModalToggle("Wrong GPS location", "The location does not match the information entered in the form");
       console.error('Business validation failed!!');
     } else {
       console.log('Business validation success!!')
@@ -149,8 +164,12 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
               render={({ field }) => (
                 <RNPickerSelect
                   style={pickerStyle}
+                  darkTheme = {true}
                   value={field.value}
                   onValueChange={handleCountryChange}
+                  Icon={() => {
+                    return <Ionicons name="chevron-down" size={24} color={palette.neutral} />;
+                  }}
                   items={cities
                     .map(item => item.country)
                     .filter((value, index, self) => self.indexOf(value) === index)
@@ -173,9 +192,13 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
               render={({ field }) => (
                 <RNPickerSelect
                   style={pickerStyle}
+                  darkTheme = {true}
                   value={field.value}
                   disabled={!getValues('Country')}
                   onValueChange={handleStateChange}
+                  Icon={() => {
+                    return <Ionicons name="chevron-down" size={24} color={palette.neutral} />;
+                  }}
                   items={cities
                     .filter(item => item.country === getValues('Country'))
                     .map(item => item.state)
@@ -199,9 +222,13 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
               render={({ field }) => (
                 <RNPickerSelect
                   style={pickerStyle}
+                  darkTheme = {true}
                   value={field.value}
                   disabled={!getValues('StateProvince')}
                   onValueChange={handleCityChange}
+                  Icon={() => {
+                    return <Ionicons name="chevron-down" size={24} color={palette.neutral} />;
+                  }}
                   items={cities
                     .filter(item => item.country == getValues('Country') && item.state === getValues('StateProvince'))
                     .map(item => item.city)
@@ -278,7 +305,8 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
                         }
                       </Pressable>
                     </View>
-                    <View style={{ marginTop: 20 }}>
+                    <View style={[styles.dangerSeparator, customStyles.my5]}></View>
+                    <View>
                       <Controller
                         control={control}
                         name='UseAPC'
@@ -327,6 +355,13 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
             onPress={handleSubmit(onFormValid)} />
         </View>
       </View>
+      <CustomModal
+              visible={modalVisible}
+              onClose={() => handleModalToggle('', '')}
+              iconName={'warning-outline'}
+              title={modalTitle}
+              text={modalText}
+            />
     </AppContainer>
 
   );
@@ -382,6 +417,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 3,
     borderBlockColor: palette.primary100
   },
+  dangerSeparator: {
+    width: 300,
+    alignSelf: 'center',
+    borderBottomWidth: 3,
+    borderBlockColor: palette.secondary200
+  },
   btnGroup: {
     borderWidth: 2,
     borderRadius: 8,
@@ -431,11 +472,29 @@ const styles = StyleSheet.create({
 });
 
 const pickerStyle: PickerStyle = {
+  inputWeb:{
+    fontSize: 20,
+    padding: 10,
+    backgroundColor: palette.transparent,
+    color: palette.neutral,
+    borderBottomWidth:1,
+    borderColor: palette.accent200
+  },
   inputIOS: {
-    color: 'white'
+    fontSize: 20,
+    padding: 10,
+    backgroundColor: palette.transparent,
+    color: palette.neutral,
+    borderBottomWidth:1,
+    borderColor: palette.accent200
   },
   inputAndroid: {
-    color: 'white'
+    fontSize: 20,
+    padding: 10,
+    backgroundColor: palette.transparent,
+    color: palette.neutral,
+    borderWidth:1,
+    borderColor: palette.accent200
   }
 };
 

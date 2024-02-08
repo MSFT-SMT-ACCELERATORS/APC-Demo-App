@@ -19,6 +19,7 @@ interface CheckboxWithTextProps {
 const defaultStyles = StyleSheet.create({
   flex: {
     flexDirection: 'row',
+    width: '100%'
     // justifyContent: 'flex-start',
     // alignItems: 'center',
   },
