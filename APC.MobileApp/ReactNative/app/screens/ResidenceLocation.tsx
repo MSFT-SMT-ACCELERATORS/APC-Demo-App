@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import Colors from '../themes/Colors';
 import Button from '../components/Button'
 import palette from '../themes/Colors';
-import { RadioButton } from 'react-native-paper';
+import { RadioButton, Modal, Portal, Text, PaperProvider } from 'react-native-paper';
 import StyledText from '../components/StyledText';
 import { useEffect, useState } from 'react';
 import AppContainer from '../components/AppContainer';
@@ -18,6 +18,7 @@ import customStyles from '../themes/CustomStyles';
 import RNPickerSelect, { PickerStyle } from 'react-native-picker-select';
 import { Position } from '../utils/APCService';
 import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration, defaultConfig, ConnectionMode } from '../utils/SettingsService'
+import Icon from 'react-native-vector-icons/AntDesign';
 
 
 interface StepProps {
@@ -31,6 +32,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
   const [gpsPosition, setGPSPosition] = useState<Position>();
   const [apcPosition, setAPCPosition] = useState<Position>();
   const [config, setConfig] = useState<AppConfiguration>();
+  const [tooltipVisible, setTooltipVisible] = useState<boolean>(false)
 
   const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm({
     defaultValues: {
@@ -101,6 +103,9 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
     }
   }
 
+  const showTooltip = () => setTooltipVisible(true);
+  const hideTooltip = () => setTooltipVisible(false);
+
   useEffect(() => {
     readConfigurations().then(setConfig);
 
@@ -125,7 +130,9 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
 
           <View style={[styles.title]}>
             <StyledText customStyle={['title2', 'extrabold']}>Residence Location</StyledText>
-            <StyledText style={{ textAlign: 'center' }} customStyle={['title5', 'regular']}>Please, select your country and state/province of residence.</StyledText>
+            <StyledText style={{ textAlign: 'center' }} customStyle={['title5', 'regular']}>Please, select your country and state/province of residence{'  '}
+                <Icon name="infocirlceo" size={20} color={palette.accent200} onPress={showTooltip} />
+            </StyledText>
           </View>
 
           <View style={[styles.separatorContainer, customStyles.mb4]}></View>
@@ -326,6 +333,11 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
             useGradient={true}
             onPress={handleSubmit(onFormValid)} />
         </View>
+
+        <Modal visible={tooltipVisible} onDismiss={hideTooltip} contentContainerStyle={styles.tooltip}>
+          <Text style={styles.tooltipContent}>You need to be using this app in the same area.</Text>
+        </Modal>
+
       </View>
     </AppContainer>
 
@@ -428,6 +440,17 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
   },
+  tooltip: {
+    position: 'absolute',
+    top: 50,
+    color: '#000',
+    alignSelf: 'center',
+    padding: 20,
+    backgroundColor: palette.neutral,
+  },
+  tooltipContent: {
+    color: palette.accent300,
+  }
 });
 
 const pickerStyle: PickerStyle = {
