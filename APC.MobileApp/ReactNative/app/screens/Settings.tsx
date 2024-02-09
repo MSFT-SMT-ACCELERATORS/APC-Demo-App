@@ -14,19 +14,29 @@ import StyledText from '../components/StyledText';
 import { RadioButton } from 'react-native-paper';
 import palette from '../themes/Colors';
 
-function Settings() {
+interface SettingsProps {
+    setLoading: (isLoading: boolean, text?: string) => void;
+}
+
+const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
     const navigation = useNavigation();
     const { control, handleSubmit, watch, formState: { errors }, reset } = useForm<AppConfiguration>({ defaultValues: defaultConfig })
     const connectionMode = watch('connectionMode');
 
     useEffect(() => {
-        const loadConfig = async () => {
-            const config = await readConfigurations();
-            reset(config);
-        };
+        const unsubscribe = navigation.addListener('focus', () => {
+            setLoading(false);
 
-        loadConfig();
-    }, []);
+            const loadConfig = async () => {
+                const config = await readConfigurations();
+                reset(config);
+            };
+
+            loadConfig();
+        });
+
+        return unsubscribe;
+    }, [navigation]);
 
     const saveConfig: SubmitHandler<AppConfiguration> = async (data) => {
         const formattedData = {
@@ -186,7 +196,7 @@ const styles = StyleSheet.create({
         bottom: 15,
         left: 0,
         right: 0,
-      },
+    },
     flex: {
         flexDirection: 'row',
         justifyContent: 'flex-start',

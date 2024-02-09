@@ -13,15 +13,21 @@ import { Controller, FieldValues, useForm } from 'react-hook-form';
 
 interface StepProps {
   setProgress: (progress: number) => void;
+  setLoading: (isLoading: boolean) => void;
 }
 
-const Information: React.FC<StepProps> = ({ setProgress }) => {
+const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const navigation = useNavigation();
-  const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm();
+  const { control, handleSubmit, formState: { errors } } = useForm();
 
   useEffect(() => {
-    setProgress(75);
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      setLoading(false);
+      setProgress(75);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const onFormValid = async (data: FieldValues) => {
     console.log(data);

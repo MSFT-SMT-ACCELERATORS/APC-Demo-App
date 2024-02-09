@@ -52,7 +52,7 @@ export const getAPCLocation = async (client: APCApi) => {
 
 export const matchesAPCLocation = async (client: APCApi, coords: Location.LocationObjectCoords) => {
     const config = await readConfigurations();
-    
+
     if (config.connectionMode == ConnectionMode.Mock || config.connectionMode == ConnectionMode.Offline) {
         const mockAPCLocation = await getAPCLocation(client);
 
@@ -107,10 +107,10 @@ export const getLatestSimChange = async (apiClient: APCApi) => {
     }
 
     const phoneNumber = await getPhoneNumber(apiClient);
-    
+
     const mockHeader = config.connectionMode == ConnectionMode.Mock ? { headers: { 'X-Use-Mock': true } } : undefined;
     const response = await apiClient.aPCSwapDatePost({ network: 'network', phoneNumber: { number: phoneNumber } }, mockHeader)
-    
+
     return response.data.latestSimChange;
 }
 
@@ -118,21 +118,28 @@ export const getLatestSimChange = async (apiClient: APCApi) => {
 
 export const getDeviceGPSLocation = async () => {
     async function getLocationPermission() {
+        console.log("Requesting gps permission...");
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
             console.error('Permission to access location was denied');
             return;
         }
+        console.log("Requesting gps permission... OK");
     }
 
     const config = await readConfigurations();
     await getLocationPermission();
 
-    const location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.BestForNavigation });
+    let location: Location.LocationObject;
+    console.log("Getting current position...");
+
+    location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+    console.log("Getting current position... OK");
 
     const bingLocation = config.connectionMode != ConnectionMode.Offline ? await BingService.translateCoordsToLocation(location.coords) : undefined;
 
     return { coords: location.coords, location: bingLocation } as Position;
+
 }
 
 export const getLocationCoords = (latitude: number, longitude: number, accuracy: number = 1000) => {

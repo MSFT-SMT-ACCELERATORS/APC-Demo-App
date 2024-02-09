@@ -9,10 +9,23 @@ import customStyles from '../themes/CustomStyles';
 import palette from '../themes/Colors';
 import StyledText from '../components/StyledText';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 
 
-function Welcome() {
+interface WelcomeProps {
+  setLoading: (isLoading: boolean, text?: string) => void;
+}
+
+const Welcome: React.FC<WelcomeProps> = ({ setLoading }) => {
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <AppContainer >

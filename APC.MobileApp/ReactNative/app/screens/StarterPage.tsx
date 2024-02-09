@@ -17,6 +17,7 @@ import { Modal } from 'react-native-paper';
 
 interface StepProps {
   setProgress: (progress: number) => void;
+  setLoading: (isLoading: boolean) => void;
 }
 
 enum ButtonNames {
@@ -29,15 +30,19 @@ enum ButtonNames {
 const screenWidth = Dimensions.get('window').width;
 const isSmallScreen = screenWidth < 200;
 
-const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
+const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const navigation = useNavigation();
   const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm();
   const [tooltipVisible, setTooltipVisible] = useState<boolean>(false)
-  
-  useEffect(() => {
-    setProgress(50);
-  }, []);
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setLoading(false);
+      setProgress(50);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const showTooltip = () => setTooltipVisible(true);
   const hideTooltip = () => setTooltipVisible(false);
@@ -66,7 +71,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
           <View style={[styles.title]}>
             <StyledText customStyle={['title2', 'extrabold']}>Let’s get started</StyledText>
             <StyledText style={{ textAlign: 'center' }} customStyle={['title5', 'regular']}>Please complete the form below {'  '}
-            <Icon name="infocirlceo" size={20} color={palette.accent200} onPress={showTooltip} />
+              <Icon name="infocirlceo" size={20} color={palette.accent200} onPress={showTooltip} />
             </StyledText>
           </View>
 
@@ -174,8 +179,8 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
 
       </View>
       <Modal visible={tooltipVisible} onDismiss={hideTooltip} contentContainerStyle={styles.tooltip}>
-          <StyledText customStyle={['standarSm', 'bold']} color='black'>Note that your phone should be the same number used by your phone</StyledText>
-        </Modal>
+        <StyledText customStyle={['standarSm', 'bold']} color='black'>Note that your phone should be the same number used by your phone</StyledText>
+      </Modal>
     </AppContainer>
   );
 }
