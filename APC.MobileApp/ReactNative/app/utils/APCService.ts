@@ -51,6 +51,13 @@ export const getAPCLocation = async (client: APCApi) => {
 }
 
 export const matchesAPCLocation = async (client: APCApi, coords: Location.LocationObjectCoords) => {
+    const apcLocation = await getAPCLocation(client);
+
+    return {
+        verificationResult: await matchesCoords(coords, apcLocation.coords)
+    }
+    
+
     const config = await readConfigurations();
 
     if (config.connectionMode == ConnectionMode.Mock || config.connectionMode == ConnectionMode.Offline) {
