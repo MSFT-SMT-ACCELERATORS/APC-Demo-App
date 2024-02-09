@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { StyleSheet, View, ScrollView, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Colors from '../themes/Colors';
 import Button from '../components/Button'
 import palette from '../themes/Colors';
-import { RadioButton } from 'react-native-paper';
+import { RadioButton, Modal, Portal, Text, PaperProvider } from 'react-native-paper';
 import StyledText from '../components/StyledText';
 import { useEffect, useState } from 'react';
 import AppContainer from '../components/AppContainer';
@@ -17,20 +17,38 @@ import cities from '../utils/cities.json'
 import customStyles from '../themes/CustomStyles';
 import RNPickerSelect, { PickerStyle } from 'react-native-picker-select';
 import { Position } from '../utils/APCService';
-import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration, defaultConfig } from '../utils/SettingsService'
-
+import { readConfigurations, AppConfiguration, ConnectionMode } from '../utils/SettingsService'
+import CustomModal from '../components/CustomModal';
+import { Ionicons } from '@expo/vector-icons';
+import Icon from 'react-native-vector-icons/AntDesign';
 
 interface StepProps {
   setProgress: (progress: number) => void;
+  setLoading: (isLoading: boolean, text?: string) => void;
 }
 
-const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
+const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const navigation = useNavigation();
   const apiClient = useApiClient();
   const [hackedGPS, setHackedGPS] = useState<LocationObjectCoords>();
   const [gpsPosition, setGPSPosition] = useState<Position>();
   const [apcPosition, setAPCPosition] = useState<Position>();
   const [config, setConfig] = useState<AppConfiguration>();
+  const [tooltipVisible, setTooltipVisible] = useState<boolean>(false);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalText, setModalText] = useState('');
+  const [showModalIcon, setModalIcon] = useState(true);
+  const [modalBackground, setModalBackground] = useState('');
+
+  const handleModalToggle = (title: string, text: string, backgroundColor: string = palette.danger100, showIcon: boolean = true) => {
+    setModalIcon(showIcon);
+    setModalTitle(title);
+    setModalText(text);
+    setModalVisible(!modalVisible);
+    setModalBackground(backgroundColor);
+  };
 
   const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm({
     defaultValues: {
@@ -71,11 +89,14 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
 
   const onFormValid = async (data: FieldValues) => {
     console.log('Submitted Data:', data);
-    navigation.navigate('StarterPage');
+    setLoading(true, "Validating your data...");
 
     const selectedCity = cities.filter(d => d.country == data.Country && d.state == data.StateProvince && d.city == data.City)[0];
+
     let coordsForm = APCService.getLocationCoords(selectedCity.latitude, selectedCity.longitude);
+    console.log('Get: device gps location');
     let coordsGPS = await APCService.getDeviceGPSLocation();
+    console.log('Get: device gps location OK');
 
     let coords: LocationObjectCoords;
     if (data.GPSOption == 'true')
@@ -83,29 +104,55 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
     else
       coords = coordsForm;
 
+    let hasError = false;
     // APC validation
     if (data.UseAPC) {
+      console.log('validating apc matches locataion');
       const response = await APCService.matchesAPCLocation(apiClient, coords);
       if (!response.verificationResult) {
-        console.error('APC validation failed!!');
+        handleModalToggle("Wrong GPS location", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence (APC)");
+        console.log('APC validation failed!!');
+        hasError = true;
       } else {
-        console.log('APC validation success!!')
+        // handleModalToggle("APC validation", "", palette.accent200, false);
+        console.log('APC validation success!!');
       }
     }
 
     // Business validation
+    console.log('validating business rule');
     if (!await APCService.matchesCoords(coords, coordsForm)) {
-      console.error('Business validation failed!!');
+      handleModalToggle("Error Business Lockout", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence (APC)");
+      // handleModalToggle("Wrong GPS location", "The location does not match the information entered in the form");
+      console.log('Business validation failed!!');
+      hasError = true;
     } else {
+      // handleModalToggle("Wrong GPS location", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence (APC)");
       console.log('Business validation success!!')
     }
+
+    setLoading(false);
+
+    if (!hasError)
+      navigation.navigate('StarterPage');
   }
+
+  const showTooltip = () => setTooltipVisible(true);
+  const hideTooltip = () => setTooltipVisible(false);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setLoading(false);
+      setProgress(25);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   useEffect(() => {
     readConfigurations().then(setConfig);
 
-    setProgress(25);
-    APCService.getDeviceGPSLocation()
+    APCService.getDeviceGPSLocation(apiClient)
       .then(setGPSPosition);
 
     APCService.getAPCLocation(apiClient)
@@ -125,7 +172,9 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
 
           <View style={[styles.title]}>
             <StyledText customStyle={['title2', 'extrabold']}>Residence Location</StyledText>
-            <StyledText style={{ textAlign: 'center' }} customStyle={['title5', 'regular']}>Please, select your country and state/province of residence.</StyledText>
+            <StyledText style={{ textAlign: 'center' }} customStyle={['title5', 'regular']}>Please, select your country and state/province of residence{'  '}
+              <Icon name="infocirlceo" size={20} color={palette.accent200} onPress={showTooltip} />
+            </StyledText>
           </View>
 
           <View style={[styles.separatorContainer, customStyles.mb4]}></View>
@@ -149,8 +198,12 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
               render={({ field }) => (
                 <RNPickerSelect
                   style={pickerStyle}
+                  darkTheme={true}
                   value={field.value}
                   onValueChange={handleCountryChange}
+                  Icon={() => {
+                    return <Ionicons name="chevron-down" size={24} color={palette.neutral} />;
+                  }}
                   items={cities
                     .map(item => item.country)
                     .filter((value, index, self) => self.indexOf(value) === index)
@@ -173,9 +226,13 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
               render={({ field }) => (
                 <RNPickerSelect
                   style={pickerStyle}
+                  darkTheme={true}
                   value={field.value}
                   disabled={!getValues('Country')}
                   onValueChange={handleStateChange}
+                  Icon={() => {
+                    return <Ionicons name="chevron-down" size={24} color={palette.neutral} />;
+                  }}
                   items={cities
                     .filter(item => item.country === getValues('Country'))
                     .map(item => item.state)
@@ -199,9 +256,13 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
               render={({ field }) => (
                 <RNPickerSelect
                   style={pickerStyle}
+                  darkTheme={true}
                   value={field.value}
                   disabled={!getValues('StateProvince')}
                   onValueChange={handleCityChange}
+                  Icon={() => {
+                    return <Ionicons name="chevron-down" size={24} color={palette.neutral} />;
+                  }}
                   items={cities
                     .filter(item => item.country == getValues('Country') && item.state === getValues('StateProvince'))
                     .map(item => item.city)
@@ -229,80 +290,88 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
                   <RadioButton.Group onValueChange={onChange} value={value}>
                     <View>
                       <View>
-                        <View style={styles.flex}>
-                          <RadioButton value='true' color={Colors.accent200} />
-                          <StyledText>Device GPS</StyledText>
-                        </View>
-                        <View style={styles.optionSubtitleContainer}>
-                          {
-                            gpsPosition && gpsPosition.location ?
-                              <View style={styles.optionSubtitleBadge}>
-                                <StyledText>{gpsPosition.location.country} - {gpsPosition.location.state} - {gpsPosition.location.city}</StyledText>
-                              </View>
-                              : null
-                          }
-                          {
-                            gpsPosition && gpsPosition.coords ?
-                              <View style={styles.optionSubtitleBadge}>
-                                <StyledText>{gpsPosition.coords.latitude}, {gpsPosition.coords.longitude}</StyledText>
-                              </View>
-                              : null
-                          }
-                        </View>
-                      </View>
-                    </View>
-                    <View>
-                      <View style={styles.flex}>
-                        <RadioButton value='hacked' color={Colors.accent200} />
-                        <StyledText>Hacked GPS</StyledText>
-                      </View>
-                      {
-                        getValues('Country') && getValues('StateProvince') && getValues('City') ? (
+
+                        <Pressable onPress={() => onChange('true')}>
+                          <View style={styles.flex}>
+                            <RadioButton.Android value='true' color={Colors.accent200} />
+                            <StyledText>Device GPS</StyledText>
+                          </View>
                           <View style={styles.optionSubtitleContainer}>
                             {
-                              !config?.offlineMode ?
-                                <View style={[styles.optionSubtitleBadge]}>
-                                  <StyledText>{getValues('Country')} - {getValues('StateProvince')} - {getValues('City')}</StyledText>
+                              gpsPosition && gpsPosition.location ?
+                                <View style={styles.optionSubtitleBadge}>
+                                  <StyledText>{gpsPosition.location.country} - {gpsPosition.location.state} - {gpsPosition.location.city}</StyledText>
                                 </View>
                                 : null
                             }
-                            <View style={styles.optionSubtitleBadge}>
-                              <StyledText>{hackedGPS?.latitude}, {hackedGPS?.longitude}</StyledText>
-                            </View>
+                            {
+                              gpsPosition && gpsPosition.coords ?
+                                <View style={styles.optionSubtitleBadge}>
+                                  <StyledText>{gpsPosition.coords.latitude.toFixed(4)}, {gpsPosition.coords.longitude.toFixed(4)}</StyledText>
+                                </View>
+                                : null
+                            }
                           </View>
-                        ) : null
-                      }
+                        </Pressable>
+                      </View>
                     </View>
-                    <View style={{ marginTop: 20 }}>
-                      <View style={styles.flex}>
-                        <Controller
-                          control={control}
-                          name='UseAPC'
-                          render={({ field: { onChange, value } }) => (
-                            <CheckboxWithText
-                              label='Use Azure Programmable Connectivity Backend'
-                              checked={value}
-                              onToggle={() => onChange(!value)}
-                            />
-                          )}
-                        />
-                      </View>
-                      <View style={styles.optionSubtitleContainer}>
+                    <View>
+                      <Pressable onPress={() => onChange('hacked')}>
+                        <View style={styles.flex}>
+                          <RadioButton.Android value='hacked' color={Colors.accent200} />
+                          <StyledText>Hacked GPS</StyledText>
+                        </View>
                         {
-                          apcPosition && apcPosition.location ?
-                            <View style={styles.optionSubtitleBadge}>
-                              <StyledText>{apcPosition.location.country} - {apcPosition.location.state} - {apcPosition.location.city}</StyledText>
+                          getValues('Country') && getValues('StateProvince') && getValues('City') ? (
+                            <View style={styles.optionSubtitleContainer}>
+                              {
+                                config?.connectionMode != ConnectionMode.Offline ?
+                                  <View style={[styles.optionSubtitleBadge]}>
+                                    <StyledText>{getValues('Country')} - {getValues('StateProvince')} - {getValues('City')}</StyledText>
+                                  </View>
+                                  : null
+                              }
+                              <View style={styles.optionSubtitleBadge}>
+                                <StyledText>{hackedGPS?.latitude}, {hackedGPS?.longitude}</StyledText>
+                              </View>
                             </View>
-                            : null
+                          ) : null
                         }
-                        {
-                          apcPosition && apcPosition.coords ?
-                            <View style={styles.optionSubtitleBadge}>
-                              <StyledText>{apcPosition.coords.latitude}, {apcPosition.coords.longitude}</StyledText>
+                      </Pressable>
+                    </View>
+                    <View style={[styles.dangerSeparator, customStyles.my5]}></View>
+                    <View>
+                      <Controller
+                        control={control}
+                        name='UseAPC'
+                        render={({ field: { onChange, value } }) => (
+                          <Pressable onPress={() => onChange(!value)}>
+                            <View style={styles.flex}>
+                              <CheckboxWithText
+                                label='Use Azure Programmable Connectivity Backend'
+                                checked={value}
+                                onToggle={() => onChange(!value)}
+                              />
                             </View>
-                            : null
-                        }
-                      </View>
+                            <View style={styles.optionSubtitleContainer}>
+                              {
+                                apcPosition && apcPosition.location ?
+                                  <View style={styles.optionSubtitleBadge}>
+                                    <StyledText>{apcPosition.location.country} - {apcPosition.location.state} - {apcPosition.location.city}</StyledText>
+                                  </View>
+                                  : null
+                              }
+                              {
+                                apcPosition && apcPosition.coords ?
+                                  <View style={styles.optionSubtitleBadge}>
+                                    <StyledText>{apcPosition.coords.latitude}, {apcPosition.coords.longitude}</StyledText>
+                                  </View>
+                                  : null
+                              }
+                            </View>
+                          </Pressable>
+                        )}
+                      />
                     </View>
                   </RadioButton.Group>
                 )}
@@ -319,7 +388,20 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
             useGradient={true}
             onPress={handleSubmit(onFormValid)} />
         </View>
+
+        <Modal visible={tooltipVisible} onDismiss={hideTooltip} contentContainerStyle={styles.tooltip}>
+          <StyledText customStyle={['standarSm', 'bold']} color='black'>You need to be using this app in the same area.</StyledText>
+        </Modal>
       </View>
+      <CustomModal
+        visible={modalVisible}
+        onClose={() => handleModalToggle('', '', '', false)}
+        showIcon={showModalIcon}
+        iconName={'warning-outline'}
+        title={modalTitle}
+        text={modalText}
+        backgroundColor={modalBackground}
+      />
     </AppContainer>
 
   );
@@ -375,6 +457,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 3,
     borderBlockColor: palette.primary100
   },
+  dangerSeparator: {
+    width: 300,
+    alignSelf: 'center',
+    borderBottomWidth: 3,
+    borderBlockColor: palette.secondary200
+  },
   btnGroup: {
     borderWidth: 2,
     borderRadius: 8,
@@ -421,14 +509,43 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
   },
+  tooltip: {
+    position: 'absolute',
+    top: 50,
+    color: '#000',
+    alignSelf: 'center',
+    padding: 20,
+    backgroundColor: palette.neutral,
+  },
+  tooltipContent: {
+    color: palette.accent300,
+  }
 });
 
 const pickerStyle: PickerStyle = {
+  inputWeb: {
+    fontSize: 20,
+    padding: 10,
+    backgroundColor: palette.transparent,
+    color: palette.neutral,
+    borderBottomWidth: 1,
+    borderColor: palette.accent200
+  },
   inputIOS: {
-    color: 'white'
+    fontSize: 20,
+    padding: 10,
+    backgroundColor: palette.transparent,
+    color: palette.neutral,
+    borderBottomWidth: 1,
+    borderColor: palette.accent200
   },
   inputAndroid: {
-    color: 'white'
+    fontSize: 20,
+    padding: 10,
+    backgroundColor: palette.transparent,
+    color: palette.neutral,
+    borderWidth: 1,
+    borderColor: palette.accent200
   }
 };
 

@@ -1,96 +1,220 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { StyleSheet, View, ScrollView, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import Colors from '../themes/Colors';
-import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration, defaultConfig } from '../utils/SettingsService'
+import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration, defaultConfig, ConnectionMode } from '../utils/SettingsService'
 
 import AppContainer from '../components/AppContainer';
 import Button from '../components/Button'
-import CheckboxWithText from '../components/CheckBox';
 import StyledInputText from '../components/StyledInputText';
+import { Controller, FieldValues, SubmitHandler, useForm } from 'react-hook-form';
+import StyledText from '../components/StyledText';
+import { RadioButton } from 'react-native-paper';
+import palette from '../themes/Colors';
 
-function Settings() {
+interface SettingsProps {
+    setLoading: (isLoading: boolean, text?: string) => void;
+}
+
+const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
     const navigation = useNavigation();
-    const [config, setConfig] = useState<AppConfiguration>(defaultConfig);
+    const { control, handleSubmit, watch, formState: { errors }, reset } = useForm<AppConfiguration>({ defaultValues: defaultConfig })
+    const connectionMode = watch('connectionMode');
 
     useEffect(() => {
-        const loadConfig = async () => {
-            const savedConfig = await readConfigurations();
-            const mergedConfig = { ...config, ...savedConfig };
-            setConfig(mergedConfig);
+        const unsubscribe = navigation.addListener('focus', () => {
+            setLoading(false);
+
+            const loadConfig = async () => {
+                const config = await readConfigurations();
+                reset(config);
+            };
+
+            loadConfig();
+        });
+
+        return unsubscribe;
+    }, [navigation]);
+
+    const saveConfig: SubmitHandler<AppConfiguration> = async (data) => {
+        const formattedData = {
+            ...data,
+            radiusKm: typeof data.radiusKm === 'string' ? parseFloat(data.radiusKm) : data.radiusKm,
+            offlineLatitude: typeof data.offlineLatitude === 'string' ? parseFloat(data.offlineLatitude) : data.offlineLatitude,
+            offlineLongitude: typeof data.offlineLongitude === 'string' ? parseFloat(data.offlineLongitude) : data.offlineLongitude,
+
         };
-
-        loadConfig();
-    }, []);
-
-    const handleConfigurationChange = async <T extends keyof AppConfiguration>(key: T, value: AppConfiguration[T]) => {
-        await updateConfiguration(key, value);
-
-        setConfig(prevConfig => ({ ...prevConfig, [key]: value }));
-    };
-
-    const parseFloat = (value: string) => {
-        return value === '' ? 0 : (Number.parseFloat(value) || 0);
+        console.log(formattedData);
+        storeConfigurations(data);
     }
 
     return (
         <AppContainer>
-            <ScrollView style={styles.container}>
-                <View>
-                    <StyledInputText labelText='Radius Km (allowed gps deviation)' value={config.radiusKm.toString()} onChangeText={(newText) => handleConfigurationChange('radiusKm', parseFloat(newText))}></StyledInputText>
+            <View style={[styles.parent]}>
+                <ScrollView style={styles.contentContainer}>
+                    <View style={styles.bodyContent}>
+                        <Controller
+                            name="radiusKm"
+                            control={control}
+                            rules={{
+                                validate: {
+                                    isNumber: value => !isNaN(value) || "The value must be a number."
+                                }
+                            }}
+                            render={({ field }) => (
+                                <StyledInputText
+                                    labelText="Radius Km (allowed gps deviation)"
+                                    value={field.value?.toString() || ''}
+                                    onChangeText={field.onChange}
+                                />
+                            )}
+                        />
+                        {errors.radiusKm && <StyledText customStyle={['regular']} color='danger200'>{errors.radiusKm.message}</StyledText>}
 
-                    <CheckboxWithText label={'Offline Mode'}
-                        checked={config.offlineMode}
-                        onToggle={() => handleConfigurationChange('offlineMode', !config.offlineMode)} />
+                        <Controller
+                            control={control}
+                            name='connectionMode'
+                            rules={{ required: 'Please select an option' }}
+                            render={({ field: { onChange, value } }) => (
+                                <RadioButton.Group onValueChange={onChange} value={value}>
+                                    <View style={styles.group}>
+                                        <StyledText>Connection Mode</StyledText>
 
-                    {
-                        config.offlineMode ?
+                                        <Pressable style={styles.flex} onPress={() => onChange(ConnectionMode.Online)}>
+                                            <RadioButton.Android value={ConnectionMode.Online} color={Colors.accent200} />
+                                            <StyledText>Full online</StyledText>
+                                        </Pressable>
+
+                                        <Pressable style={styles.flex} onPress={() => onChange(ConnectionMode.Mock)}>
+                                            <RadioButton.Android value={ConnectionMode.Mock} color={Colors.accent200} />
+                                            <StyledText>Mock APC</StyledText>
+                                        </Pressable>
+
+                                        <Pressable style={styles.flex} onPress={() => onChange(ConnectionMode.Offline)}>
+                                            <RadioButton.Android value={ConnectionMode.Offline} color={Colors.accent200} />
+                                            <StyledText>Offline</StyledText>
+                                        </Pressable>
+                                    </View>
+                                </RadioButton.Group>
+                            )}
+                        />
+
+                        {true || connectionMode == ConnectionMode.Offline ?
                             <View style={[{ marginHorizontal: 30, marginTop: 5 }]}>
-                                <StyledInputText labelText='Last sim swap' value={config.offlineLastSimChange} onChangeText={(newText) => handleConfigurationChange('offlineLastSimChange', newText)}></StyledInputText>
-                                <StyledInputText labelText='APC Latitude' value={config.offlineLatitude.toString()} onChangeText={(newText) => handleConfigurationChange('offlineLatitude', parseFloat(newText))}></StyledInputText>
-                                <StyledInputText labelText='APC Longitude' value={config.offlineLongitude.toString()} onChangeText={(newText) => handleConfigurationChange('offlineLongitude', parseFloat(newText))}></StyledInputText>
-                                <StyledInputText labelText='APC Phone Number' value={config.offlinePhoneNumber} onChangeText={(newText) => handleConfigurationChange('offlinePhoneNumber', newText)}></StyledInputText>
+                                <Controller
+                                    name='offlineLastSimChange'
+                                    control={control}
+                                    render={({ field }) => (
+                                        <StyledInputText labelText='Last sim swap' value={field.value}></StyledInputText>
+                                    )}
+                                />
+
+                                <Controller
+                                    name='offlineLatitude'
+                                    control={control}
+                                    rules={{
+                                        validate: {
+                                            isNumber: value => !isNaN(value) || "The value must be a number.",
+                                            isValidLatitude: value => (-90 <= value && value <= 90) || "The value must be a number between -90 and 90."
+                                        }
+                                    }}
+                                    render={({ field }) => (
+                                        <StyledInputText
+                                            labelText='APC Latitude'
+                                            value={field.value?.toString() || ''}
+                                            onChangeText={field.onChange}
+                                        />
+                                    )}
+                                />
+                                {errors.offlineLatitude && <StyledText customStyle={['regular']} color='danger200'>{errors.offlineLatitude.message}</StyledText>}
+
+                                <Controller
+                                    name='offlineLongitude'
+                                    control={control}
+                                    rules={{
+                                        validate: {
+                                            isNumber: value => !isNaN(value) || "The value must be a number.",
+                                            isValidLongitude: value => (-180 <= value && value <= 180) || "The value must be a number between -180 and 180."
+                                        }
+                                    }}
+                                    render={({ field }) => (
+                                        <StyledInputText
+                                            labelText='APC Longitude'
+                                            value={field.value?.toString() || ''}
+                                            onChangeText={field.onChange}
+                                        />
+                                    )}
+                                />
+                                {errors.offlineLongitude && <StyledText customStyle={['regular']} color='danger200'>{errors.offlineLongitude.message}</StyledText>}
+
+                                <Controller
+                                    name='offlinePhoneNumber'
+                                    control={control}
+                                    render={({ field }) => (
+                                        <StyledInputText
+                                            labelText='APC Phone Number'
+                                            value={field.value}
+                                            onChangeText={field.onChange}
+                                        />
+                                    )}
+                                />
                             </View>
-                            : null
-                    }
+                            : null}
+                    </View>
+                </ScrollView>
 
-                    <CheckboxWithText label={'APC Mock mode'}
-                        checked={config.apcMockMode}
-                        onToggle={() => handleConfigurationChange('apcMockMode', !config.apcMockMode)} />
-
+                <View style={[styles.footer]}>
                     <Button
-                        title="Save"
-                        style={styles.button}
+                        title="Next"
+                        style={[styles.button]}
+                        size='long'
                         useGradient={true}
-                        onPress={() => {}}
-                    />
-                    <Button
-                        title="Back"
-                        style={styles.button}
-                        useGradient={true}
-                        onPress={() => navigation.goBack()}
-                    />
+                        onPress={handleSubmit(saveConfig)} />
                 </View>
-            </ScrollView>
+            </View>
         </AppContainer>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
+    parent: {
+        width: ' 100%',
+        flex: 1,
+        backgroundColor: palette.primary300
+    },
+    contentContainer: {
         flex: 1,
         width: '100%',
-        backgroundColor: Colors.primary300,
-        gap: 5,
-        padding: 15
+        padding: 15,
+        paddingTop: 0,
+        marginBottom: 120
     },
     button: {
+        position: 'absolute',
+        bottom: 15,
+        left: 0,
+        right: 0,
+    },
+    flex: {
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+    },
+    group: {
+        padding: 10
+    },
+    bodyContent: {
         marginTop: 30,
-        alignSelf: 'flex-end',
-        width: '100%'
-    }
+        width: '100%',
+        justifyContent: 'center',
+        gap: 25,
+    },
+    footer: {
+        width: '100%',
+        height: undefined
+    },
 });
 
 export default Settings;

@@ -1,28 +1,29 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Float } from 'react-native/Libraries/Types/CodegenTypes';
 
+export enum ConnectionMode {
+  Online = "online",
+  Offline = "offline",
+  Mock = "mock"
+}
 export type AppConfiguration = {
-  offlineMode: boolean;
+  connectionMode: ConnectionMode;
+  radiusKm: number;
   offlineLastSimChange: string;
   offlineLatitude: number;
   offlineLongitude: number;
   offlinePhoneNumber: string;
-  
-  apcMockMode: boolean;
-
-  radiusKm: number;
 };
 
 const CONFIG_KEY = 'app_configuration';
 
 export const defaultConfig = {
-  offlineMode: false,
+  connectionMode: 'online',
+  radiusKm: 10,
   offlineLatitude: 0,
   offlineLongitude: 0,
-  offlineLastSimChange: "",
-  offlinePhoneNumber: "",
-  radiusKm: 10,
-  apcMockMode: false
+  offlineLastSimChange: '',
+  offlinePhoneNumber: '',
 } as AppConfiguration;
 
 export const storeConfigurations = async (configurations: AppConfiguration) => {
@@ -37,8 +38,8 @@ export const storeConfigurations = async (configurations: AppConfiguration) => {
 export const readConfigurations = async (): Promise<AppConfiguration> => {
   try {
     const jsonValue = await AsyncStorage.getItem(CONFIG_KEY);
-    
-    if(jsonValue)
+
+    if (jsonValue)
       return JSON.parse(jsonValue);
 
     return await initDefaultConfig();

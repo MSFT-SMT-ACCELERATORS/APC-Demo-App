@@ -177,12 +177,15 @@ const customStyles = {
         fontSize: 20,
     },
     standar: {
+        fontSize: 18,
+    },
+    standarSm:{
+        fontSize: 16,
+    },
+    small: {
         fontSize: 12,
     },
-      small: {
-        fontSize: 10,
-    },
-    standarLineHeight:{
+    standarLineHeight: {
         lineHeight: 40
     },
     extrabold: {

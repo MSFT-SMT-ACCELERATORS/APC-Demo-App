@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { Pressable, StyleSheet } from 'react-native';
 import { Checkbox } from 'react-native-paper';
 import palette from '../themes/Colors';
 import StyledText from './StyledText';
@@ -19,6 +19,7 @@ interface CheckboxWithTextProps {
 const defaultStyles = StyleSheet.create({
   flex: {
     flexDirection: 'row',
+    width: '100%'
     // justifyContent: 'flex-start',
     // alignItems: 'center',
   },
@@ -38,21 +39,22 @@ const defaultStyles = StyleSheet.create({
     color: palette.neutral,
     flex: 1,
     textAlign: 'justify',
+    alignSelf: 'center',
   },
 });
 
 
 const CheckboxWithText: React.FC<CheckboxWithTextProps> = ({ label, checked, onToggle, styles = {} }) => {
   return (
-    <View style={defaultStyles.flex}>
-      <Checkbox
+    <Pressable style={defaultStyles.flex} onPress={onToggle}>
+      <Checkbox.Android
         status={checked ? 'checked' : 'unchecked'}
         onPress={onToggle}
         uncheckedColor={palette.accent200}
-        color={palette.accent200}  
+        color={palette.accent200}
       />
       <StyledText style={defaultStyles.text}>{label}</StyledText>
-    </View>
+    </Pressable>
   );
 };
 

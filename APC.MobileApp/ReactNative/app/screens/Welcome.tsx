@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Constants from 'expo-constants';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, View, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Button from '../components/Button'
 import Colors from '../themes/Colors';
@@ -9,10 +9,23 @@ import customStyles from '../themes/CustomStyles';
 import palette from '../themes/Colors';
 import StyledText from '../components/StyledText';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 
 
-function Welcome() {
+interface WelcomeProps {
+  setLoading: (isLoading: boolean, text?: string) => void;
+}
+
+const Welcome: React.FC<WelcomeProps> = ({ setLoading }) => {
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <AppContainer >
@@ -43,7 +56,9 @@ function Welcome() {
             useGradient={true}
             onPress={() => navigation.navigate('Consents')}
           />
+
         </View>
+
       </View>
     </AppContainer>
   );
