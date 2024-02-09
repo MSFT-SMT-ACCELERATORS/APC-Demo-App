@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "MicrosoftAPCDemo",
+    "name": "Microsoft APC Demo",
     "slug": "MicrosoftAPCDemo",
     "version": "1.0.2",
     "orientation": "portrait",
@@ -30,8 +30,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "d695a223-bfe6-47d7-99dd-5ab020065e57"
+        "projectId": "b27a47ba-89da-4b9c-8de8-7e94e6c9d414"
       }
-    }
+    },
+    "owner": "turingchallenge"
   }
 }
