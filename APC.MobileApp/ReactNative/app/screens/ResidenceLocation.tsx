@@ -114,7 +114,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
         console.log('APC validation failed!!');
         hasError = true;
       } else {
-        handleModalToggle("APC validation", "", palette.accent200, false);
+        // handleModalToggle("APC validation", "", palette.accent200, false);
         console.log('APC validation success!!');
       }
     }
@@ -127,7 +127,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
       console.log('Business validation failed!!');
       hasError = true;
     } else {
-      handleModalToggle("Wrong GPS location", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence (APC)");
+      // handleModalToggle("Wrong GPS location", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence (APC)");
       console.log('Business validation success!!')
     }
 
