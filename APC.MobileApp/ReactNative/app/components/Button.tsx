@@ -28,6 +28,7 @@ interface ButtonProps {
   iconSize?: number;
   iconColor?: string;
   useGradient?: boolean;
+  disabled?: boolean
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -45,6 +46,7 @@ const Button: React.FC<ButtonProps> = ({
   iconName,
   iconSize = 20,
   iconColor = palette.neutral,
+  disabled =false
 }) => {
   const buttonStyle = [btnStyles.buttonStyles[size]];
   const buttonBorder = outline ? ([styles.outline]): null;
@@ -65,6 +67,8 @@ const Button: React.FC<ButtonProps> = ({
       IconComponent = Ionicons;
   }
 
+  const disabledStyle = disabled ? styles.disabledButton : {};
+
   const iconElement = showIcon && iconName ? (
     <IconComponent name={iconName} size={iconSize} color={iconColor} />
   ) : null;
@@ -81,7 +85,7 @@ const Button: React.FC<ButtonProps> = ({
   );
 
   return (
-    <TouchableOpacity style={[buttonStyle, buttonBorder, style, isActive && styles.buttonPressed]} onPress={onPress}>
+    <TouchableOpacity style={[buttonStyle, buttonBorder, style, isActive && styles.buttonPressed,disabledStyle]} onPress={onPress} disabled={disabled}>
       {useGradient? (
         <LinearGradient
           colors={[palette.accent100, palette.accent200]}
@@ -120,6 +124,9 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  disabledButton:{
+    opacity: 0.5,
   }
 });
 
