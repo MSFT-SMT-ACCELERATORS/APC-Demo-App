@@ -131,7 +131,7 @@ const Slider: React.FC<Props> = ({
                         ]}
                         {...panResponder.panHandlers}
                     >
-                        <StyledText customStyle={['standarSm']} color='primary300' style={styles.sliderText}>{formatter(sliderValue)}</StyledText>
+                        <StyledText customStyle={['small']} color='primary300' style={styles.sliderText}>{formatter(sliderValue)}</StyledText>
                     </Animated.View>
                 )}
             </View>

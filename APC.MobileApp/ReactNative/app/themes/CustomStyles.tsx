@@ -183,7 +183,7 @@ const customStyles = {
         fontSize: 16,
     },
     small: {
-        fontSize: 10,
+        fontSize: 12,
     },
     standarLineHeight: {
         lineHeight: 40

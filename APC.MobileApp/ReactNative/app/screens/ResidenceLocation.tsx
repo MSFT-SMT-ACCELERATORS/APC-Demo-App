@@ -17,8 +17,8 @@ import cities from '../utils/cities.json'
 import customStyles from '../themes/CustomStyles';
 import RNPickerSelect, { PickerStyle } from 'react-native-picker-select';
 import { Position } from '../utils/APCService';
-import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration, defaultConfig, ConnectionMode } from '../utils/SettingsService'
-import CustomModal from '../components/Modal';
+import { readConfigurations, AppConfiguration, ConnectionMode } from '../utils/SettingsService'
+import CustomModal from '../components/CustomModal';
 import { Ionicons } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/AntDesign';
 
@@ -368,7 +368,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
         </View>
 
         <Modal visible={tooltipVisible} onDismiss={hideTooltip} contentContainerStyle={styles.tooltip}>
-          <Text style={styles.tooltipContent}>You need to be using this app in the same area.</Text>
+        <StyledText customStyle={['standarSm', 'bold']} color='black'>You need to be using this app in the same area.</StyledText>
         </Modal>
 
       </View>

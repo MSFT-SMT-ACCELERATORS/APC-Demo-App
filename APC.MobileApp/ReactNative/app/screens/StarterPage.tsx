@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, View, ScrollView, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -11,6 +11,9 @@ import Slider from '../components/Slider';
 import AppContainer from '../components/AppContainer';
 import customStyles from '../themes/CustomStyles';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
+import Icon from 'react-native-vector-icons/AntDesign';
+import { Modal } from 'react-native-paper';
+
 
 interface StepProps {
   setProgress: (progress: number) => void;
@@ -29,11 +32,15 @@ const isSmallScreen = screenWidth < 200;
 const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
   const navigation = useNavigation();
   const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm();
-
+  const [tooltipVisible, setTooltipVisible] = useState<boolean>(false)
+  
   useEffect(() => {
     setProgress(50);
   }, []);
 
+
+  const showTooltip = () => setTooltipVisible(true);
+  const hideTooltip = () => setTooltipVisible(false);
 
   const buttonStyleVariant = (buttonElement: 'title' | 'icon', isSelected: boolean) => {
     switch (buttonElement) {
@@ -58,7 +65,9 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
 
           <View style={[styles.title]}>
             <StyledText customStyle={['title2', 'extrabold']}>Let’s get started</StyledText>
-            <StyledText style={{ textAlign: 'center' }} customStyle={['title5', 'regular']}>Please complete the form below.</StyledText>
+            <StyledText style={{ textAlign: 'center' }} customStyle={['title5', 'regular']}>Please complete the form below {'  '}
+            <Icon name="infocirlceo" size={20} color={palette.accent200} onPress={showTooltip} />
+            </StyledText>
           </View>
 
           <View style={[styles.separatorContainer, customStyles.mb4]}></View>
@@ -162,7 +171,11 @@ const StarterPage: React.FC<StepProps> = ({ setProgress }) => {
             useGradient={true}
             onPress={handleSubmit(onFormValid)} />
         </View>
+
       </View>
+      <Modal visible={tooltipVisible} onDismiss={hideTooltip} contentContainerStyle={styles.tooltip}>
+          <StyledText customStyle={['standarSm', 'bold']} color='black'>Note that your phone should be the same number used by your phone</StyledText>
+        </Modal>
     </AppContainer>
   );
 }
@@ -233,6 +246,14 @@ const styles = StyleSheet.create({
   },
   largeIconButton: {
     flex: 1
+  },
+  tooltip: {
+    position: 'absolute',
+    top: 50,
+    color: '#000',
+    alignSelf: 'center',
+    padding: 20,
+    backgroundColor: palette.neutral,
   }
 });
 

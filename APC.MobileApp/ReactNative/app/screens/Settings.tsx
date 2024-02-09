@@ -12,6 +12,7 @@ import StyledInputText from '../components/StyledInputText';
 import { Controller, FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import StyledText from '../components/StyledText';
 import { RadioButton } from 'react-native-paper';
+import palette from '../themes/Colors';
 
 function Settings() {
     const navigation = useNavigation();
@@ -41,147 +42,151 @@ function Settings() {
 
     return (
         <AppContainer>
-            <ScrollView style={styles.container}>
-                <View>
-                    <Controller
-                        name="radiusKm"
-                        control={control}
-                        rules={{
-                            validate: {
-                                isNumber: value => !isNaN(value) || "The value must be a number."
-                            }
-                        }}
-                        render={({ field }) => (
-                            <StyledInputText
-                                labelText="Radius Km (allowed gps deviation)"
-                                value={field.value?.toString() || ''}
-                                onChangeText={field.onChange}
-                            />
-                        )}
-                    />
-                    {errors.radiusKm && <StyledText customStyle={['regular']} color='danger200'>{errors.radiusKm.message}</StyledText>}
+            <View style={[styles.parent]}>
+                <ScrollView style={styles.contentContainer}>
+                    <View style={styles.bodyContent}>
+                        <Controller
+                            name="radiusKm"
+                            control={control}
+                            rules={{
+                                validate: {
+                                    isNumber: value => !isNaN(value) || "The value must be a number."
+                                }
+                            }}
+                            render={({ field }) => (
+                                <StyledInputText
+                                    labelText="Radius Km (allowed gps deviation)"
+                                    value={field.value?.toString() || ''}
+                                    onChangeText={field.onChange}
+                                />
+                            )}
+                        />
+                        {errors.radiusKm && <StyledText customStyle={['regular']} color='danger200'>{errors.radiusKm.message}</StyledText>}
 
-                    <Controller
-                        control={control}
-                        name='connectionMode'
-                        rules={{ required: 'Please select an option' }}
-                        render={({ field: { onChange, value } }) => (
-                            <RadioButton.Group onValueChange={onChange} value={value}>
-                                <View style={styles.group}>
-                                    <StyledText>Connection Mode</StyledText>
+                        <Controller
+                            control={control}
+                            name='connectionMode'
+                            rules={{ required: 'Please select an option' }}
+                            render={({ field: { onChange, value } }) => (
+                                <RadioButton.Group onValueChange={onChange} value={value}>
+                                    <View style={styles.group}>
+                                        <StyledText>Connection Mode</StyledText>
 
-                                    <Pressable style={styles.flex} onPress={() => onChange(ConnectionMode.Online)}>
-                                        <RadioButton.Android value={ConnectionMode.Online} color={Colors.accent200} />
-                                        <StyledText>Full online</StyledText>
-                                    </Pressable>
+                                        <Pressable style={styles.flex} onPress={() => onChange(ConnectionMode.Online)}>
+                                            <RadioButton.Android value={ConnectionMode.Online} color={Colors.accent200} />
+                                            <StyledText>Full online</StyledText>
+                                        </Pressable>
 
-                                    <Pressable style={styles.flex} onPress={() => onChange(ConnectionMode.Mock)}>
-                                        <RadioButton.Android value={ConnectionMode.Mock} color={Colors.accent200} />
-                                        <StyledText>Mock APC</StyledText>
-                                    </Pressable>
+                                        <Pressable style={styles.flex} onPress={() => onChange(ConnectionMode.Mock)}>
+                                            <RadioButton.Android value={ConnectionMode.Mock} color={Colors.accent200} />
+                                            <StyledText>Mock APC</StyledText>
+                                        </Pressable>
 
-                                    <Pressable style={styles.flex} onPress={() => onChange(ConnectionMode.Offline)}>
-                                        <RadioButton.Android value={ConnectionMode.Offline} color={Colors.accent200} />
-                                        <StyledText>Offline</StyledText>
-                                    </Pressable>
-                                </View>
-                            </RadioButton.Group>
-                        )}
-                    />
+                                        <Pressable style={styles.flex} onPress={() => onChange(ConnectionMode.Offline)}>
+                                            <RadioButton.Android value={ConnectionMode.Offline} color={Colors.accent200} />
+                                            <StyledText>Offline</StyledText>
+                                        </Pressable>
+                                    </View>
+                                </RadioButton.Group>
+                            )}
+                        />
 
-                    {true || connectionMode == ConnectionMode.Offline ?
-                        <View style={[{ marginHorizontal: 30, marginTop: 5 }]}>
-                            <Controller
-                                name='offlineLastSimChange'
-                                control={control}
-                                render={({ field }) => (
-                                    <StyledInputText labelText='Last sim swap' value={field.value}></StyledInputText>
-                                )}
-                            />
+                        {true || connectionMode == ConnectionMode.Offline ?
+                            <View style={[{ marginHorizontal: 30, marginTop: 5 }]}>
+                                <Controller
+                                    name='offlineLastSimChange'
+                                    control={control}
+                                    render={({ field }) => (
+                                        <StyledInputText labelText='Last sim swap' value={field.value}></StyledInputText>
+                                    )}
+                                />
 
-                            <Controller
-                                name='offlineLatitude'
-                                control={control}
-                                rules={{
-                                    validate: {
-                                        isNumber: value => !isNaN(value) || "The value must be a number.",
-                                        isValidLatitude: value => (-90 <= value && value <= 90) || "The value must be a number between -90 and 90."
-                                    }
-                                }}
-                                render={({ field }) => (
-                                    <StyledInputText
-                                        labelText='APC Latitude'
-                                        value={field.value?.toString() || ''}
-                                        onChangeText={field.onChange}
-                                    />
-                                )}
-                            />
-                            {errors.offlineLatitude && <StyledText customStyle={['regular']} color='danger200'>{errors.offlineLatitude.message}</StyledText>}
+                                <Controller
+                                    name='offlineLatitude'
+                                    control={control}
+                                    rules={{
+                                        validate: {
+                                            isNumber: value => !isNaN(value) || "The value must be a number.",
+                                            isValidLatitude: value => (-90 <= value && value <= 90) || "The value must be a number between -90 and 90."
+                                        }
+                                    }}
+                                    render={({ field }) => (
+                                        <StyledInputText
+                                            labelText='APC Latitude'
+                                            value={field.value?.toString() || ''}
+                                            onChangeText={field.onChange}
+                                        />
+                                    )}
+                                />
+                                {errors.offlineLatitude && <StyledText customStyle={['regular']} color='danger200'>{errors.offlineLatitude.message}</StyledText>}
 
-                            <Controller
-                                name='offlineLongitude'
-                                control={control}
-                                rules={{
-                                    validate: {
-                                        isNumber: value => !isNaN(value) || "The value must be a number.",
-                                        isValidLongitude: value => (-180 <= value && value <= 180) || "The value must be a number between -180 and 180."
-                                    }
-                                }}
-                                render={({ field }) => (
-                                    <StyledInputText
-                                        labelText='APC Longitude'
-                                        value={field.value?.toString() || ''}
-                                        onChangeText={field.onChange}
-                                    />
-                                )}
-                            />
-                            {errors.offlineLongitude && <StyledText customStyle={['regular']} color='danger200'>{errors.offlineLongitude.message}</StyledText>}
+                                <Controller
+                                    name='offlineLongitude'
+                                    control={control}
+                                    rules={{
+                                        validate: {
+                                            isNumber: value => !isNaN(value) || "The value must be a number.",
+                                            isValidLongitude: value => (-180 <= value && value <= 180) || "The value must be a number between -180 and 180."
+                                        }
+                                    }}
+                                    render={({ field }) => (
+                                        <StyledInputText
+                                            labelText='APC Longitude'
+                                            value={field.value?.toString() || ''}
+                                            onChangeText={field.onChange}
+                                        />
+                                    )}
+                                />
+                                {errors.offlineLongitude && <StyledText customStyle={['regular']} color='danger200'>{errors.offlineLongitude.message}</StyledText>}
 
-                            <Controller
-                                name='offlinePhoneNumber'
-                                control={control}
-                                render={({ field }) => (
-                                    <StyledInputText
-                                        labelText='APC Phone Number'
-                                        value={field.value}
-                                        onChangeText={field.onChange}
-                                    />
-                                )}
-                            />
-                        </View>
-                        : null}
+                                <Controller
+                                    name='offlinePhoneNumber'
+                                    control={control}
+                                    render={({ field }) => (
+                                        <StyledInputText
+                                            labelText='APC Phone Number'
+                                            value={field.value}
+                                            onChangeText={field.onChange}
+                                        />
+                                    )}
+                                />
+                            </View>
+                            : null}
+                    </View>
+                </ScrollView>
 
+                <View style={[styles.footer]}>
                     <Button
-                        title="Save"
-                        style={styles.button}
+                        title="Next"
+                        style={[styles.button]}
+                        size='long'
                         useGradient={true}
-                        onPress={handleSubmit(saveConfig)}
-                    />
-                    <Button
-                        title="Back"
-                        style={styles.button}
-                        useGradient={true}
-                        onPress={() => navigation.goBack()}
-                    />
+                        onPress={handleSubmit(saveConfig)} />
                 </View>
-            </ScrollView>
+            </View>
         </AppContainer>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
+    parent: {
+        width: ' 100%',
+        flex: 1,
+        backgroundColor: palette.primary300
+    },
+    contentContainer: {
         flex: 1,
         width: '100%',
-        backgroundColor: Colors.primary300,
-        gap: 5,
-        padding: 15
+        padding: 15,
+        paddingTop: 0,
+        marginBottom: 120
     },
     button: {
-        marginTop: 30,
-        alignSelf: 'flex-end',
-        width: '100%'
-    },
+        position: 'absolute',
+        bottom: 15,
+        left: 0,
+        right: 0,
+      },
     flex: {
         flexDirection: 'row',
         justifyContent: 'flex-start',
@@ -189,7 +194,17 @@ const styles = StyleSheet.create({
     },
     group: {
         padding: 10
-    }
+    },
+    bodyContent: {
+        marginTop: 30,
+        width: '100%',
+        justifyContent: 'center',
+        gap: 25,
+    },
+    footer: {
+        width: '100%',
+        height: undefined
+    },
 });
 
 export default Settings;
