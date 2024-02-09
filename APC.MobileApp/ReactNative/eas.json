@@ -13,6 +13,12 @@
     "production": {}
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleId": "javier.ruiz@turingchallenge.com",
+        "ascAppId": "6476621804",
+        "appleTeamId": "UMD9433CYS"
+      }
+    }
   }
 }
