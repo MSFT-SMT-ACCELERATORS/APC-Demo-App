@@ -38,11 +38,15 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [modalText, setModalText] = useState('');
+  const [showModalIcon, setModalIcon] = useState(true);
+  const [modalBackground, setModalBackground] = useState('');
 
-  const handleModalToggle = (title: string, text: string) => {
+  const handleModalToggle = (title: string, text: string, backgroundColor: string = palette.danger100, showIcon: boolean = true) => {
+    setModalIcon(showIcon);
     setModalTitle(title);
     setModalText(text);
     setModalVisible(!modalVisible);
+    setModalBackground(backgroundColor);
   };
 
   const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm({
@@ -84,7 +88,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
 
   const onFormValid = async (data: FieldValues) => {
     console.log('Submitted Data:', data);
-    // navigation.navigate('StarterPage');
+    navigation.navigate('StarterPage');
 
     const selectedCity = cities.filter(d => d.country == data.Country && d.state == data.StateProvince && d.city == data.City)[0];
     let coordsForm = APCService.getLocationCoords(selectedCity.latitude, selectedCity.longitude);
@@ -103,17 +107,18 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
         handleModalToggle("Wrong GPS location", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence (APC)");
         console.error('APC validation failed!!');
       } else {
+        handleModalToggle("APC validation", "", palette.accent200, false);
         console.log('APC validation success!!')
       }
     }
     
     // Business validation
     if (!await APCService.matchesCoords(coords, coordsForm)) {
-      handleModalToggle("Wrong GPS location", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence (APC)");
-
+      handleModalToggle("Error Business Lockout", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence (APC)");
       // handleModalToggle("Wrong GPS location", "The location does not match the information entered in the form");
       console.error('Business validation failed!!');
     } else {
+      handleModalToggle("Wrong GPS location", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence (APC)");
       console.log('Business validation success!!')
     }
   }
@@ -369,10 +374,12 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
       </View>
       <CustomModal
               visible={modalVisible}
-              onClose={() => handleModalToggle('', '')}
+              onClose={() => handleModalToggle('', '', '', false)}
+              showIcon = {showModalIcon}
               iconName={'warning-outline'}
               title={modalTitle}
               text={modalText}
+              backgroundColor={modalBackground}
             />
     </AppContainer>
 

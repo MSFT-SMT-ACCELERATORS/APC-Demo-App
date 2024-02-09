@@ -12,10 +12,12 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   text: string;
+  showIcon?: boolean;
   iconLib?: 'Ionicons' | 'FontAwesome' | 'MaterialIcons' | 'MaterialCommunity';
   iconName?: any;
   iconSize?: number;
   iconColor?: string;
+  backgroundColor?: string;
 }
 
 const CustomModal: React.FC<ModalProps> = ({
@@ -23,10 +25,12 @@ const CustomModal: React.FC<ModalProps> = ({
   onClose,
   title,
   text,
+  showIcon = true,
   iconLib = 'Ionicons',
   iconName,
   iconSize = 70,
-  iconColor = palette.danger200 }) => {
+  iconColor = palette.danger200,
+  backgroundColor }) => {
 
   let IconComponent;
 
@@ -44,6 +48,10 @@ const CustomModal: React.FC<ModalProps> = ({
       IconComponent = Ionicons;
   }
 
+  const iconElement = showIcon && iconName ? (
+    <IconComponent name={iconName} size={iconSize} color={iconColor} />
+  ) : null;
+
   return (
 
     <Modal
@@ -58,8 +66,8 @@ const CustomModal: React.FC<ModalProps> = ({
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <IconComponent name={iconName} size={iconSize} color={iconColor} />
+            <View style={[styles.modalView, { backgroundColor }]}>
+              {iconElement}
               <StyledText customStyle={['extrabold', 'title4']} color='black' style={styles.modalText}>{title}</StyledText>
               <StyledText customStyle={['bold', 'standar']} color='black' style={styles.modalText}>{text}</StyledText>
             </View>
