@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -11,9 +11,22 @@ import StyledText from '../components/StyledText';
 import customStyles from '../themes/CustomStyles';
 import palette from '../themes/Colors';
 
-function Consents() {
+interface ConsentsProps {
+  setLoading: (isLoading: boolean, text?: string) => void;
+}
+
+const Consents: React.FC<ConsentsProps> = ({ setLoading }) => {
   const navigation = useNavigation();
   const [isChecked, setIsChecked] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
   return (
 
     <AppContainer>

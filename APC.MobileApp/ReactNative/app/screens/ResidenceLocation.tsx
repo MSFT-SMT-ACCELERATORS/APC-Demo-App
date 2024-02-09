@@ -24,16 +24,17 @@ import Icon from 'react-native-vector-icons/AntDesign';
 
 interface StepProps {
   setProgress: (progress: number) => void;
+  setLoading: (isLoading: boolean, text?: string) => void;
 }
 
-const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
+const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const navigation = useNavigation();
   const apiClient = useApiClient();
   const [hackedGPS, setHackedGPS] = useState<LocationObjectCoords>();
   const [gpsPosition, setGPSPosition] = useState<Position>();
   const [apcPosition, setAPCPosition] = useState<Position>();
   const [config, setConfig] = useState<AppConfiguration>();
-  const [tooltipVisible, setTooltipVisible] = useState<boolean>(false)
+  const [tooltipVisible, setTooltipVisible] = useState<boolean>(false);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
@@ -88,11 +89,14 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
 
   const onFormValid = async (data: FieldValues) => {
     console.log('Submitted Data:', data);
-    navigation.navigate('StarterPage');
+    setLoading(true, "Validating your data...");
 
     const selectedCity = cities.filter(d => d.country == data.Country && d.state == data.StateProvince && d.city == data.City)[0];
+
     let coordsForm = APCService.getLocationCoords(selectedCity.latitude, selectedCity.longitude);
+    console.log('Get: device gps location');
     let coordsGPS = await APCService.getDeviceGPSLocation();
+    console.log('Get: device gps location OK');
 
     let coords: LocationObjectCoords;
     if (data.GPSOption == 'true')
@@ -100,37 +104,55 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
     else
       coords = coordsForm;
 
+    let hasError = false;
     // APC validation
     if (data.UseAPC) {
+      console.log('validating apc matches locataion');
       const response = await APCService.matchesAPCLocation(apiClient, coords);
       if (!response.verificationResult) {
         handleModalToggle("Wrong GPS location", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence (APC)");
-        console.error('APC validation failed!!');
+        console.log('APC validation failed!!');
+        hasError = true;
       } else {
         handleModalToggle("APC validation", "", palette.accent200, false);
-        console.log('APC validation success!!')
+        console.log('APC validation success!!');
       }
     }
-    
+
     // Business validation
+    console.log('validating business rule');
     if (!await APCService.matchesCoords(coords, coordsForm)) {
       handleModalToggle("Error Business Lockout", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence (APC)");
       // handleModalToggle("Wrong GPS location", "The location does not match the information entered in the form");
-      console.error('Business validation failed!!');
+      console.log('Business validation failed!!');
+      hasError = true;
     } else {
       handleModalToggle("Wrong GPS location", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence (APC)");
       console.log('Business validation success!!')
     }
+
+    setLoading(false);
+
+    if (!hasError)
+      navigation.navigate('StarterPage');
   }
 
   const showTooltip = () => setTooltipVisible(true);
   const hideTooltip = () => setTooltipVisible(false);
 
   useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setLoading(false);
+      setProgress(25);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  useEffect(() => {
     readConfigurations().then(setConfig);
 
-    setProgress(25);
-    APCService.getDeviceGPSLocation()
+    APCService.getDeviceGPSLocation(apiClient)
       .then(setGPSPosition);
 
     APCService.getAPCLocation(apiClient)
@@ -151,7 +173,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
           <View style={[styles.title]}>
             <StyledText customStyle={['title2', 'extrabold']}>Residence Location</StyledText>
             <StyledText style={{ textAlign: 'center' }} customStyle={['title5', 'regular']}>Please, select your country and state/province of residence{'  '}
-                <Icon name="infocirlceo" size={20} color={palette.accent200} onPress={showTooltip} />
+              <Icon name="infocirlceo" size={20} color={palette.accent200} onPress={showTooltip} />
             </StyledText>
           </View>
 
@@ -176,7 +198,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
               render={({ field }) => (
                 <RNPickerSelect
                   style={pickerStyle}
-                  darkTheme = {true}
+                  darkTheme={true}
                   value={field.value}
                   onValueChange={handleCountryChange}
                   Icon={() => {
@@ -204,7 +226,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
               render={({ field }) => (
                 <RNPickerSelect
                   style={pickerStyle}
-                  darkTheme = {true}
+                  darkTheme={true}
                   value={field.value}
                   disabled={!getValues('Country')}
                   onValueChange={handleStateChange}
@@ -234,7 +256,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
               render={({ field }) => (
                 <RNPickerSelect
                   style={pickerStyle}
-                  darkTheme = {true}
+                  darkTheme={true}
                   value={field.value}
                   disabled={!getValues('StateProvince')}
                   onValueChange={handleCityChange}
@@ -285,7 +307,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
                             {
                               gpsPosition && gpsPosition.coords ?
                                 <View style={styles.optionSubtitleBadge}>
-                                  <StyledText>{gpsPosition.coords.latitude}, {gpsPosition.coords.longitude}</StyledText>
+                                  <StyledText>{gpsPosition.coords.latitude.toFixed(4)}, {gpsPosition.coords.longitude.toFixed(4)}</StyledText>
                                 </View>
                                 : null
                             }
@@ -368,19 +390,18 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress }) => {
         </View>
 
         <Modal visible={tooltipVisible} onDismiss={hideTooltip} contentContainerStyle={styles.tooltip}>
-        <StyledText customStyle={['standarSm', 'bold']} color='black'>You need to be using this app in the same area.</StyledText>
+          <StyledText customStyle={['standarSm', 'bold']} color='black'>You need to be using this app in the same area.</StyledText>
         </Modal>
-
       </View>
       <CustomModal
-              visible={modalVisible}
-              onClose={() => handleModalToggle('', '', '', false)}
-              showIcon = {showModalIcon}
-              iconName={'warning-outline'}
-              title={modalTitle}
-              text={modalText}
-              backgroundColor={modalBackground}
-            />
+        visible={modalVisible}
+        onClose={() => handleModalToggle('', '', '', false)}
+        showIcon={showModalIcon}
+        iconName={'warning-outline'}
+        title={modalTitle}
+        text={modalText}
+        backgroundColor={modalBackground}
+      />
     </AppContainer>
 
   );
@@ -502,12 +523,12 @@ const styles = StyleSheet.create({
 });
 
 const pickerStyle: PickerStyle = {
-  inputWeb:{
+  inputWeb: {
     fontSize: 20,
     padding: 10,
     backgroundColor: palette.transparent,
     color: palette.neutral,
-    borderBottomWidth:1,
+    borderBottomWidth: 1,
     borderColor: palette.accent200
   },
   inputIOS: {
@@ -515,7 +536,7 @@ const pickerStyle: PickerStyle = {
     padding: 10,
     backgroundColor: palette.transparent,
     color: palette.neutral,
-    borderBottomWidth:1,
+    borderBottomWidth: 1,
     borderColor: palette.accent200
   },
   inputAndroid: {
@@ -523,7 +544,7 @@ const pickerStyle: PickerStyle = {
     padding: 10,
     backgroundColor: palette.transparent,
     color: palette.neutral,
-    borderWidth:1,
+    borderWidth: 1,
     borderColor: palette.accent200
   }
 };
