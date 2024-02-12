@@ -200,12 +200,12 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
               render={({ field }) => (
                 <RNPickerSelect
                   style={pickerStyle}
-                  darkTheme={true}
+                  darkTheme={false}
                   value={field.value}
                   onValueChange={handleCountryChange}
+                  useNativeAndroidPickerStyle={false}
                   Icon={() => {
-                    if (Platform.OS === 'ios')
-                      return <Ionicons name="chevron-down" size={24} color={palette.neutral} />;
+                    return <Ionicons name="chevron-down" size={24} color={palette.neutral} style={styles.iconPicker} />;
                   }}
                   items={cities
                     .map(item => item.country)
@@ -233,9 +233,9 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
                   value={field.value}
                   disabled={!getValues('Country')}
                   onValueChange={handleStateChange}
+                  useNativeAndroidPickerStyle={false}
                   Icon={() => {
-                    if (Platform.OS === 'ios')
-                      return <Ionicons name="chevron-down" size={24} color={palette.neutral} />;
+                    return <Ionicons name="chevron-down" size={24} color={palette.neutral} style={styles.iconPicker} />;
                   }}
                   items={cities
                     .filter(item => item.country === getValues('Country'))
@@ -264,9 +264,9 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
                   value={field.value}
                   disabled={!getValues('StateProvince')}
                   onValueChange={handleCityChange}
+                  useNativeAndroidPickerStyle={false}
                   Icon={() => {
-                    if (Platform.OS === 'ios')
-                      return <Ionicons name="chevron-down" size={24} color={palette.neutral} />;
+                    return <Ionicons name="chevron-down" size={24} color={palette.neutral} style={styles.iconPicker} />;
                   }}
                   items={cities
                     .filter(item => item.country == getValues('Country') && item.state === getValues('StateProvince'))
@@ -524,6 +524,9 @@ const styles = StyleSheet.create({
   },
   tooltipContent: {
     color: palette.accent300,
+  },
+  iconPicker: {
+    paddingTop: 12
   }
 });
 
