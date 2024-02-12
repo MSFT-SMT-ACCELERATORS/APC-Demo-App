@@ -6,9 +6,11 @@ export enum ConnectionMode {
   Offline = "offline",
   Mock = "mock"
 }
+
 export type AppConfiguration = {
   connectionMode: ConnectionMode;
   radiusKm: number;
+  skipGeolocationCheck: false,
   offlineLastSimChange: string;
   offlineLatitude: number;
   offlineLongitude: number;
@@ -20,6 +22,7 @@ const CONFIG_KEY = 'app_configuration';
 export const defaultConfig = {
   connectionMode: 'online',
   radiusKm: 10,
+  skipGeolocationCheck: false,
   offlineLatitude: 0,
   offlineLongitude: 0,
   offlineLastSimChange: '',
