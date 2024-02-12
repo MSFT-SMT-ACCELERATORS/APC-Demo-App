@@ -32,6 +32,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
             const loadConfig = async () => {
                 const config = await readConfigurations();
                 reset(config);
+                setGeolocationCheck(config.skipGeolocationCheck || false);
             };
 
             loadConfig();
@@ -49,7 +50,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
             skipGeolocationCheck: geolocationCheck,
         };
         console.log(formattedData);
-        storeConfigurations(data);
+        storeConfigurations(formattedData);
     }
 
     return (
