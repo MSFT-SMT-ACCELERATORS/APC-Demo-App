@@ -151,12 +151,14 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
 
   useEffect(() => {
     readConfigurations().then(setConfig);
-
-    APCService.getDeviceGPSLocation(apiClient)
-      .then(setGPSPosition);
+    
+    APCService.getDeviceGPSLocation()
+      .then(setGPSPosition)
+      .catch(console.error);
 
     APCService.getAPCLocation(apiClient)
-      .then(setAPCPosition);
+      .then(setAPCPosition)
+      .catch(console.error);
 
     const firstCountry = cities
       .map(item => item.country)
