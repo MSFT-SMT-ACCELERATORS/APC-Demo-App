@@ -7,9 +7,8 @@ import Colors from '../themes/Colors';
 import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration, defaultConfig, ConnectionMode } from '../utils/SettingsService'
 
 import AppContainer from '../components/AppContainer';
-import Button from '../components/Button'
 import StyledInputText from '../components/StyledInputText';
-import { Controller, FieldValues, SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import StyledText from '../components/StyledText';
 import { RadioButton } from 'react-native-paper';
 import palette from '../themes/Colors';
@@ -164,15 +163,6 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                             : null}
                     </View>
                 </ScrollView>
-
-                <View style={[styles.footer]}>
-                    <Button
-                        title="Next"
-                        style={[styles.button]}
-                        size='long'
-                        useGradient={true}
-                        onPress={handleSubmit(saveConfig)} />
-                </View>
             </View>
         </AppContainer>
     );
@@ -189,13 +179,6 @@ const styles = StyleSheet.create({
         width: '100%',
         padding: 15,
         paddingTop: 0,
-        marginBottom: 120
-    },
-    button: {
-        position: 'absolute',
-        bottom: 15,
-        left: 0,
-        right: 0,
     },
     flex: {
         flexDirection: 'row',
