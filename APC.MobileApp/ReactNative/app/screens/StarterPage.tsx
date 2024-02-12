@@ -13,6 +13,7 @@ import customStyles from '../themes/CustomStyles';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { Modal } from 'react-native-paper';
+import { useStep } from '../utils/StepContext';
 
 
 interface StepProps {
@@ -32,6 +33,7 @@ const isSmallScreen = screenWidth < 200;
 
 const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const navigation = useNavigation();
+  const { setCurrentStep } = useStep();
   const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm();
   const [tooltipVisible, setTooltipVisible] = useState<boolean>(false)
 
@@ -43,6 +45,10 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
 
     return unsubscribe;
   }, [navigation]);
+
+  useEffect(() => {
+    setCurrentStep(2);
+  }, [setCurrentStep]);
 
   const showTooltip = () => setTooltipVisible(true);
   const hideTooltip = () => setTooltipVisible(false);

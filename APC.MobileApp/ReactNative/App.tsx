@@ -13,6 +13,7 @@ import { ApiClientProvider } from './app/api/ApiClientProvider';
 import Settings from './app/screens/Settings';
 import { useState } from 'react';
 import OverlaySpinner from './app/components/OverlaySpinner';
+import { StepProvider } from './app/utils/StepContext';
 
 
 function App() {
@@ -26,25 +27,27 @@ function App() {
   return (
     <ApiClientProvider>
       <PaperProvider>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName='Welcome'>
-            <Stack.Screen name='Settings' options={{ header: () => <Header /> }}>
-              {(props) => <Settings {...props} setLoading={setLoading} />}
-            </Stack.Screen>
-            <Stack.Screen name='Welcome' options={{ headerShown: false }} >
-              {(props) => <Welcome {...props} setLoading={setLoading} />}
-            </Stack.Screen>
-            <Stack.Screen name='Consents' options={{ header: () => <Header /> }}>
-              {(props) => <Consents {...props} setLoading={setLoading} />}
-            </Stack.Screen>
-            <Stack.Screen name='Steps' options={{ header: () => <Header /> }}>
-              {(props) => <Steps {...props} setLoading={setLoading} />}
-            </Stack.Screen>
-            <Stack.Screen name='Success' options={{ headerShown: false }} >
-              {(props) => <Success {...props} setLoading={setLoading} />}
-            </Stack.Screen>
-          </Stack.Navigator>
-        </NavigationContainer>
+        <StepProvider>
+          <NavigationContainer>
+            <Stack.Navigator initialRouteName='Welcome'>
+              <Stack.Screen name='Settings' options={{ header: () => <Header /> }}>
+                {(props) => <Settings {...props} setLoading={setLoading} />}
+              </Stack.Screen>
+              <Stack.Screen name='Welcome' options={{ headerShown: false }} >
+                {(props) => <Welcome {...props} setLoading={setLoading} />}
+              </Stack.Screen>
+              <Stack.Screen name='Consents' options={{ header: () => <Header /> }}>
+                {(props) => <Consents {...props} setLoading={setLoading} />}
+              </Stack.Screen>
+              <Stack.Screen name='Steps' options={{ header: () => <Header /> }}>
+                {(props) => <Steps {...props} setLoading={setLoading} />}
+              </Stack.Screen>
+              <Stack.Screen name='Success' options={{ headerShown: false }} >
+                {(props) => <Success {...props} setLoading={setLoading} />}
+              </Stack.Screen>
+            </Stack.Navigator>
+          </NavigationContainer>
+        </StepProvider>
 
         {loadingState.isLoading && <OverlaySpinner text={loadingState.text} />}
       </PaperProvider>
