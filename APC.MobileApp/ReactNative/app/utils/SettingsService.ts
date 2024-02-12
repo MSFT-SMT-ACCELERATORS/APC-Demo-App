@@ -10,7 +10,7 @@ export enum ConnectionMode {
 export type AppConfiguration = {
   connectionMode: ConnectionMode;
   radiusKm: number;
-  skipGeolocationCheck: false,
+  skipGeolocationCheck: boolean,
   offlineLastSimChange: string;
   offlineLatitude: number;
   offlineLongitude: number;

@@ -282,7 +282,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
             />
             {errors.City && <StyledText color='danger200'>{errors.City.message}</StyledText>}
 
-            <View style={styles.btnGroup}>
+            {!config?.skipGeolocationCheck && <View style={styles.btnGroup}>
               <StyledText style={styles.comparisonTitle}>Internal Comparison with:</StyledText>
               <Controller
                 control={control}
@@ -378,7 +378,8 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
                   </RadioButton.Group>
                 )}
               />
-            </View>
+            </View>}
+
           </View>
         </ScrollView>
 
