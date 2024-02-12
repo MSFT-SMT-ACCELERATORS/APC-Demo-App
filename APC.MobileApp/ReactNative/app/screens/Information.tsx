@@ -10,6 +10,7 @@ import palette from '../themes/Colors';
 import customStyles from '../themes/CustomStyles';
 import AppContainer from '../components/AppContainer';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
+import { useStep } from '../utils/StepContext';
 
 interface StepProps {
   setProgress: (progress: number) => void;
@@ -18,6 +19,7 @@ interface StepProps {
 
 const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const navigation = useNavigation();
+  const { setCurrentStep } = useStep();
   const { control, handleSubmit, formState: { errors } } = useForm();
 
   useEffect(() => {
@@ -28,6 +30,10 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
 
     return unsubscribe;
   }, [navigation]);
+
+  useEffect(() => {
+    setCurrentStep(3);
+  }, [setCurrentStep]);
 
   const onFormValid = async (data: FieldValues) => {
     console.log(data);

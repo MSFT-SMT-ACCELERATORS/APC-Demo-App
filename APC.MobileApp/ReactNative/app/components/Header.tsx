@@ -4,12 +4,18 @@ import Icon from 'react-native-vector-icons/AntDesign'
 import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import palette from '../themes/Colors';
+import { useStep } from '../utils/StepContext';
 
 function Header() {
   const navigation = useNavigation();
+  const { currentStep, setCurrentStep, currentScreen } = useStep();
 
   const handleGoBack = () => {
-    navigation.goBack();
+    if (currentScreen === 'Steps' && currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    } else {
+      navigation.goBack();
+    }
   };
 
   return (
@@ -32,7 +38,7 @@ const styles = StyleSheet.create({
     paddingTop: Constants.statusBarHeight,
     height: Constants.statusBarHeight + 70,
     backgroundColor: palette.primary200,
-    borderBottomWidth : 3,
+    borderBottomWidth: 3,
     borderBottomColor: palette.primary100
   },
   content: {
