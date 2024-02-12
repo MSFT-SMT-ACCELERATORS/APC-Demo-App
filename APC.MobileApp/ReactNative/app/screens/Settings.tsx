@@ -80,7 +80,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                             name="skipGeolocationCheck"
                             control={control}
                             render={() => (
-                                <CheckboxWithText label={"Skip Geolocation check"} checked={geolocationCheck} onToggle={() => { setGeolocationCheck(!geolocationCheck) }} />
+                                <CheckboxWithText label={"Exclude phone location verification"} checked={geolocationCheck} onToggle={() => { setGeolocationCheck(!geolocationCheck) }} />
                             )}>
                         </Controller>
                         
