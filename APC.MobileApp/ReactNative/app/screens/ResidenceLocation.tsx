@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, View, ScrollView, Pressable } from 'react-native';
+import { StyleSheet, View, ScrollView, Pressable, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Colors from '../themes/Colors';
 import Button from '../components/Button'
@@ -151,7 +151,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
 
   useEffect(() => {
     readConfigurations().then(setConfig);
-    
+
     APCService.getDeviceGPSLocation()
       .then(setGPSPosition)
       .catch(console.error);
@@ -204,7 +204,8 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
                   value={field.value}
                   onValueChange={handleCountryChange}
                   Icon={() => {
-                    return <Ionicons name="chevron-down" size={24} color={palette.neutral} />;
+                    if (Platform.OS === 'ios')
+                      return <Ionicons name="chevron-down" size={24} color={palette.neutral} />;
                   }}
                   items={cities
                     .map(item => item.country)
@@ -233,7 +234,8 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
                   disabled={!getValues('Country')}
                   onValueChange={handleStateChange}
                   Icon={() => {
-                    return <Ionicons name="chevron-down" size={24} color={palette.neutral} />;
+                    if (Platform.OS === 'ios')
+                      return <Ionicons name="chevron-down" size={24} color={palette.neutral} />;
                   }}
                   items={cities
                     .filter(item => item.country === getValues('Country'))
@@ -263,7 +265,8 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
                   disabled={!getValues('StateProvince')}
                   onValueChange={handleCityChange}
                   Icon={() => {
-                    return <Ionicons name="chevron-down" size={24} color={palette.neutral} />;
+                    if (Platform.OS === 'ios')
+                      return <Ionicons name="chevron-down" size={24} color={palette.neutral} />;
                   }}
                   items={cities
                     .filter(item => item.country == getValues('Country') && item.state === getValues('StateProvince'))
@@ -427,7 +430,6 @@ const styles = StyleSheet.create({
     padding: 15,
     paddingTop: 0,
     marginBottom: 120
-    // marginBottom:'33%'
   },
   bodyContent: {
     width: '100%',
@@ -530,14 +532,16 @@ const pickerStyle: PickerStyle = {
     padding: 10,
     backgroundColor: palette.transparent,
     color: palette.neutral,
+    borderWidth: 0,
     borderBottomWidth: 1,
-    borderColor: palette.accent200
+    borderBottomColor: palette.accent200
   },
   inputIOS: {
     fontSize: 20,
     padding: 10,
     backgroundColor: palette.transparent,
     color: palette.neutral,
+    borderWidth: 0,
     borderBottomWidth: 1,
     borderColor: palette.accent200
   },
@@ -546,7 +550,8 @@ const pickerStyle: PickerStyle = {
     padding: 10,
     backgroundColor: palette.transparent,
     color: palette.neutral,
-    borderWidth: 1,
+    borderWidth: 0,
+    borderBottomWidth: 1,
     borderColor: palette.accent200
   }
 };

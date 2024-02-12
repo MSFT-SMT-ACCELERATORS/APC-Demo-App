@@ -139,7 +139,7 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
 
       <View style={[styles.footer]}>
         <Button
-          title="Request"
+          title="Confirm Request"
           style={[styles.button]}
           size='long'
           useGradient={true}
