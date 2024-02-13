@@ -41,6 +41,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
   const [modalText, setModalText] = useState('');
   const [showModalIcon, setModalIcon] = useState(true);
   const [modalBackground, setModalBackground] = useState('');
+  const [shouldNavigate, setShouldNavigate] = useState(false);
 
   const handleModalToggle = (title: string, text: string, backgroundColor: string = palette.danger100, showIcon: boolean = true) => {
     setModalIcon(showIcon);
@@ -114,7 +115,8 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
         console.log('APC validation failed!!');
         hasError = true;
       } else {
-        // handleModalToggle("APC validation", "", palette.accent200, false);
+        handleModalToggle("APC checked", "", palette.accent200, false);
+        setShouldNavigate(true);
         console.log('APC validation success!!');
       }
     }
@@ -127,18 +129,25 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
       console.log('Business validation failed!!');
       hasError = true;
     } else {
-      // handleModalToggle("Wrong GPS location", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence (APC)");
+      handleModalToggle("APC unchecked", "", palette.accent200, false);
+      setShouldNavigate(true);
       console.log('Business validation success!!')
     }
 
     setLoading(false);
-
-    if (!hasError)
-      navigation.navigate('StarterPage');
   }
 
   const showTooltip = () => setTooltipVisible(true);
   const hideTooltip = () => setTooltipVisible(false);
+
+  useEffect(() => {
+    if (!modalVisible && shouldNavigate) {
+      setTimeout(() => {
+        navigation.navigate('StarterPage');
+        setShouldNavigate(false);
+      }, 100);
+    }
+  }, [modalVisible, shouldNavigate, navigation]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
