@@ -110,7 +110,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
       console.log('validating apc matches locataion');
       const response = await APCService.matchesAPCLocation(apiClient, coords);
       if (!response.verificationResult) {
-        handleModalToggle("Wrong GPS location", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence.");
+        handleModalToggle("Blocking anti-hacking rule: GPS coordinates hacking attempted", "A possible hacking has been detected. The device GPS location does not match the device’s actual location provided by the network carrier. The application’s flow must stop.");
         console.log('APC validation failed!!');
         hasError = true;
       } else {
@@ -122,7 +122,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
     // Business validation
     console.log('validating business rule');
     if (!await APCService.matchesCoords(coords, coordsForm)) {
-      handleModalToggle("Error Business Lockout", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence.");
+      handleModalToggle("Blocking business rule: Not allowed device location", " For anti-fraud purposes, this application requires the user to be using the app in a location relatively close to the user’s residence location (i.e. same state). You are currently far away.");
       // handleModalToggle("Wrong GPS location", "The location does not match the information entered in the form");
       console.log('Business validation failed!!');
       hasError = true;
@@ -286,7 +286,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
             {errors.City && <StyledText color='danger200'>{errors.City.message}</StyledText>}
 
             {!config?.skipGeolocationCheck && <View style={styles.btnGroup}>
-              <StyledText style={styles.comparisonTitle}>Internal Comparison with:</StyledText>
+              <StyledText style={styles.comparisonTitle}>Internal comparison with:</StyledText>
               <Controller
                 control={control}
                 name='GPSOption'
@@ -353,7 +353,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
                           <Pressable onPress={() => onChange(!value)}>
                             <View style={styles.flex}>
                               <CheckboxWithText
-                                label='Use Azure Programmable Connectivity Backend'
+                                label='Use Azure Programmable Connectivity backend'
                                 checked={value}
                                 onToggle={() => onChange(!value)}
                               />
@@ -396,7 +396,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
         </View>
 
         <Modal visible={tooltipVisible} onDismiss={hideTooltip} contentContainerStyle={styles.tooltip}>
-          <StyledText customStyle={['standarSm', 'bold']} color='black'>You need to be using this app in the same area.</StyledText>
+          <StyledText customStyle={['standarSm', 'bold']} color='black'>You need to be using this app in an area relatively close to your residence location (i.e. The same state/province).</StyledText>
         </Modal>
       </View>
       <CustomModal

@@ -107,7 +107,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
                 <View>
                   <View style={styles.row}>
                     <Button
-                      title='Debt Consolidation'
+                      title='Debt consolidation'
                       titleSize={customStyles.small}
                       titleColor={buttonStyleVariant('title', field.value === ButtonNames.consolidation)}
                       style={[customStyles.my3, customStyles.mr1, isSmallScreen ? styles.largeIconButton : styles.smallIconButton]}
@@ -122,7 +122,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
                       isActive={field.value === ButtonNames.consolidation}
                     />
                     <Button
-                      title='Monthly Bills'
+                      title='Monthly bills'
                       titleSize={customStyles.small}
                       titleColor={buttonStyleVariant('title', field.value === ButtonNames.bills)}
                       style={[customStyles.my2, isSmallScreen ? styles.largeIconButton : styles.smallIconButton]}

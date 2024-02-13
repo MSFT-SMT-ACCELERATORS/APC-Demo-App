@@ -43,7 +43,7 @@ const Consents: React.FC<ConsentsProps> = ({ setLoading }) => {
             <StyledText style={{ textAlign: 'justify' }} customStyle={['regular', 'standar']}>This application is secured based on the mobile phone line used, checking that the provided information matches certain checks performed by the carrier's network APIs.</StyledText>
             <StyledText style={{ textAlign: 'justify' }} customStyle={['regular', 'standar']}>This demo application uses Microsoft Azure Programmable Connectivity (APC) as a single platform interface and under the covers it communicates with any of the multiple supported carriers such as TELEFONICA, ORANGE, AT&T, DT, Singtel, etc.</StyledText>
 
-            <CheckboxWithText label={'I authorize and consent this application to verify data such as phone number identification, phone location and SIM swap, for fraud detection safety'} checked={isChecked} onToggle={() => { setIsChecked(!isChecked) }} />
+            <CheckboxWithText label={'I authorize and consent this application to verify my personal data at the carrier’s network backend, such as phone number verification, device location and SIM swap, for fraud detection purposes.'} checked={isChecked} onToggle={() => { setIsChecked(!isChecked) }} />
 
           </View>
         </ScrollView>
