@@ -13,6 +13,7 @@ import customStyles from '../themes/CustomStyles';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { Modal } from 'react-native-paper';
+import { useStep } from '../utils/StepContext';
 
 
 interface StepProps {
@@ -32,6 +33,7 @@ const isSmallScreen = screenWidth < 200;
 
 const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const navigation = useNavigation();
+  const { setCurrentStep } = useStep();
   const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm();
   const [tooltipVisible, setTooltipVisible] = useState<boolean>(false)
 
@@ -43,6 +45,10 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
 
     return unsubscribe;
   }, [navigation]);
+
+  useEffect(() => {
+    setCurrentStep(2);
+  }, [setCurrentStep]);
 
   const showTooltip = () => setTooltipVisible(true);
   const hideTooltip = () => setTooltipVisible(false);
@@ -101,7 +107,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
                 <View>
                   <View style={styles.row}>
                     <Button
-                      title='Debt Consolidation'
+                      title='Debt consolidation'
                       titleSize={customStyles.small}
                       titleColor={buttonStyleVariant('title', field.value === ButtonNames.consolidation)}
                       style={[customStyles.my3, customStyles.mr1, isSmallScreen ? styles.largeIconButton : styles.smallIconButton]}
@@ -116,7 +122,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
                       isActive={field.value === ButtonNames.consolidation}
                     />
                     <Button
-                      title='Monthly Bills'
+                      title='Monthly bills'
                       titleSize={customStyles.small}
                       titleColor={buttonStyleVariant('title', field.value === ButtonNames.bills)}
                       style={[customStyles.my2, isSmallScreen ? styles.largeIconButton : styles.smallIconButton]}
@@ -179,7 +185,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
 
       </View>
       <Modal visible={tooltipVisible} onDismiss={hideTooltip} contentContainerStyle={styles.tooltip}>
-        <StyledText customStyle={['standarSm', 'bold']} color='black'>Note that your phone should be the same number used by your phone</StyledText>
+        <StyledText customStyle={['standarSm', 'bold']} color='black'>Note that the provided contact phone number should match the line number of the current phone using the app.</StyledText>
       </Modal>
     </AppContainer>
   );

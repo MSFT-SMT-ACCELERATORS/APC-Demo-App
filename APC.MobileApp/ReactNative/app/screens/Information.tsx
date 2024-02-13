@@ -10,6 +10,7 @@ import palette from '../themes/Colors';
 import customStyles from '../themes/CustomStyles';
 import AppContainer from '../components/AppContainer';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
+import { useStep } from '../utils/StepContext';
 
 interface StepProps {
   setProgress: (progress: number) => void;
@@ -18,6 +19,7 @@ interface StepProps {
 
 const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const navigation = useNavigation();
+  const { setCurrentStep } = useStep();
   const { control, handleSubmit, formState: { errors } } = useForm();
 
   useEffect(() => {
@@ -28,6 +30,10 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
 
     return unsubscribe;
   }, [navigation]);
+
+  useEffect(() => {
+    setCurrentStep(3);
+  }, [setCurrentStep]);
 
   const onFormValid = async (data: FieldValues) => {
     console.log(data);
@@ -41,7 +47,7 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
         <ScrollView style={[styles.contentContainer]}>
 
           <View style={[styles.title]}>
-            <StyledText customStyle={['title2', 'extrabold']}>Personal Information</StyledText>
+            <StyledText customStyle={['title2', 'extrabold']}>Personal information</StyledText>
             <StyledText style={{ textAlign: 'center' }} customStyle={['title5', 'regular']}>Please complete the required information fields</StyledText>
           </View>
 
@@ -51,14 +57,14 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
               name='firstName'
               control={control}
               render={({ field }) => (
-                <StyledInputText labelText="First Name" placeholder="First Name" onChangeText={field.onChange}></StyledInputText>
+                <StyledInputText labelText="First name" placeholder="First name" onChangeText={field.onChange}></StyledInputText>
               )} />
 
             <Controller
               name='lastName'
               control={control}
               render={({ field }) => (
-                <StyledInputText labelText="Last Name" placeholder="Last Name" onChangeText={field.onChange}></StyledInputText>
+                <StyledInputText labelText="Last name" placeholder="Last name" onChangeText={field.onChange}></StyledInputText>
               )} />
 
 
@@ -66,14 +72,14 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
               name='address'
               control={control}
               render={({ field }) => (
-                <StyledInputText labelText="Street Address" placeholder="Start typing your street... (e.g. 28 Mai...)" onChangeText={field.onChange}></StyledInputText>
+                <StyledInputText labelText="Street address" placeholder="Start typing your street... (e.g. 28 Mai...)" onChangeText={field.onChange}></StyledInputText>
               )} />
 
             <Controller
               name='address2'
               control={control}
               render={({ field }) => (
-                <StyledInputText labelText="Unit/Apt Number (optional)" placeholder="Address Line 2" onChangeText={field.onChange}></StyledInputText>
+                <StyledInputText labelText="Unit/Apt number (optional)" placeholder="Address line 2" onChangeText={field.onChange}></StyledInputText>
               )} />
 
             <Controller
@@ -94,26 +100,26 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
               name='zipcode'
               control={control}
               render={({ field }) => (
-                <StyledInputText labelText="Zip Code" placeholder="Zip Code" onChangeText={field.onChange}></StyledInputText>
+                <StyledInputText labelText="Zip code" placeholder="Zip code" onChangeText={field.onChange}></StyledInputText>
               )} />
             <View style={[styles.idContainer]}>
-              <StyledText>Identity Verification</StyledText>
+              <StyledText>Identity verification</StyledText>
 
               <Controller
                 name='birthdate'
                 control={control}
                 render={({ field }) => (
-                  <StyledInputText labelText="Your Date of Birth" placeholder="MM/DD/YYYY" onChangeText={field.onChange}></StyledInputText>
+                  <StyledInputText labelText="Your date of birth" placeholder="MM/DD/YYYY" onChangeText={field.onChange}></StyledInputText>
                 )} />
 
               <Controller
                 name='ssn'
                 control={control}
                 render={({ field }) => (
-                  <StyledInputText labelText="Your Social Security Number (SSN)" placeholder="9 digit number" isSensitiveData={true} onChangeText={field.onChange}></StyledInputText>
+                  <StyledInputText labelText="Your social security number (SSN)" placeholder="9 digit number" isSensitiveData={true} onChangeText={field.onChange}></StyledInputText>
                 )} />
             </View>
-            <StyledText color='accent200'>By selecting the 'Confirm Operation' option, you are agreeing to our terms and conditions, and will proceed with the account creation process.</StyledText>
+            <StyledText color='accent200'>By selecting the 'Confirm operation' option, you are agreeing to our terms and conditions, and will proceed with the account creation process.</StyledText>
             <Controller
               name='email'
               control={control}
@@ -133,7 +139,7 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
 
       <View style={[styles.footer]}>
         <Button
-          title="Request"
+          title="Confirm request"
           style={[styles.button]}
           size='long'
           useGradient={true}

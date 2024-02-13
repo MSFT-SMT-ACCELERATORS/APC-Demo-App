@@ -13,6 +13,7 @@ import { Controller, FieldValues, SubmitHandler, useForm } from 'react-hook-form
 import StyledText from '../components/StyledText';
 import { RadioButton } from 'react-native-paper';
 import palette from '../themes/Colors';
+import CheckboxWithText from '../components/CheckBox';
 
 interface SettingsProps {
     setLoading: (isLoading: boolean, text?: string) => void;
@@ -21,6 +22,7 @@ interface SettingsProps {
 const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
     const navigation = useNavigation();
     const { control, handleSubmit, watch, formState: { errors }, reset } = useForm<AppConfiguration>({ defaultValues: defaultConfig })
+    const [geolocationCheck, setGeolocationCheck] = useState<boolean>(false)
     const connectionMode = watch('connectionMode');
 
     useEffect(() => {
@@ -30,6 +32,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
             const loadConfig = async () => {
                 const config = await readConfigurations();
                 reset(config);
+                setGeolocationCheck(config.skipGeolocationCheck || false);
             };
 
             loadConfig();
@@ -44,10 +47,10 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
             radiusKm: typeof data.radiusKm === 'string' ? parseFloat(data.radiusKm) : data.radiusKm,
             offlineLatitude: typeof data.offlineLatitude === 'string' ? parseFloat(data.offlineLatitude) : data.offlineLatitude,
             offlineLongitude: typeof data.offlineLongitude === 'string' ? parseFloat(data.offlineLongitude) : data.offlineLongitude,
-
+            skipGeolocationCheck: geolocationCheck,
         };
         console.log(formattedData);
-        storeConfigurations(data);
+        storeConfigurations(formattedData);
     }
 
     return (
@@ -72,6 +75,15 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                             )}
                         />
                         {errors.radiusKm && <StyledText customStyle={['regular']} color='danger200'>{errors.radiusKm.message}</StyledText>}
+
+                        <Controller
+                            name="skipGeolocationCheck"
+                            control={control}
+                            render={() => (
+                                <CheckboxWithText label={"Exclude phone location verification"} checked={geolocationCheck} onToggle={() => { setGeolocationCheck(!geolocationCheck) }} />
+                            )}>
+                        </Controller>
+                        
 
                         <Controller
                             control={control}
@@ -102,7 +114,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                         />
 
                         {true || connectionMode == ConnectionMode.Offline ?
-                            <View style={[{ marginHorizontal: 30, marginTop: 5 }]}>
+                            <View style={[{ marginTop: 5 }]}>
                                 <Controller
                                     name='offlineLastSimChange'
                                     control={control}
@@ -167,7 +179,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
 
                 <View style={[styles.footer]}>
                     <Button
-                        title="Next"
+                        title="Save"
                         style={[styles.button]}
                         size='long'
                         useGradient={true}
