@@ -185,7 +185,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
 
       </View>
       <Modal visible={tooltipVisible} onDismiss={hideTooltip} contentContainerStyle={styles.tooltip}>
-        <StyledText customStyle={['standarSm', 'bold']} color='black'>Note that your phone should be the same number used by your phone</StyledText>
+        <StyledText customStyle={['standarSm', 'bold']} color='black'>Note that the provided contact phone number should match the line number of the current phone using the app.</StyledText>
       </Modal>
     </AppContainer>
   );

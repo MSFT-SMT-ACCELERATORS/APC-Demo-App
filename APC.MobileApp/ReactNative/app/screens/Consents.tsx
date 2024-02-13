@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   },
   title: {
     width: '100%',
-    marginTop: 70,
+    marginTop: 30,
     marginBottom: 20,
     alignItems: 'center',
     gap: 10
