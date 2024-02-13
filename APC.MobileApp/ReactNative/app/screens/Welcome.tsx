@@ -9,7 +9,10 @@ import customStyles from '../themes/CustomStyles';
 import palette from '../themes/Colors';
 import StyledText from '../components/StyledText';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import NetInfo from '@react-native-community/netinfo';
+import Icon from 'react-native-vector-icons/AntDesign';
+
 
 
 interface WelcomeProps {
@@ -18,10 +21,16 @@ interface WelcomeProps {
 
 const Welcome: React.FC<WelcomeProps> = ({ setLoading }) => {
   const navigation = useNavigation();
+  const [isWifiConnected, setIsWifiConnected] = useState(false);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       setLoading(false);
+    });
+
+    const networkUnsubscribe = NetInfo.addEventListener(state => {
+      const wifiConnected = state.isConnected && state.type === 'wifi' || false;
+      setIsWifiConnected(wifiConnected);
     });
 
     return unsubscribe;
@@ -44,6 +53,14 @@ const Welcome: React.FC<WelcomeProps> = ({ setLoading }) => {
             onPress={() => navigation.navigate('Settings')}
           />
         </View>
+
+        {/* {isWifiConnected && 
+            <StyledText style={ styles.warningMessage }>
+                <Icon name="warning" size={20} color={palette.accent200} />
+                {' '} This demo app relays on Cell-Network and currently needs the Wi-Fi to be disabled in the phone
+            </StyledText>
+        } */}
+
         <View style={[styles.bodyContainer]}>
           <Image source={require('../../assets/images/logo.png')} style={styles.image} resizeMode='contain' />
           <StyledText customStyle={['title1', 'extrabold']}>Your loan, just a touch away</StyledText>
@@ -91,7 +108,11 @@ const styles = StyleSheet.create({
   },
   settings: {
     alignSelf: 'flex-end'
-  }
+  },
+  warningMessage: {
+    padding: 15,
+    backgroundColor: '#252533',
+}
 });
 
 export default Welcome;
