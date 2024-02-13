@@ -46,11 +46,11 @@ const Welcome: React.FC<WelcomeProps> = ({ setLoading }) => {
         </View>
         <View style={[styles.bodyContainer]}>
           <Image source={require('../../assets/images/logo.png')} style={styles.image} resizeMode='contain' />
-          <StyledText customStyle={['title1', 'extrabold']}>Your Loan, Just a Touch Away</StyledText>
-          <StyledText customStyle={['title2', 'light']}>Get a Personal Line of Credit Between</StyledText>
+          <StyledText customStyle={['title1', 'extrabold']}>Your loan, just a touch away</StyledText>
+          <StyledText customStyle={['title2', 'light']}>Get a personal line of credit between</StyledText>
           <StyledText customStyle={['title2']} color='accent200'>$500 - $10000</StyledText>
           <Button
-            title='Get Started'
+            title='Get started'
             size='normal'
             style={customStyles.my4}
             useGradient={true}
