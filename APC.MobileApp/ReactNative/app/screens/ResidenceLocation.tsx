@@ -110,7 +110,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
       console.log('validating apc matches locataion');
       const response = await APCService.matchesAPCLocation(apiClient, coords);
       if (!response.verificationResult) {
-        handleModalToggle("Wrong GPS location", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence.");
+        handleModalToggle("Blocking anti-hacking rule: GPS coordinates hacking attempted", "A possible hacking has been detected. The device GPS location does not match the device’s actual location provided by the network carrier. The application’s flow must stop.");
         console.log('APC validation failed!!');
         hasError = true;
       } else {
@@ -122,7 +122,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
     // Business validation
     console.log('validating business rule');
     if (!await APCService.matchesCoords(coords, coordsForm)) {
-      handleModalToggle("Error Business Lockout", "This application requires that the location of the user's mobile phone be in the same area as the location of the user's usual residence.");
+      handleModalToggle("Blocking business rule: Not allowed device location", " For anti-fraud purposes, this application requires the user to be using the app in a location relatively close to the user’s residence location (i.e. same state). You are currently far away.");
       // handleModalToggle("Wrong GPS location", "The location does not match the information entered in the form");
       console.log('Business validation failed!!');
       hasError = true;
