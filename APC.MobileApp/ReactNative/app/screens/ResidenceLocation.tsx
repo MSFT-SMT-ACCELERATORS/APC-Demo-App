@@ -286,7 +286,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
             {errors.City && <StyledText color='danger200'>{errors.City.message}</StyledText>}
 
             {!config?.skipGeolocationCheck && <View style={styles.btnGroup}>
-              <StyledText style={styles.comparisonTitle}>Internal Comparison with:</StyledText>
+              <StyledText style={styles.comparisonTitle}>Internal comparison with:</StyledText>
               <Controller
                 control={control}
                 name='GPSOption'
@@ -353,7 +353,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
                           <Pressable onPress={() => onChange(!value)}>
                             <View style={styles.flex}>
                               <CheckboxWithText
-                                label='Use Azure Programmable Connectivity Backend'
+                                label='Use Azure Programmable Connectivity backend'
                                 checked={value}
                                 onToggle={() => onChange(!value)}
                               />
@@ -396,7 +396,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
         </View>
 
         <Modal visible={tooltipVisible} onDismiss={hideTooltip} contentContainerStyle={styles.tooltip}>
-          <StyledText customStyle={['standarSm', 'bold']} color='black'>You need to be using this app in the same area.</StyledText>
+          <StyledText customStyle={['standarSm', 'bold']} color='black'>You need to be using this app in an area relatively close to your residence location (i.e. The same state/province).</StyledText>
         </Modal>
       </View>
       <CustomModal
