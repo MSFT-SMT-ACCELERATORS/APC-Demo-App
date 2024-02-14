@@ -278,5 +278,34 @@
         "city": "Pozuelo de Alarc\u00f3n",
         "latitude": 40.43122,
         "longitude": -3.81333
+    },
+    {
+        "country": "Spain",
+        "state": "Andalucia",
+        "city": "Málaga",
+        "latitude": 36.71959,
+        "longitude": -4.416972
+    },
+    {
+        "country": "United States",
+        "state": "Washington",
+        "city": "Redmond",
+        "latitude": 47.6612, 
+        "longitude": -122.20670
+    },
+    {
+        "country": "United States",
+        "state": "Washington",
+        "city": "Seattle",
+        "latitude": 47.62242,
+        "longitude": -122.34803
+    },
+    {
+        "country": "United States",
+        "state": "Florida",
+        "city": "Miami",
+        "latitude": 25.775482, 
+        "longitude": -80.186360
     }
+
 ]

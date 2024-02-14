@@ -129,7 +129,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
       console.log('Business validation failed!!');
       hasError = true;
     } else {
-      handleModalToggle("APC unchecked", "", palette.accent200, false);
+      handleModalToggle("APC checked", "", palette.accent200, false);
       setShouldNavigate(true);
       console.log('Business validation success!!')
     }

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { StyleSheet, View, ScrollView, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useApiClient } from '../api/ApiClientProvider';
 
 import Button from '../components/Button'
 import StyledText from '../components/StyledText';
@@ -10,10 +11,12 @@ import palette from '../themes/Colors';
 import Slider from '../components/Slider';
 import AppContainer from '../components/AppContainer';
 import customStyles from '../themes/CustomStyles';
-import { Controller, FieldValues, useForm } from 'react-hook-form';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { Modal } from 'react-native-paper';
 import { useStep } from '../utils/StepContext';
+import { Controller, FieldValues, useForm } from 'react-hook-form';
+import * as APCService from '../utils/APCService'
+import CustomModal from '../components/CustomModal';
 
 
 interface StepProps {
@@ -28,14 +31,76 @@ enum ButtonNames {
   others
 }
 
+
+
 const screenWidth = Dimensions.get('window').width;
 const isSmallScreen = screenWidth < 200;
 
 const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const navigation = useNavigation();
+  const apiClient = useApiClient();
   const { setCurrentStep } = useStep();
   const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm();
   const [tooltipVisible, setTooltipVisible] = useState<boolean>(false)
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalText, setModalText] = useState('');
+  const [showModalIcon, setModalIcon] = useState(true);
+  const [modalBackground, setModalBackground] = useState('');
+  const [shouldNavigate, setShouldNavigate] = useState(false);
+
+  const handleModalToggle = (title: string, text: string, backgroundColor: string = palette.danger100, showIcon: boolean = true) => {
+    setModalIcon(showIcon);
+    setModalTitle(title);
+    setModalText(text);
+    setModalVisible(!modalVisible);
+    setModalBackground(backgroundColor);
+  };
+
+  const buttonStyleVariant = (buttonElement: 'title' | 'icon', isSelected: boolean) => {
+    switch (buttonElement) {
+      case "title":
+        return isSelected ? 'primary300' : 'accent200'
+
+      case "icon":
+        return isSelected ? palette.primary300 : palette.accent200
+    }
+  }
+
+
+  const onFormValid = async (data: FieldValues) => {
+    console.log(data);
+    setLoading(true, "Validating your data...");
+    // APC validation
+
+    const response = await APCService.checkSimChange(apiClient);
+    console.log("SIMSWAP: ", response);
+
+    if (response) {
+      console.log("SIM swap detected");
+      handleModalToggle("SIM swap detected", "A recent SIM change has been detected on this device, for security reasons you cannot continue with this local request");
+
+    } else {
+      console.log("SIM swap not detected");
+      handleModalToggle("SIM swap not detected", "For security reasons we checked that your phone line didn’t have any SIM swap recently. You can continue with this loan request.", palette.accent200, false);
+      setShouldNavigate(true);
+    }
+
+    setLoading(false);
+
+
+    // navigation.navigate('Information');
+  }
+
+  useEffect(() => {
+    if (!modalVisible && shouldNavigate) {
+      setTimeout(() => {
+        navigation.navigate('Information');
+        setShouldNavigate(false);
+      }, 100);
+    }
+  }, [modalVisible, shouldNavigate, navigation]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -53,21 +118,6 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const showTooltip = () => setTooltipVisible(true);
   const hideTooltip = () => setTooltipVisible(false);
 
-  const buttonStyleVariant = (buttonElement: 'title' | 'icon', isSelected: boolean) => {
-    switch (buttonElement) {
-      case "title":
-        return isSelected ? 'primary300' : 'accent200'
-
-      case "icon":
-        return isSelected ? palette.primary300 : palette.accent200
-    }
-  }
-
-
-  const onFormValid = async (data: FieldValues) => {
-    console.log(data);
-    navigation.navigate('Information');
-  }
 
   return (
     <AppContainer>
@@ -184,6 +234,16 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
         </View>
 
       </View>
+      <CustomModal
+        visible={modalVisible}
+        onClose={() => handleModalToggle('', '', '', false)}
+        showIcon={showModalIcon}
+        iconName={'warning-outline'}
+        title={modalTitle}
+        text={modalText}
+        backgroundColor={modalBackground}
+      />
+
       <Modal visible={tooltipVisible} onDismiss={hideTooltip} contentContainerStyle={styles.tooltip}>
         <StyledText customStyle={['standarSm', 'bold']} color='black'>Note that the provided contact phone number should match the line number of the current phone using the app.</StyledText>
       </Modal>
