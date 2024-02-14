@@ -4,12 +4,24 @@ import { StyleSheet, View, ScrollView, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import Colors from '../themes/Colors';
-import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration, defaultConfig, ConnectionMode } from '../utils/SettingsService'
+import {
+    storeConfigurations,
+    readConfigurations,
+    updateConfiguration,
+    AppConfiguration,
+    defaultConfig,
+    ConnectionMode,
+} from '../utils/SettingsService';
 
 import AppContainer from '../components/AppContainer';
-import Button from '../components/Button'
+import Button from '../components/Button';
 import StyledInputText from '../components/StyledInputText';
-import { Controller, FieldValues, SubmitHandler, useForm } from 'react-hook-form';
+import {
+    Controller,
+    FieldValues,
+    SubmitHandler,
+    useForm,
+} from 'react-hook-form';
 import StyledText from '../components/StyledText';
 import { RadioButton } from 'react-native-paper';
 import palette from '../themes/Colors';
@@ -21,8 +33,17 @@ interface SettingsProps {
 
 const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
     const navigation = useNavigation();
-    const { control, handleSubmit, watch, formState: { errors }, reset } = useForm<AppConfiguration>({ defaultValues: defaultConfig })
-    const [geolocationCheck, setGeolocationCheck] = useState<boolean>(false)
+    const {
+        control,
+        handleSubmit,
+        watch,
+        formState: { errors },
+        reset,
+    } = useForm<AppConfiguration>({ defaultValues: defaultConfig });
+    const [geolocationCheck, setGeolocationCheck] = useState<boolean>(false);
+    const [autovalidatePhoneNumber, setAutovalidatePhoneNumber] =
+        useState<boolean>(false);
+    const [simSwap, setSimSwap] = useState<boolean>(false);
     const connectionMode = watch('connectionMode');
 
     useEffect(() => {
@@ -33,6 +54,10 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                 const config = await readConfigurations();
                 reset(config);
                 setGeolocationCheck(config.skipGeolocationCheck || false);
+                setAutovalidatePhoneNumber(
+                    config.autovalidatePhoneNumber || false
+                );
+                setSimSwap(config.offlineLastSimChange || false);
             };
 
             loadConfig();
@@ -44,14 +69,25 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
     const saveConfig: SubmitHandler<AppConfiguration> = async (data) => {
         const formattedData = {
             ...data,
-            radiusKm: typeof data.radiusKm === 'string' ? parseFloat(data.radiusKm) : data.radiusKm,
-            offlineLatitude: typeof data.offlineLatitude === 'string' ? parseFloat(data.offlineLatitude) : data.offlineLatitude,
-            offlineLongitude: typeof data.offlineLongitude === 'string' ? parseFloat(data.offlineLongitude) : data.offlineLongitude,
+            radiusKm:
+                typeof data.radiusKm === 'string'
+                    ? parseFloat(data.radiusKm)
+                    : data.radiusKm,
+            offlineLatitude:
+                typeof data.offlineLatitude === 'string'
+                    ? parseFloat(data.offlineLatitude)
+                    : data.offlineLatitude,
+            offlineLongitude:
+                typeof data.offlineLongitude === 'string'
+                    ? parseFloat(data.offlineLongitude)
+                    : data.offlineLongitude,
             skipGeolocationCheck: geolocationCheck,
+            autovalidatePhoneNumber,
+            offlineLastSimChange: simSwap,
         };
         console.log(formattedData);
         storeConfigurations(formattedData);
-    }
+    };
 
     return (
         <AppContainer>
@@ -63,8 +99,10 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                             control={control}
                             rules={{
                                 validate: {
-                                    isNumber: value => !isNaN(value) || "The value must be a number."
-                                }
+                                    isNumber: (value) =>
+                                        !isNaN(value) ||
+                                        'The value must be a number.',
+                                },
                             }}
                             render={({ field }) => (
                                 <StyledInputText
@@ -74,38 +112,111 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                 />
                             )}
                         />
-                        {errors.radiusKm && <StyledText customStyle={['regular']} color='danger200'>{errors.radiusKm.message}</StyledText>}
+                        {errors.radiusKm && (
+                            <StyledText
+                                customStyle={['regular']}
+                                color="danger200"
+                            >
+                                {errors.radiusKm.message}
+                            </StyledText>
+                        )}
 
                         <Controller
                             name="skipGeolocationCheck"
                             control={control}
                             render={() => (
-                                <CheckboxWithText label={"Exclude phone location verification"} checked={geolocationCheck} onToggle={() => { setGeolocationCheck(!geolocationCheck) }} />
-                            )}>
-                        </Controller>
-                        
+                                <CheckboxWithText
+                                    label={
+                                        'Exclude phone location verification'
+                                    }
+                                    checked={geolocationCheck}
+                                    onToggle={() => {
+                                        setGeolocationCheck(!geolocationCheck);
+                                    }}
+                                />
+                            )}
+                        ></Controller>
+
+                        <Controller
+                            name="autovalidatePhoneNumber"
+                            control={control}
+                            render={() => (
+                                <CheckboxWithText
+                                    label={
+                                        'Autovalidate phone number (offline only)'
+                                    }
+                                    checked={autovalidatePhoneNumber}
+                                    onToggle={() => {
+                                        setAutovalidatePhoneNumber(
+                                            !autovalidatePhoneNumber
+                                        );
+                                    }}
+                                />
+                            )}
+                        ></Controller>
+
+                        <Controller
+                            name="offlineLastSimChange"
+                            control={control}
+                            render={() => (
+                                <CheckboxWithText
+                                    label={'Swapped SIM within last 10 days'}
+                                    checked={simSwap}
+                                    onToggle={() => {
+                                        setSimSwap(!simSwap);
+                                    }}
+                                />
+                            )}
+                        />
 
                         <Controller
                             control={control}
-                            name='connectionMode'
+                            name="connectionMode"
                             rules={{ required: 'Please select an option' }}
                             render={({ field: { onChange, value } }) => (
-                                <RadioButton.Group onValueChange={onChange} value={value}>
+                                <RadioButton.Group
+                                    onValueChange={onChange}
+                                    value={value}
+                                >
                                     <View style={styles.group}>
                                         <StyledText>Connection Mode</StyledText>
 
-                                        <Pressable style={styles.flex} onPress={() => onChange(ConnectionMode.Online)}>
-                                            <RadioButton.Android value={ConnectionMode.Online} color={Colors.accent200} />
+                                        <Pressable
+                                            style={styles.flex}
+                                            onPress={() =>
+                                                onChange(ConnectionMode.Online)
+                                            }
+                                        >
+                                            <RadioButton.Android
+                                                value={ConnectionMode.Online}
+                                                color={Colors.accent200}
+                                            />
                                             <StyledText>Full online</StyledText>
                                         </Pressable>
 
-                                        <Pressable style={styles.flex} onPress={() => onChange(ConnectionMode.Mock)}>
-                                            <RadioButton.Android value={ConnectionMode.Mock} color={Colors.accent200} />
+                                        <Pressable
+                                            style={styles.flex}
+                                            onPress={() =>
+                                                onChange(ConnectionMode.Mock)
+                                            }
+                                        >
+                                            <RadioButton.Android
+                                                value={ConnectionMode.Mock}
+                                                color={Colors.accent200}
+                                            />
                                             <StyledText>Mock APC</StyledText>
                                         </Pressable>
 
-                                        <Pressable style={styles.flex} onPress={() => onChange(ConnectionMode.Offline)}>
-                                            <RadioButton.Android value={ConnectionMode.Offline} color={Colors.accent200} />
+                                        <Pressable
+                                            style={styles.flex}
+                                            onPress={() =>
+                                                onChange(ConnectionMode.Offline)
+                                            }
+                                        >
+                                            <RadioButton.Android
+                                                value={ConnectionMode.Offline}
+                                                color={Colors.accent200}
+                                            />
                                             <StyledText>Offline</StyledText>
                                         </Pressable>
                                     </View>
@@ -113,67 +224,86 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                             )}
                         />
 
-                        {true || connectionMode == ConnectionMode.Offline ?
+                        {true || connectionMode == ConnectionMode.Offline ? (
                             <View style={[{ marginTop: 5 }]}>
                                 <Controller
-                                    name='offlineLastSimChange'
-                                    control={control}
-                                    render={({ field }) => (
-                                        <StyledInputText labelText='Last sim swap' value={field.value}></StyledInputText>
-                                    )}
-                                />
-
-                                <Controller
-                                    name='offlineLatitude'
+                                    name="offlineLatitude"
                                     control={control}
                                     rules={{
                                         validate: {
-                                            isNumber: value => !isNaN(value) || "The value must be a number.",
-                                            isValidLatitude: value => (-90 <= value && value <= 90) || "The value must be a number between -90 and 90."
-                                        }
+                                            isNumber: (value) =>
+                                                !isNaN(value) ||
+                                                'The value must be a number.',
+                                            isValidLatitude: (value) =>
+                                                (-90 <= value && value <= 90) ||
+                                                'The value must be a number between -90 and 90.',
+                                        },
                                     }}
                                     render={({ field }) => (
                                         <StyledInputText
-                                            labelText='APC Latitude'
-                                            value={field.value?.toString() || ''}
+                                            labelText="APC Latitude"
+                                            value={
+                                                field.value?.toString() || ''
+                                            }
                                             onChangeText={field.onChange}
                                         />
                                     )}
                                 />
-                                {errors.offlineLatitude && <StyledText customStyle={['regular']} color='danger200'>{errors.offlineLatitude.message}</StyledText>}
+                                {errors.offlineLatitude && (
+                                    <StyledText
+                                        customStyle={['regular']}
+                                        color="danger200"
+                                    >
+                                        {errors.offlineLatitude.message}
+                                    </StyledText>
+                                )}
 
                                 <Controller
-                                    name='offlineLongitude'
+                                    name="offlineLongitude"
                                     control={control}
                                     rules={{
                                         validate: {
-                                            isNumber: value => !isNaN(value) || "The value must be a number.",
-                                            isValidLongitude: value => (-180 <= value && value <= 180) || "The value must be a number between -180 and 180."
-                                        }
+                                            isNumber: (value) =>
+                                                !isNaN(value) ||
+                                                'The value must be a number.',
+                                            isValidLongitude: (value) =>
+                                                (-180 <= value &&
+                                                    value <= 180) ||
+                                                'The value must be a number between -180 and 180.',
+                                        },
                                     }}
                                     render={({ field }) => (
                                         <StyledInputText
-                                            labelText='APC Longitude'
-                                            value={field.value?.toString() || ''}
+                                            labelText="APC Longitude"
+                                            value={
+                                                field.value?.toString() || ''
+                                            }
                                             onChangeText={field.onChange}
                                         />
                                     )}
                                 />
-                                {errors.offlineLongitude && <StyledText customStyle={['regular']} color='danger200'>{errors.offlineLongitude.message}</StyledText>}
+                                {errors.offlineLongitude && (
+                                    <StyledText
+                                        customStyle={['regular']}
+                                        color="danger200"
+                                    >
+                                        {errors.offlineLongitude.message}
+                                    </StyledText>
+                                )}
 
                                 <Controller
-                                    name='offlinePhoneNumber'
+                                    name="offlinePhoneNumber"
                                     control={control}
                                     render={({ field }) => (
                                         <StyledInputText
-                                            labelText='APC Phone Number'
+                                            labelText="APC Phone Number"
                                             value={field.value}
                                             onChangeText={field.onChange}
                                         />
                                     )}
                                 />
                             </View>
-                            : null}
+                        ) : null}
                     </View>
                 </ScrollView>
 
@@ -181,27 +311,28 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                     <Button
                         title="Save"
                         style={[styles.button]}
-                        size='long'
+                        size="long"
                         useGradient={true}
-                        onPress={handleSubmit(saveConfig)} />
+                        onPress={handleSubmit(saveConfig)}
+                    />
                 </View>
             </View>
         </AppContainer>
     );
-}
+};
 
 const styles = StyleSheet.create({
     parent: {
         width: ' 100%',
         flex: 1,
-        backgroundColor: palette.primary300
+        backgroundColor: palette.primary300,
     },
     contentContainer: {
         flex: 1,
         width: '100%',
         padding: 15,
         paddingTop: 0,
-        marginBottom: 120
+        marginBottom: 120,
     },
     button: {
         position: 'absolute',
@@ -215,7 +346,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     group: {
-        padding: 10
+        padding: 10,
     },
     bodyContent: {
         marginTop: 30,
@@ -225,7 +356,7 @@ const styles = StyleSheet.create({
     },
     footer: {
         width: '100%',
-        height: undefined
+        height: undefined,
     },
 });
 
