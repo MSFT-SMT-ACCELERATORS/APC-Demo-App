@@ -11,7 +11,7 @@ export type AppConfiguration = {
   connectionMode: ConnectionMode;
   radiusKm: number;
   skipGeolocationCheck: boolean,
-  offlineLastSimChange: string;
+  offlineLastSimChange: boolean;
   offlineLatitude: number;
   offlineLongitude: number;
   offlinePhoneNumber: string;
@@ -25,7 +25,7 @@ export const defaultConfig = {
   skipGeolocationCheck: false,
   offlineLatitude: 0,
   offlineLongitude: 0,
-  offlineLastSimChange: '',
+  offlineLastSimChange: false,
   offlinePhoneNumber: '',
 } as AppConfiguration;
 
