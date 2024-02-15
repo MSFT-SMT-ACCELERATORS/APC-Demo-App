@@ -15,6 +15,7 @@ export type AppConfiguration = {
   offlineLatitude: number;
   offlineLongitude: number;
   offlinePhoneNumber: string;
+  autovalidatePhoneNumber: boolean
 };
 
 const CONFIG_KEY = 'app_configuration';
@@ -27,6 +28,7 @@ export const defaultConfig = {
   offlineLongitude: 0,
   offlineLastSimChange: false,
   offlinePhoneNumber: '',
+  autovalidatePhoneNumber: false,
 } as AppConfiguration;
 
 export const storeConfigurations = async (configurations: AppConfiguration) => {
