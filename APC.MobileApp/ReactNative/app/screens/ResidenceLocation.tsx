@@ -142,8 +142,8 @@ const ResidenceLocation: React.FC<StepProps> = ({
         setLoading(true, 'Validating your data...');
 
         if (data.Country === 'Select a country') {
-            console.log('Selection Required');
-            handleModalToggle('Selection Required', 'Please select a valid option from the "Select a country" dropdown to proceed.', palette.primary100, undefined, 'information-circle-outline', palette.black);
+            console.log('Selection required');
+            handleModalToggle('Selection required', 'Please select a valid option from the "Select a country" dropdown to proceed.', palette.primary100, undefined, 'information-circle-outline', palette.black);
             setLoading(false);
             return;
 
@@ -266,7 +266,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                 <ScrollView style={[styles.contentContainer]}>
                     <View style={[styles.title]}>
                         <StyledText customStyle={['title2', 'extrabold']}>
-                            Residence Location
+                            Residence location
                         </StyledText>
                         <StyledText
                             style={{ textAlign: 'center' }}
