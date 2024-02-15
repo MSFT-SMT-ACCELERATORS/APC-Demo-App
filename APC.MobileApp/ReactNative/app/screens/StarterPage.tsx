@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as APCService from '../utils/APCService';
-import { useApiClient } from '../api/ApiClientProvider';
 
 import Button from '../components/Button';
 import StyledText from '../components/StyledText';
@@ -18,13 +17,13 @@ import palette from '../themes/Colors';
 import Slider from '../components/Slider';
 import AppContainer from '../components/AppContainer';
 import customStyles from '../themes/CustomStyles';
+import { Controller, FieldValues, useForm } from 'react-hook-form';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { Modal } from 'react-native-paper';
 import { useStep } from '../utils/StepContext';
-import { Controller, FieldValues, useForm } from 'react-hook-form';
+import { useApiClient } from '../api/ApiClientProvider';
 import CustomModal from '../components/CustomModal';
 import { AppConfiguration, ConnectionMode, readConfigurations } from '../utils/SettingsService';
-
 
 interface StepProps {
   setProgress: (progress: number) => void;
@@ -37,8 +36,6 @@ enum ButtonNames {
   moving,
   others,
 }
-
-
 
 const screenWidth = Dimensions.get('window').width;
 const isSmallScreen = screenWidth < 200;
@@ -54,29 +51,34 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   } = useForm();
   const [tooltipVisible, setTooltipVisible] = useState<boolean>(false);
   const [phoneNumber, setPhoneNumber] = useState<string>('');
-  const [isPhoneNumberValid, setIsPhoneNumberValid] = useState<boolean>(false);
+  const [isPhoneNumberValid, setIsPhoneNumberValid] =
+    useState<boolean>(false);
   const [config, setConfig] = useState<AppConfiguration>();
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [modalText, setModalText] = useState('');
   const [showModalIcon, setModalIcon] = useState(true);
+  const [modalIconName, setIcon] = useState('');
+  const [modalIconColor, setColorIcon] = useState('');
   const [modalBackground, setModalBackground] = useState('');
   const [shouldNavigate, setShouldNavigate] = useState(false);
 
-  const handleModalToggle = (title: string, text: string, backgroundColor: string = palette.danger100, showIcon: boolean = true) => {
+  const handleModalToggle = (title: string, text: string, backgroundColor: string = palette.danger100, showIcon: boolean = true, iconName: string = 'warning-outline', iconColor: string = palette.danger200) => {
+    setModalVisible(!modalVisible);
     setModalIcon(showIcon);
+    setModalBackground(backgroundColor);
     setModalTitle(title);
     setModalText(text);
-    setModalVisible(!modalVisible);
-    setModalBackground(backgroundColor);
+    setIcon(iconName);
+    setColorIcon(iconColor);
   };
 
 
   const onFormValid = async (data: FieldValues) => {
     console.log(data);
     setLoading(true, "Validating your data...");
+    
     // APC validation
-
     const response = await APCService.checkSimChange(apiClient);
     console.log("SIMSWAP: ", response);
 
@@ -86,14 +88,12 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
 
     } else {
       console.log("SIM swap not detected");
-      handleModalToggle("SIM swap not detected", "For security reasons we checked that your phone line didn’t have any SIM swap recently. You can continue with this loan request.", palette.accent200, false);
+      handleModalToggle("SIM swap not detected", "For security reasons we checked that your phone line didn’t have any SIM swap recently. You can continue with this loan request.", palette.accent200, true, 'information-circle-outline', palette.black);
       setShouldNavigate(true);
     }
 
     setLoading(false);
 
-
-    // navigation.navigate('Information');
   }
 
   useEffect(() => {
@@ -118,326 +118,323 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
     setCurrentStep(2);
   }, [setCurrentStep]);
 
-    useEffect(() => {
-        readConfigurations().then(setConfig);
-    }, [])
+  useEffect(() => {
+    readConfigurations().then(setConfig);
+  }, [])
 
-    const showTooltip = () => setTooltipVisible(true);
-    const hideTooltip = () => setTooltipVisible(false);
+  const showTooltip = () => setTooltipVisible(true);
+  const hideTooltip = () => setTooltipVisible(false);
 
-    const buttonStyleVariant = (
-        buttonElement: 'title' | 'icon',
-        isSelected: boolean
-    ) => {
-        switch (buttonElement) {
-            case 'title':
-                return isSelected ? 'primary300' : 'accent200';
+  const buttonStyleVariant = (
+    buttonElement: 'title' | 'icon',
+    isSelected: boolean
+  ) => {
+    switch (buttonElement) {
+      case 'title':
+        return isSelected ? 'primary300' : 'accent200';
 
-            case 'icon':
-                return isSelected ? palette.primary300 : palette.accent200;
-        }
-    };
+      case 'icon':
+        return isSelected ? palette.primary300 : palette.accent200;
+    }
+  };
 
-    const apiClient = useApiClient();
+  const autocompletePhoneNumber = async () => {
 
-    const autocompletePhoneNumber = async () => {
+    if (config?.connectionMode === ConnectionMode.Offline) {
+      setIsPhoneNumberValid(true);
+      handleModalToggle("Information message:", "Your phone has been validated against the actual", palette.accent200, undefined, 'information-circle-outline', palette.black);
+    }
 
-        if (config?.connectionMode === ConnectionMode.Offline) {
-            setIsPhoneNumberValid(true);
-            setModalVisible(true);
-        }
+    const devicePhoneNumber = await APCService.getPhoneNumber(apiClient);
 
-        const devicePhoneNumber = await APCService.getPhoneNumber(apiClient);
+    if (!phoneNumber) {
+      setPhoneNumber(devicePhoneNumber);
+      setIsPhoneNumberValid(true);
+    } else {
+      if (phoneNumber === devicePhoneNumber) {
+        setIsPhoneNumberValid(true);
+        handleModalToggle("Information message:", "Your phone has been validated against the actual", palette.accent200, undefined, 'information-circle-outline', palette.black);
+      } else {
+        setIsPhoneNumberValid(false);
+        handleModalToggle("Error message:", "Invalid phone number");
+      }
+    }
+  };
 
-        if (!phoneNumber) {
-            setPhoneNumber(devicePhoneNumber);
-            setIsPhoneNumberValid(true);
-        } else {
-            if (phoneNumber === devicePhoneNumber) {
-                setIsPhoneNumberValid(true);
-                setModalVisible(true);
-            } else {
-                setIsPhoneNumberValid(false);
-                setModalVisible(true);
-            }
-        }
-    };
-
-    const onFormValid = async (data: FieldValues) => {
-        console.log(data);
-        navigation.navigate('Information');
-    };
-
-    return (
-        <AppContainer>
-            <View style={[styles.parent]}>
-                <ScrollView style={[styles.contentContainer]}>
-                    <View style={[styles.title]}>
-                        <StyledText customStyle={['title2', 'extrabold']}>
-                            Let’s get started
-                        </StyledText>
-                        <StyledText
-                            style={{ textAlign: 'center' }}
-                            customStyle={['title5', 'regular']}
-                        >
-                            Please complete the form below {'  '}
-                            <Icon
-                                name="infocirlceo"
-                                size={20}
-                                color={palette.accent200}
-                                onPress={showTooltip}
-                            />
-                        </StyledText>
-                    </View>
-
-                    <View
-                        style={[styles.separatorContainer, customStyles.mb4]}
-                    ></View>
-                    <View style={styles.bodyContent}>
-                        <Controller
-                            name="phonenumber"
-                            control={control}
-                            render={() => (
-                                <View style={styles.phoneNumberField}>
-                                    <StyledInputText
-                                        style={styles.phoneInput}
-                                        labelText="Phone number"
-                                        placeholder="+1 365-478-8429"
-                                        value={phoneNumber}
-                                        inputType="tel"
-                                        onChangeText={(text) =>
-                                            setPhoneNumber(text)
-                                        }
-                                    ></StyledInputText>
-                                    <TouchableOpacity>
-                                        <Button
-                                            title=""
-                                            size="short"
-                                            style={
-                                                styles.phoneVerificationCheck
-                                            }
-                                            showIcon={true}
-                                            iconName={'check'}
-                                            iconColor={palette.primary300}
-                                            useGradient={true}
-                                            onPress={autocompletePhoneNumber}
-                                        />
-                                    </TouchableOpacity>
-                                </View>
-                            )}
-                        />
-                        <StyledText customStyle={['standar']}>
-                            I would like to formally request a loan for the
-                            following amount:
-                        </StyledText>
-
-                        <Controller
-                            name="amount"
-                            control={control}
-                            render={({ field }) => (
-                                <Slider
-                                    minValue={500}
-                                    maxValue={10000}
-                                    stepSize={100}
-                                    formatter={currencyFormatter}
-                                    onChange={field.onChange}
-                                    value={field.value}
-                                    style={{ padding: 10 }}
-                                />
-                            )}
-                        />
-                        <StyledText customStyle={['standar']}>
-                            Purpose:
-                        </StyledText>
-
-                        <Controller
-                            name="purpose"
-                            control={control}
-                            render={({ field }) => (
-                                <View>
-                                    <View style={styles.row}>
-                                        <Button
-                                            title="Debt consolidation"
-                                            titleSize={customStyles.small}
-                                            titleColor={buttonStyleVariant(
-                                                'title',
-                                                field.value ===
-                                                    ButtonNames.consolidation
-                                            )}
-                                            style={[
-                                                customStyles.my3,
-                                                customStyles.mr1,
-                                                isSmallScreen
-                                                    ? styles.largeIconButton
-                                                    : styles.smallIconButton,
-                                            ]}
-                                            size="square"
-                                            showIcon={true}
-                                            outline={true}
-                                            iconLib="MaterialIcons"
-                                            iconName={'attach-money'}
-                                            iconSize={50}
-                                            iconColor={buttonStyleVariant(
-                                                'icon',
-                                                field.value ===
-                                                    ButtonNames.consolidation
-                                            )}
-                                            onPress={() =>
-                                                field.onChange(
-                                                    ButtonNames.consolidation
-                                                )
-                                            }
-                                            isActive={
-                                                field.value ===
-                                                ButtonNames.consolidation
-                                            }
-                                        />
-                                        <Button
-                                            title="Monthly bills"
-                                            titleSize={customStyles.small}
-                                            titleColor={buttonStyleVariant(
-                                                'title',
-                                                field.value ===
-                                                    ButtonNames.bills
-                                            )}
-                                            style={[
-                                                customStyles.my2,
-                                                isSmallScreen
-                                                    ? styles.largeIconButton
-                                                    : styles.smallIconButton,
-                                            ]}
-                                            size="square"
-                                            showIcon={true}
-                                            outline={true}
-                                            iconLib="Ionicons"
-                                            iconName={'calendar-outline'}
-                                            iconSize={50}
-                                            iconColor={buttonStyleVariant(
-                                                'icon',
-                                                field.value ===
-                                                    ButtonNames.bills
-                                            )}
-                                            onPress={() =>
-                                                field.onChange(
-                                                    ButtonNames.bills
-                                                )
-                                            }
-                                            isActive={
-                                                field.value ===
-                                                ButtonNames.bills
-                                            }
-                                        />
-                                    </View>
-                                    <View style={styles.row}>
-                                        <Button
-                                            title="Moving"
-                                            titleSize={customStyles.small}
-                                            titleColor={buttonStyleVariant(
-                                                'title',
-                                                field.value ===
-                                                    ButtonNames.moving
-                                            )}
-                                            style={[
-                                                customStyles.my3,
-                                                customStyles.mr1,
-                                                isSmallScreen
-                                                    ? styles.largeIconButton
-                                                    : styles.smallIconButton,
-                                            ]}
-                                            size="square"
-                                            showIcon={true}
-                                            outline={true}
-                                            iconLib="MaterialCommunity"
-                                            iconName={'truck-check-outline'}
-                                            iconSize={45}
-                                            iconColor={buttonStyleVariant(
-                                                'icon',
-                                                field.value ===
-                                                    ButtonNames.moving
-                                            )}
-                                            onPress={() =>
-                                                field.onChange(
-                                                    ButtonNames.moving
-                                                )
-                                            }
-                                            isActive={
-                                                field.value ===
-                                                ButtonNames.moving
-                                            }
-                                        />
-                                        <Button
-                                            title="Others"
-                                            titleSize={customStyles.small}
-                                            titleColor={buttonStyleVariant(
-                                                'title',
-                                                field.value ===
-                                                    ButtonNames.others
-                                            )}
-                                            style={[
-                                                customStyles.my3,
-                                                isSmallScreen
-                                                    ? styles.largeIconButton
-                                                    : styles.smallIconButton,
-                                            ]}
-                                            size="square"
-                                            showIcon={true}
-                                            outline={true}
-                                            iconLib="Ionicons"
-                                            iconName={'wallet-outline'}
-                                            iconSize={50}
-                                            iconColor={buttonStyleVariant(
-                                                'icon',
-                                                field.value ===
-                                                    ButtonNames.others
-                                            )}
-                                            onPress={() =>
-                                                field.onChange(
-                                                    ButtonNames.others
-                                                )
-                                            }
-                                            isActive={
-                                                field.value ===
-                                                ButtonNames.others
-                                            }
-                                        />
-                                    </View>
-                                </View>
-                            )}
-                        />
-                    </View>
-                </ScrollView>
-
-                <View style={[styles.footer]}>
-                    <Button
-                        title="Next"
-                        style={[styles.button]}
-                        size="long"
-                        useGradient={true}
-                        onPress={handleSubmit(onFormValid)}
-                        disabled={!isPhoneNumberValid}
-                    />
-                </View>
-            </View>
-            <Modal
-                visible={tooltipVisible}
-                onDismiss={hideTooltip}
-                contentContainerStyle={styles.tooltip}
+  return (
+    <AppContainer>
+      <View style={[styles.parent]}>
+        <ScrollView style={[styles.contentContainer]}>
+          <View style={[styles.title]}>
+            <StyledText customStyle={['title2', 'extrabold']}>
+              Let’s get started
+            </StyledText>
+            <StyledText
+              style={{ textAlign: 'center' }}
+              customStyle={['title5', 'regular']}
             >
-                <StyledText customStyle={['standarSm', 'bold']} color="black">
-                    Note that the provided contact phone number should match the
-                    line number of the current phone using the app.
-                </StyledText>
-            </Modal>
+              Please complete the form below {'  '}
+              <Icon
+                name="infocirlceo"
+                size={20}
+                color={palette.accent200}
+                onPress={showTooltip}
+              />
+            </StyledText>
+          </View>
 
+          <View
+            style={[styles.separatorContainer, customStyles.mb4]}
+          ></View>
+          <View style={styles.bodyContent}>
+            <Controller
+              name="phonenumber"
+              control={control}
+              render={() => (
+                <View style={styles.phoneNumberField}>
+                  <StyledInputText
+                    style={styles.phoneInput}
+                    labelText="Phone number"
+                    placeholder="+1 365-478-8429"
+                    value={phoneNumber}
+                    inputType="tel"
+                    onChangeText={(text) =>
+                      setPhoneNumber(text)
+                    }
+                  ></StyledInputText>
+                  <TouchableOpacity>
+                    <Button
+                      title=""
+                      size="short"
+                      style={
+                        styles.phoneVerificationCheck
+                      }
+                      showIcon={true}
+                      iconName={'check'}
+                      iconColor={palette.primary300}
+                      useGradient={true}
+                      onPress={autocompletePhoneNumber}
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
+            <StyledText customStyle={['standar']}>
+              I would like to formally request a loan for the
+              following amount:
+            </StyledText>
+
+            <Controller
+              name="amount"
+              control={control}
+              render={({ field }) => (
+                <Slider
+                  minValue={500}
+                  maxValue={10000}
+                  stepSize={100}
+                  formatter={currencyFormatter}
+                  onChange={field.onChange}
+                  value={field.value}
+                  style={{ padding: 10 }}
+                />
+              )}
+            />
+            <StyledText customStyle={['standar']}>
+              Purpose:
+            </StyledText>
+
+            <Controller
+              name="purpose"
+              control={control}
+              render={({ field }) => (
+                <View>
+                  <View style={styles.row}>
+                    <Button
+                      title="Debt consolidation"
+                      titleSize={customStyles.small}
+                      titleColor={buttonStyleVariant(
+                        'title',
+                        field.value ===
+                        ButtonNames.consolidation
+                      )}
+                      style={[
+                        customStyles.my3,
+                        customStyles.mr1,
+                        isSmallScreen
+                          ? styles.largeIconButton
+                          : styles.smallIconButton,
+                      ]}
+                      size="square"
+                      showIcon={true}
+                      outline={true}
+                      iconLib="MaterialIcons"
+                      iconName={'attach-money'}
+                      iconSize={50}
+                      iconColor={buttonStyleVariant(
+                        'icon',
+                        field.value ===
+                        ButtonNames.consolidation
+                      )}
+                      onPress={() =>
+                        field.onChange(
+                          ButtonNames.consolidation
+                        )
+                      }
+                      isActive={
+                        field.value ===
+                        ButtonNames.consolidation
+                      }
+                    />
+                    <Button
+                      title="Monthly bills"
+                      titleSize={customStyles.small}
+                      titleColor={buttonStyleVariant(
+                        'title',
+                        field.value ===
+                        ButtonNames.bills
+                      )}
+                      style={[
+                        customStyles.my2,
+                        isSmallScreen
+                          ? styles.largeIconButton
+                          : styles.smallIconButton,
+                      ]}
+                      size="square"
+                      showIcon={true}
+                      outline={true}
+                      iconLib="Ionicons"
+                      iconName={'calendar-outline'}
+                      iconSize={50}
+                      iconColor={buttonStyleVariant(
+                        'icon',
+                        field.value ===
+                        ButtonNames.bills
+                      )}
+                      onPress={() =>
+                        field.onChange(
+                          ButtonNames.bills
+                        )
+                      }
+                      isActive={
+                        field.value ===
+                        ButtonNames.bills
+                      }
+                    />
+                  </View>
+                  <View style={styles.row}>
+                    <Button
+                      title="Moving"
+                      titleSize={customStyles.small}
+                      titleColor={buttonStyleVariant(
+                        'title',
+                        field.value ===
+                        ButtonNames.moving
+                      )}
+                      style={[
+                        customStyles.my3,
+                        customStyles.mr1,
+                        isSmallScreen
+                          ? styles.largeIconButton
+                          : styles.smallIconButton,
+                      ]}
+                      size="square"
+                      showIcon={true}
+                      outline={true}
+                      iconLib="MaterialCommunity"
+                      iconName={'truck-check-outline'}
+                      iconSize={45}
+                      iconColor={buttonStyleVariant(
+                        'icon',
+                        field.value ===
+                        ButtonNames.moving
+                      )}
+                      onPress={() =>
+                        field.onChange(
+                          ButtonNames.moving
+                        )
+                      }
+                      isActive={
+                        field.value ===
+                        ButtonNames.moving
+                      }
+                    />
+                    <Button
+                      title="Others"
+                      titleSize={customStyles.small}
+                      titleColor={buttonStyleVariant(
+                        'title',
+                        field.value ===
+                        ButtonNames.others
+                      )}
+                      style={[
+                        customStyles.my3,
+                        isSmallScreen
+                          ? styles.largeIconButton
+                          : styles.smallIconButton,
+                      ]}
+                      size="square"
+                      showIcon={true}
+                      outline={true}
+                      iconLib="Ionicons"
+                      iconName={'wallet-outline'}
+                      iconSize={50}
+                      iconColor={buttonStyleVariant(
+                        'icon',
+                        field.value ===
+                        ButtonNames.others
+                      )}
+                      onPress={() =>
+                        field.onChange(
+                          ButtonNames.others
+                        )
+                      }
+                      isActive={
+                        field.value ===
+                        ButtonNames.others
+                      }
+                    />
+                  </View>
+                </View>
+              )}
+            />
+          </View>
+        </ScrollView>
+
+        <View style={[styles.footer]}>
+          <Button
+            title="Next"
+            style={[styles.button]}
+            size="long"
+            useGradient={true}
+            onPress={handleSubmit(onFormValid)}
+            disabled={!isPhoneNumberValid}
+          />
+        </View>
+      </View>
+      <Modal
+        visible={tooltipVisible}
+        onDismiss={hideTooltip}
+        contentContainerStyle={styles.tooltip}
+      >
+        <StyledText customStyle={['standarSm', 'bold']} color="black">
+          Note that the provided contact phone number should match the
+          line number of the current phone using the app.
+        </StyledText>
+      </Modal>
+
+      
       <CustomModal
         visible={modalVisible}
-        onClose={() => handleModalToggle('', '', '', false)}
+        onClose={() => handleModalToggle('', '', '', false,'','')}
         showIcon={showModalIcon}
-        iconName={'warning-outline'}
+        iconName={modalIconName}
+        iconColor={modalIconColor}
         title={modalTitle}
         text={modalText}
         backgroundColor={modalBackground}
+        
       />
+
     </AppContainer>
   );
 };

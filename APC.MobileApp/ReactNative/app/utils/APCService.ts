@@ -123,32 +123,6 @@ export const checkSimChange = async (apiClient: APCApi) => {
 
 
 
-// export const getDeviceGPSLocation = async () => {
-//     async function getLocationPermission() {
-//         console.log("Requesting gps permission...");
-//         const { status } = await Location.requestForegroundPermissionsAsync();
-//         if (status !== 'granted') {
-//             console.error('Permission to access location was denied');
-//             return;
-//         }
-//         console.log("Requesting gps permission... OK");
-//     }
-
-//     const config = await readConfigurations();
-//     await getLocationPermission();
-
-//     let location: Location.LocationObject;
-//     console.log("Getting current position...");
-
-//     location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-//     console.log("Getting current position... OK");
-
-//     const bingLocation = config.connectionMode != ConnectionMode.Offline ? await BingService.translateCoordsToLocation(location.coords) : undefined;
-
-//     return { coords: location.coords, location: bingLocation } as Position;
-
-// }
-
 export const getDeviceGPSLocation = async () => {
     async function getLocationPermission() {
         console.log("Requesting gps permission...");
@@ -159,23 +133,49 @@ export const getDeviceGPSLocation = async () => {
         }
         console.log("Requesting gps permission... OK");
     }
- 
+
     const config = await readConfigurations();
     await getLocationPermission();
- 
+
     let location: Location.LocationObject;
     console.log("Getting current position...");
- 
+
     location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-    let coords = location.coords;
-    coords = getLocationCoords(41.3851, 2.1734, 0);
     console.log("Getting current position... OK");
- 
-    const bingLocation = config.connectionMode != ConnectionMode.Offline ? await BingService.translateCoordsToLocation(coords) : undefined;
- 
-    return { coords: coords, location: bingLocation } as Position;
- 
+
+    const bingLocation = config.connectionMode != ConnectionMode.Offline ? await BingService.translateCoordsToLocation(location.coords) : undefined;
+
+    return { coords: location.coords, location: bingLocation } as Position;
+
 }
+
+// export const getDeviceGPSLocation = async () => {
+//     async function getLocationPermission() {
+//         console.log("Requesting gps permission...");
+//         const { status } = await Location.requestForegroundPermissionsAsync();
+//         if (status !== 'granted') {
+//             console.error('Permission to access location was denied');
+//             return;
+//         }
+//         console.log("Requesting gps permission... OK");
+//     }
+ 
+//     const config = await readConfigurations();
+//     await getLocationPermission();
+ 
+//     let location: Location.LocationObject;
+//     console.log("Getting current position...");
+ 
+//     location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+//     let coords = location.coords;
+//     coords = getLocationCoords(40.4168, -3.7038, 0);
+//     console.log("Getting current position... OK");
+ 
+//     const bingLocation = config.connectionMode != ConnectionMode.Offline ? await BingService.translateCoordsToLocation(coords) : undefined;
+ 
+//     return { coords: coords, location: bingLocation } as Position;
+ 
+// }
 
 export const getLocationCoords = (latitude: number, longitude: number, accuracy: number = 1000) => {
     return {

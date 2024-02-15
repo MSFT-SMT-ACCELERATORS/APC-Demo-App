@@ -4,7 +4,6 @@ import {
     View,
     ScrollView,
     Pressable,
-    Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Colors from '../themes/Colors';
@@ -13,9 +12,6 @@ import palette from '../themes/Colors';
 import {
     RadioButton,
     Modal,
-    Portal,
-    Text,
-    PaperProvider,
 } from 'react-native-paper';
 import StyledText from '../components/StyledText';
 import { useEffect, useState } from 'react';
@@ -60,19 +56,25 @@ const ResidenceLocation: React.FC<StepProps> = ({
     const [modalText, setModalText] = useState('');
     const [showModalIcon, setModalIcon] = useState(true);
     const [modalBackground, setModalBackground] = useState('');
+    const [modalIconName, setIcon] = useState('');
+    const [modalIconColor, setColorIcon] = useState('');
     const [shouldNavigate, setShouldNavigate] = useState(false);
 
     const handleModalToggle = (
         title: string,
         text: string,
         backgroundColor: string = palette.danger100,
-        showIcon: boolean = true
+        showIcon: boolean = true,
+        iconName: string = 'warning-outline',
+        iconColor: string = palette.danger200
     ) => {
         setModalIcon(showIcon);
         setModalTitle(title);
         setModalText(text);
         setModalVisible(!modalVisible);
         setModalBackground(backgroundColor);
+        setIcon(iconName);
+        setColorIcon(iconColor);
     };
 
     const {
@@ -139,6 +141,14 @@ const ResidenceLocation: React.FC<StepProps> = ({
         console.log('Submitted Data:', data);
         setLoading(true, 'Validating your data...');
 
+        if (data.Country === 'Select a country') {
+            console.log('Selection Required');
+            handleModalToggle('Selection Required', 'Please select a valid option from the "Select a country" dropdown to proceed.', palette.primary100, undefined, 'information-circle-outline', palette.black);
+            setLoading(false);
+            return;
+
+        }
+
         const selectedCity = cities.filter(
             (d) =>
                 d.country == data.Country &&
@@ -159,34 +169,10 @@ const ResidenceLocation: React.FC<StepProps> = ({
         else coords = coordsForm;
 
         let hasError = false;
-        // APC validation
-        if (data.UseAPC) {
-            console.log('validating apc matches locataion');
-            const response = await APCService.matchesAPCLocation(
-                apiClient,
-                coords
-            );
-            if (!response.verificationResult) {
-                handleModalToggle(
-                    'Blocking anti-hacking rule: GPS coordinates hacking attempted',
-                    'A possible hacking has been detected. The device GPS location does not match the device’s actual location provided by the network carrier. The application’s flow must stop.'
-                );
-                console.log('APC validation failed!!');
-                hasError = true;
-            } else {
-                handleModalToggle('APC checked', '', palette.accent200, false);
-                setShouldNavigate(true);
-                console.log('APC validation success!!');
-            }
-        }
 
-        if (config?.skipGeolocationCheck) {
-            handleModalToggle('APC unchecked', '', palette.accent200, false);
-            setShouldNavigate(true);
-            setLoading(false);
 
-            return
-        }
+
+
         // Business validation
         console.log('validating business rule');
         if (!(await APCService.matchesCoords(coords, coordsForm))) {
@@ -194,14 +180,43 @@ const ResidenceLocation: React.FC<StepProps> = ({
                 'Blocking business rule: Not allowed device location',
                 ' For anti-fraud purposes, this application requires the user to be using the app in a location relatively close to the user’s residence location (i.e. same state). You are currently far away.'
             );
-            // handleModalToggle("Wrong GPS location", "The location does not match the information entered in the form");
             console.log('Business validation failed!!');
             hasError = true;
         } else {
-            handleModalToggle('APC unchecked', '', palette.accent200, false);
-            setShouldNavigate(true);
-            console.log('Business validation success!!');
+
+            if (config?.skipGeolocationCheck) {
+                // handleModalToggle('APC unchecked', '', palette.accent200, false);
+                setShouldNavigate(true);
+                setLoading(false);
+
+                return
+            }
+            if (!data.UseAPC) {
+                handleModalToggle('APC unchecked', '', palette.accent200, false);
+                setShouldNavigate(true);
+                console.log('Business validation success!!');
+            } else {  //APC Validation
+                console.log('USING APC validating apc matches location');
+                const response = await APCService.matchesAPCLocation(
+                    apiClient,
+                    coords
+                );
+                if (!response.verificationResult) {
+                    handleModalToggle(
+                        'Blocking anti-hacking rule: GPS coordinates hacking attempted',
+                        'A possible hacking has been detected. The device GPS location does not match the device’s actual location provided by the network carrier. The application’s flow must stop.'
+                    );
+                    console.log('APC validation failed!!');
+                    hasError = true;
+                } else {
+                    handleModalToggle('APC checked', '', palette.accent200, false);
+                    setShouldNavigate(true);
+                    console.log('APC validation success!!');
+                }
+            }
         }
+
+
 
         setLoading(false);
     };
@@ -411,9 +426,9 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                         .filter(
                                             (item) =>
                                                 item.country ==
-                                                    getValues('Country') &&
+                                                getValues('Country') &&
                                                 item.state ===
-                                                    getValues('StateProvince')
+                                                getValues('StateProvince')
                                         )
                                         .map((item) => item.city)
                                         .filter(
@@ -484,7 +499,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                                             }
                                                         >
                                                             {gpsPosition &&
-                                                            gpsPosition.location ? (
+                                                                gpsPosition.location ? (
                                                                 <View
                                                                     style={
                                                                         styles.optionSubtitleBadge
@@ -512,7 +527,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                                                 </View>
                                                             ) : null}
                                                             {gpsPosition &&
-                                                            gpsPosition.coords ? (
+                                                                gpsPosition.coords ? (
                                                                 <View
                                                                     style={
                                                                         styles.optionSubtitleBadge
@@ -551,17 +566,17 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                                         </StyledText>
                                                     </View>
                                                     {getValues('Country') &&
-                                                    getValues(
-                                                        'StateProvince'
-                                                    ) &&
-                                                    getValues('City') ? (
+                                                        getValues(
+                                                            'StateProvince'
+                                                        ) &&
+                                                        getValues('City') ? (
                                                         <View
                                                             style={
                                                                 styles.optionSubtitleContainer
                                                             }
                                                         >
                                                             {config?.connectionMode !=
-                                                            ConnectionMode.Offline ? (
+                                                                ConnectionMode.Offline ? (
                                                                 <View
                                                                     style={[
                                                                         styles.optionSubtitleBadge,
@@ -645,7 +660,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                                                 }
                                                             >
                                                                 {apcPosition &&
-                                                                apcPosition.location ? (
+                                                                    apcPosition.location ? (
                                                                     <View
                                                                         style={
                                                                             styles.optionSubtitleBadge
@@ -673,7 +688,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                                                     </View>
                                                                 ) : null}
                                                                 {apcPosition &&
-                                                                apcPosition.coords ? (
+                                                                    apcPosition.coords ? (
                                                                     <View
                                                                         style={
                                                                             styles.optionSubtitleBadge
@@ -734,12 +749,14 @@ const ResidenceLocation: React.FC<StepProps> = ({
             </View>
             <CustomModal
                 visible={modalVisible}
-                onClose={() => handleModalToggle('', '', '', false)}
+                onClose={() => handleModalToggle('', '', '', false, '', '')}
                 showIcon={showModalIcon}
-                iconName={'warning-outline'}
+                iconName={modalIconName}
+                iconColor={modalIconColor}
                 title={modalTitle}
                 text={modalText}
                 backgroundColor={modalBackground}
+
             />
         </AppContainer>
     );
