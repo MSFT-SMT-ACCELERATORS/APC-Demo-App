@@ -23,6 +23,7 @@ import { Modal } from 'react-native-paper';
 import { useStep } from '../utils/StepContext';
 import { useApiClient } from '../api/ApiClientProvider';
 import CustomModal from '../components/CustomModal';
+import { AppConfiguration, ConnectionMode, readConfigurations } from '../utils/SettingsService';
 
 interface StepProps {
     setProgress: (progress: number) => void;
@@ -52,6 +53,8 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
     const [isPhoneNumberValid, setIsPhoneNumberValid] =
         useState<boolean>(false);
     const [modalVisible, setModalVisible] = useState(false);
+    const [config, setConfig] = useState<AppConfiguration>();
+
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -65,6 +68,10 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
     useEffect(() => {
         setCurrentStep(2);
     }, [setCurrentStep]);
+
+    useEffect(() => {
+        readConfigurations().then(setConfig);
+    }, [])
 
     const showTooltip = () => setTooltipVisible(true);
     const hideTooltip = () => setTooltipVisible(false);
@@ -85,6 +92,12 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
     const apiClient = useApiClient();
 
     const autocompletePhoneNumber = async () => {
+
+        if (config?.connectionMode === ConnectionMode.Offline) {
+            setIsPhoneNumberValid(true);
+            setModalVisible(true);
+        }
+
         const devicePhoneNumber = await APCService.getPhoneNumber(apiClient);
 
         if (!phoneNumber) {
