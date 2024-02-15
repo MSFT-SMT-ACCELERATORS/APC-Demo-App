@@ -111,7 +111,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
       console.log('validating apc matches locataion');
       const response = await APCService.matchesAPCLocation(apiClient, coords);
       if (!response.verificationResult) {
-        handleModalToggle("Blocking anti-hacking rule: GPS coordinates hacking attempted", "A possible hacking has been detected. The device GPS location does not match the device’s actual location provided by the network carrier. The application’s flow must stop.");
+        // handleModalToggle("Blocking anti-hacking rule: GPS coordinates hacking attempted", "A possible hacking has been detected. The device GPS location does not match the device’s actual location provided by the network carrier. The application’s flow must stop.");
         console.log('APC validation failed!!');
         hasError = true;
       } else {
@@ -209,7 +209,7 @@ const ResidenceLocation: React.FC<StepProps> = ({ setProgress, setLoading }) => 
               render={({ field }) => (
                 <RNPickerSelect
                   style={pickerStyle}
-                  darkTheme={false}
+                  darkTheme={true}
                   value={field.value}
                   onValueChange={handleCountryChange}
                   useNativeAndroidPickerStyle={false}
