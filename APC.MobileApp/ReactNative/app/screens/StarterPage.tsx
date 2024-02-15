@@ -140,9 +140,10 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
 
   const autocompletePhoneNumber = async () => {
 
-    if (config?.connectionMode === ConnectionMode.Offline) {
+    if (config?.connectionMode === ConnectionMode.Offline && config.autovalidatePhoneNumber) {
       setIsPhoneNumberValid(true);
-      handleModalToggle("Information message:", "Your phone has been validated against the actual", palette.accent200, undefined, 'information-circle-outline', palette.black);
+      handleModalToggle("Information message:", "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using", palette.accent200, undefined, 'information-circle-outline', palette.black);
+      return;
     }
 
     const devicePhoneNumber = await APCService.getPhoneNumber(apiClient);
@@ -153,7 +154,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
     } else {
       if (phoneNumber === devicePhoneNumber) {
         setIsPhoneNumberValid(true);
-        handleModalToggle("Information message:", "Your phone has been validated against the actual", palette.accent200, undefined, 'information-circle-outline', palette.black);
+        handleModalToggle("Information message:", "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using", palette.accent200, undefined, 'information-circle-outline', palette.black);
       } else {
         setIsPhoneNumberValid(false);
         handleModalToggle("Error message:", "Invalid phone number");

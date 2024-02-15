@@ -209,7 +209,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                     console.log('APC validation failed!!');
                     hasError = true;
                 } else {
-                    handleModalToggle('APC checked', '', palette.accent200, false);
+                    handleModalToggle('APC checked', 'Congratulations, you have been verified in a location close to your residence location so you can continue with the loan request', palette.accent200, false);
                     setShouldNavigate(true);
                     console.log('APC validation success!!');
                 }
