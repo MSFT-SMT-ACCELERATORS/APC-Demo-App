@@ -94,138 +94,145 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
             <View style={[styles.parent]}>
                 <ScrollView style={styles.contentContainer}>
                     <View style={styles.bodyContent}>
-                        <Controller
-                            name="radiusKm"
-                            control={control}
-                            rules={{
-                                validate: {
-                                    isNumber: (value) =>
-                                        !isNaN(value) ||
-                                        'The value must be a number.',
-                                },
-                            }}
-                            render={({ field }) => (
-                                <StyledInputText
-                                    labelText="Radius Km (allowed gps deviation)"
-                                    value={field.value?.toString() || ''}
-                                    onChangeText={field.onChange}
-                                />
-                            )}
-                        />
-                        {errors.radiusKm && (
-                            <StyledText
-                                customStyle={['regular']}
-                                color="danger200"
-                            >
-                                {errors.radiusKm.message}
-                            </StyledText>
-                        )}
 
-                        <Controller
-                            name="skipGeolocationCheck"
-                            control={control}
-                            render={() => (
-                                <CheckboxWithText
-                                    label={
-                                        'Exclude phone location verification'
-                                    }
-                                    checked={geolocationCheck}
-                                    onToggle={() => {
-                                        setGeolocationCheck(!geolocationCheck);
-                                    }}
-                                />
-                            )}
-                        ></Controller>
-
-                        <Controller
-                            name="autovalidatePhoneNumber"
-                            control={control}
-                            render={() => (
-                                <CheckboxWithText
-                                    label={
-                                        'Autovalidate phone number (offline only)'
-                                    }
-                                    checked={autovalidatePhoneNumber}
-                                    onToggle={() => {
-                                        setAutovalidatePhoneNumber(
-                                            !autovalidatePhoneNumber
-                                        );
-                                    }}
-                                />
-                            )}
-                        ></Controller>
-
-                        <Controller
-                            name="offlineLastSimChange"
-                            control={control}
-                            render={() => (
-                                <CheckboxWithText
-                                    label={'Swapped SIM within last 10 days'}
-                                    checked={simSwap}
-                                    onToggle={() => {
-                                        setSimSwap(!simSwap);
-                                    }}
-                                />
-                            )}
-                        />
-
-                        <Controller
-                            control={control}
-                            name="connectionMode"
-                            rules={{ required: 'Please select an option' }}
-                            render={({ field: { onChange, value } }) => (
-                                <RadioButton.Group
-                                    onValueChange={onChange}
-                                    value={value}
+                        <View style={styles.sectionContent}>
+                            <StyledText customStyle={['bold', 'title4']} color='accent200'>Global settings</StyledText>
+                            <Controller
+                                name="radiusKm"
+                                control={control}
+                                rules={{
+                                    validate: {
+                                        isNumber: (value) =>
+                                            !isNaN(value) ||
+                                            'The value must be a number.',
+                                    },
+                                }}
+                                render={({ field }) => (
+                                    <StyledInputText
+                                        labelText="Radius Km (allowed gps deviation)"
+                                        value={field.value?.toString() || ''}
+                                        onChangeText={field.onChange}
+                                    />
+                                )}
+                            />
+                            {errors.radiusKm && (
+                                <StyledText
+                                    customStyle={['regular']}
+                                    color="danger200"
                                 >
-                                    <View style={styles.group}>
-                                        <StyledText>Connection Mode</StyledText>
-
-                                        <Pressable
-                                            style={styles.flex}
-                                            onPress={() =>
-                                                onChange(ConnectionMode.Online)
-                                            }
-                                        >
-                                            <RadioButton.Android
-                                                value={ConnectionMode.Online}
-                                                color={Colors.accent200}
-                                            />
-                                            <StyledText>Full online</StyledText>
-                                        </Pressable>
-
-                                        <Pressable
-                                            style={styles.flex}
-                                            onPress={() =>
-                                                onChange(ConnectionMode.Mock)
-                                            }
-                                        >
-                                            <RadioButton.Android
-                                                value={ConnectionMode.Mock}
-                                                color={Colors.accent200}
-                                            />
-                                            <StyledText>Mock APC</StyledText>
-                                        </Pressable>
-
-                                        <Pressable
-                                            style={styles.flex}
-                                            onPress={() =>
-                                                onChange(ConnectionMode.Offline)
-                                            }
-                                        >
-                                            <RadioButton.Android
-                                                value={ConnectionMode.Offline}
-                                                color={Colors.accent200}
-                                            />
-                                            <StyledText>Offline</StyledText>
-                                        </Pressable>
-                                    </View>
-                                </RadioButton.Group>
+                                    {errors.radiusKm.message}
+                                </StyledText>
                             )}
-                        />
+                        </View>
 
-                        {true || connectionMode == ConnectionMode.Offline ? (
-                            <View style={[{ marginTop: 5 }]}>
+
+                        <View style={styles.sectionContent}>
+                            <StyledText customStyle={['bold', 'title4']} color='accent200'>Connection mode</StyledText>
+                            <Controller
+                                control={control}
+                                name="connectionMode"
+                                rules={{ required: 'Please select an option' }}
+                                render={({ field: { onChange, value } }) => (
+                                    <RadioButton.Group
+                                        onValueChange={onChange}
+                                        value={value}
+                                    >
+                                        <View style={styles.sectionContent}>
+                                            <Pressable
+                                                style={styles.flex}
+                                                onPress={() =>
+                                                    onChange(ConnectionMode.Online)
+                                                }
+                                            >
+                                                <RadioButton.Android
+                                                    value={ConnectionMode.Online}
+                                                    color={Colors.accent200}
+                                                />
+                                                <StyledText>Full online</StyledText>
+                                            </Pressable>
+
+                                            <Pressable
+                                                style={styles.flex}
+                                                onPress={() =>
+                                                    onChange(ConnectionMode.Mock)
+                                                }
+                                            >
+                                                <RadioButton.Android
+                                                    value={ConnectionMode.Mock}
+                                                    color={Colors.accent200}
+                                                />
+                                                <StyledText>Mock APC</StyledText>
+                                            </Pressable>
+
+                                            <Pressable
+                                                style={styles.flex}
+                                                onPress={() =>
+                                                    onChange(ConnectionMode.Offline)
+                                                }
+                                            >
+                                                <RadioButton.Android
+                                                    value={ConnectionMode.Offline}
+                                                    color={Colors.accent200}
+                                                />
+                                                <StyledText>Offline</StyledText>
+                                            </Pressable>
+                                        </View>
+                                    </RadioButton.Group>
+                                )}
+                            />
+                        </View>
+
+                        {connectionMode == ConnectionMode.Offline ? (
+                            <View style={styles.sectionContent}>
+                                <StyledText style={styles.sectionTitle} customStyle={['bold', 'title4']} color='accent200'>Offline mode settings</StyledText>
+                                 <Controller
+                                    name="autovalidatePhoneNumber"
+                                    control={control}
+                                    render={() => (
+                                        <CheckboxWithText
+                                            label={
+                                                'Autovalidate phone number'
+                                            }
+                                            checked={autovalidatePhoneNumber}
+                                            onToggle={() => {
+                                                setAutovalidatePhoneNumber(
+                                                    !autovalidatePhoneNumber
+                                                );
+                                            }}
+                                        />
+                                    )}
+                                ></Controller>
+
+                                <Controller
+                                    name="skipGeolocationCheck"
+                                    control={control}
+                                    render={() => (
+                                        <CheckboxWithText
+                                            label={
+                                                'Exclude phone location verification'
+                                            }
+                                            checked={geolocationCheck}
+                                            onToggle={() => {
+                                                setGeolocationCheck(!geolocationCheck);
+                                            }}
+                                        />
+                                    )}
+                                ></Controller>
+
+                                <Controller
+                                    name="offlineLastSimChange"
+                                    control={control}
+                                    render={() => (
+                                        <CheckboxWithText
+                                            label={'Swapped SIM within last 10 days'}
+                                            checked={simSwap}
+                                            onToggle={() => {
+                                                setSimSwap(!simSwap);
+                                            }}
+                                        />
+                                    )}
+                                />
+
                                 <Controller
                                     name="offlineLatitude"
                                     control={control}
@@ -290,18 +297,6 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                         {errors.offlineLongitude.message}
                                     </StyledText>
                                 )}
-
-                                <Controller
-                                    name="offlinePhoneNumber"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <StyledInputText
-                                            labelText="APC Phone Number"
-                                            value={field.value}
-                                            onChangeText={field.onChange}
-                                        />
-                                    )}
-                                />
                             </View>
                         ) : null}
                     </View>
@@ -345,14 +340,21 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'center',
     },
-    group: {
-        padding: 10,
-    },
     bodyContent: {
         marginTop: 30,
         width: '100%',
         justifyContent: 'center',
         gap: 25,
+    },
+    sectionTitle: {
+        marginBottom: 20
+    },
+    sectionContent: {
+        flexDirection: 'column',
+        gap: 15,
+        padding: 15,
+        backgroundColor: '#252533',
+        borderRadius: 10
     },
     footer: {
         width: '100%',
