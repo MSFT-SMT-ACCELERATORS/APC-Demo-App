@@ -125,6 +125,33 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                     {errors.radiusKm.message}
                                 </StyledText>
                             )}
+
+                             <Controller
+                                name="residenceLocationRadius"
+                                control={control}
+                                rules={{
+                                    validate: {
+                                        isWithinRange: (value) =>
+                                            value <= 10 ||
+                                            'The allowed range is up to 10km.',
+                                    },
+                                }}
+                                render={({ field }) => (
+                                    <StyledInputText
+                                        labelText="Radius Km (allowed deviation for residence location)"
+                                        value={field.value?.toString() || ''}
+                                        onChangeText={field.onChange}
+                                    />
+                                )}
+                            />
+                            {errors.residenceLocationRadius && (
+                                <StyledText
+                                    customStyle={['regular']}
+                                    color="danger200"
+                                >
+                                    {errors.residenceLocationRadius.message}
+                                </StyledText>
+                            )}
                         </View>
 
 
