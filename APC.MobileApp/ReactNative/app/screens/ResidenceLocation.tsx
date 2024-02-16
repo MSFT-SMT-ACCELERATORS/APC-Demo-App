@@ -141,20 +141,20 @@ const ResidenceLocation: React.FC<StepProps> = ({
         console.log('Submitted Data:', data);
         setLoading(true, 'Validating your data...');
 
-        if (data.Country === 'Select a country') {
-            console.log('Selection required');
-            handleModalToggle('Selection required', 'Please select a valid option from the "Select a country" dropdown to proceed.', '#dadaed', undefined, 'information-circle-outline', palette.black);
-            setLoading(false);
-            return;
-
-        }
-
         const selectedCity = cities.filter(
             (d) =>
                 d.country == data.Country &&
                 d.state == data.StateProvince &&
                 d.city == data.City
         )[0];
+
+        if (data.Country === 'Select a country' || !selectedCity) {
+            console.log('Selection required');
+            handleModalToggle('Selection required', 'Please select a valid option from the "Select a country" dropdown to proceed.', '#dadaed', undefined, 'information-circle-outline', palette.black);
+            setLoading(false);
+
+            return;
+        }
 
         let coordsForm = APCService.getLocationCoords(
             selectedCity.latitude,
@@ -169,8 +169,6 @@ const ResidenceLocation: React.FC<StepProps> = ({
         else coords = coordsForm;
 
         let hasError = false;
-
-
 
 
         // Business validation
@@ -290,6 +288,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                         <Controller
                             name="Country"
                             control={control}
+                            defaultValue=""
                             // rules={{
                             //   required: 'This field is required',
                             //   pattern: {
@@ -307,7 +306,8 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                 <RNPickerSelect
                                     style={pickerStyle}
                                     darkTheme={true}
-                                    value={field.value}
+                                    value={field.value || ''}
+                                    
                                     onValueChange={handleCountryChange}
                                     useNativeAndroidPickerStyle={false}
                                     Icon={() => {
@@ -352,11 +352,12 @@ const ResidenceLocation: React.FC<StepProps> = ({
                         <Controller
                             name="StateProvince"
                             control={control}
+                            defaultValue=""
                             render={({ field }) => (
                                 <RNPickerSelect
                                     style={pickerStyle}
                                     darkTheme={true}
-                                    value={field.value}
+                                    value={field.value || ''}
                                     disabled={!getValues('Country')}
                                     onValueChange={handleStateChange}
                                     useNativeAndroidPickerStyle={false}
@@ -404,11 +405,12 @@ const ResidenceLocation: React.FC<StepProps> = ({
                         <Controller
                             name="City"
                             control={control}
+                            defaultValue=""
                             render={({ field }) => (
                                 <RNPickerSelect
                                     style={pickerStyle}
                                     darkTheme={true}
-                                    value={field.value}
+                                    value={field.value || ''}
                                     disabled={!getValues('StateProvince')}
                                     onValueChange={handleCityChange}
                                     useNativeAndroidPickerStyle={false}
