@@ -209,7 +209,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                     render={() => (
                                         <CheckboxWithText
                                             label={
-                                                'Exclude phone location verification'
+                                                'Exclude APC phone location verification'
                                             }
                                             checked={geolocationCheck}
                                             onToggle={() => {
