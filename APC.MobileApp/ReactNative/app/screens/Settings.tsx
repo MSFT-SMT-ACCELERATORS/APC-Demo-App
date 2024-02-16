@@ -87,6 +87,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
         };
         console.log(formattedData);
         storeConfigurations(formattedData);
+        navigation.navigate('Welcome');
     };
 
     return (
@@ -304,7 +305,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
 
                 <View style={[styles.footer]}>
                     <Button
-                        title="Save"
+                        title="Save and close"
                         style={[styles.button]}
                         size="long"
                         useGradient={true}
