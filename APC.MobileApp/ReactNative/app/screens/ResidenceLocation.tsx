@@ -143,7 +143,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
         if (data.Country === 'Select a country') {
             console.log('Selection required');
-            handleModalToggle('Selection required', 'Please select a valid option from the "Select a country" dropdown to proceed.', palette.primary100, undefined, 'information-circle-outline', palette.black);
+            handleModalToggle('Selection required', 'Please select a valid option from the "Select a country" dropdown to proceed.', '#dadaed', undefined, 'information-circle-outline', palette.black);
             setLoading(false);
             return;
 
@@ -192,7 +192,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                 return
             }
             if (!data.UseAPC) {
-                handleModalToggle('APC unchecked', '', palette.accent200, false);
+                handleModalToggle('APC unchecked', '', palette.accent200, undefined, 'information-circle-outline', palette.black);
                 setShouldNavigate(true);
                 console.log('Business validation success!!');
             } else {  //APC Validation
@@ -209,7 +209,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                     console.log('APC validation failed!!');
                     hasError = true;
                 } else {
-                    handleModalToggle('APC checked', 'Congratulations, you have been verified in a location close to your residence location so you can continue with the loan request', palette.accent200, false);
+                    handleModalToggle('Information message', 'Congratulations, you have been verified in a location close to your residence location so you can continue with the loan request', palette.accent200, undefined, 'information-circle-outline', palette.black);
                     setShouldNavigate(true);
                     console.log('APC validation success!!');
                 }
