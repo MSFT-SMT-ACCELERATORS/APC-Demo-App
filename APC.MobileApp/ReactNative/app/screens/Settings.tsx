@@ -54,9 +54,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                 const config = await readConfigurations();
                 reset(config);
                 setGeolocationCheck(config.skipGeolocationCheck || false);
-                setAutovalidatePhoneNumber(
-                    config.autovalidatePhoneNumber || false
-                );
+                setAutovalidatePhoneNumber(config.autovalidatePhoneNumber || false);
                 setSimSwap(config.offlineLastSimChange || false);
             };
 
@@ -67,28 +65,31 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
     }, [navigation]);
 
     const saveConfig: SubmitHandler<AppConfiguration> = async (data) => {
+        let updatedGeolocationCheck = geolocationCheck;
+        let updatedAutovalidatePhoneNumber = autovalidatePhoneNumber;
+        let updatedSimSwap = simSwap;
+
+        if (connectionMode === 'online') {
+            updatedGeolocationCheck = false;
+            updatedAutovalidatePhoneNumber = false;
+            updatedSimSwap = false;
+        }
+
         const formattedData = {
             ...data,
-            radiusKm:
-                typeof data.radiusKm === 'string'
-                    ? parseFloat(data.radiusKm)
-                    : data.radiusKm,
-            offlineLatitude:
-                typeof data.offlineLatitude === 'string'
-                    ? parseFloat(data.offlineLatitude)
-                    : data.offlineLatitude,
-            offlineLongitude:
-                typeof data.offlineLongitude === 'string'
-                    ? parseFloat(data.offlineLongitude)
-                    : data.offlineLongitude,
-            skipGeolocationCheck: geolocationCheck,
-            autovalidatePhoneNumber,
-            offlineLastSimChange: simSwap,
+            radiusKm: typeof data.radiusKm === 'string' ? parseFloat(data.radiusKm) : data.radiusKm,
+            offlineLatitude: typeof data.offlineLatitude === 'string' ? parseFloat(data.offlineLatitude) : data.offlineLatitude,
+            offlineLongitude: typeof data.offlineLongitude === 'string' ? parseFloat(data.offlineLongitude) : data.offlineLongitude,
+            skipGeolocationCheck: updatedGeolocationCheck,
+            autovalidatePhoneNumber: updatedAutovalidatePhoneNumber,
+            offlineLastSimChange: updatedSimSwap,
         };
+
         console.log(formattedData);
         storeConfigurations(formattedData);
         navigation.navigate('Welcome');
     };
+
 
     return (
         <AppContainer>
