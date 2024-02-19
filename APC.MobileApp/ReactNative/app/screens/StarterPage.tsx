@@ -142,7 +142,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
 
     if (config?.connectionMode === ConnectionMode.Offline && config.autovalidatePhoneNumber) {
       setIsPhoneNumberValid(true);
-      handleModalToggle("Information message:", "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using", palette.accent200, undefined, 'information-circle-outline', palette.black);
+      handleModalToggle("Information message", "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using", palette.accent200, undefined, 'information-circle-outline', palette.black);
       return;
     }
 
