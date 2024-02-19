@@ -193,10 +193,11 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
               control={control}
               render={() => (
                 <View style={styles.phoneNumberField}>
+                <StyledText style={styles.plusIcon}>+</StyledText>
                   <StyledInputText
                     style={styles.phoneInput}
-                    labelText="Phone number"
-                    placeholder="+1 365-478-8429"
+                    labelText="Phone number (Include country code)"
+                    placeholder="00 123 456 7890"
                     value={phoneNumber}
                     inputType="tel"
                     onChangeText={(text) =>
@@ -531,6 +532,11 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 6,
   },
+  plusIcon: {
+    position: 'absolute',
+    left: 5,
+    bottom: 25
+  }
 });
 
 export default StarterPage;
