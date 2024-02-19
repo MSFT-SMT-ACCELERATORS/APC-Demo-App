@@ -153,7 +153,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
         if (data.Country === 'Select a country' || !selectedCity) {
             console.log('Selection required');
-            handleModalToggle('Selection required', 'Please select a valid option from the "Select a country" dropdown to proceed.', '#dadaed', undefined, 'information-circle-outline', palette.black);
+            handleModalToggle('Selection required', 'Please select a valid option from the "Select a country" dropdown to proceed', '#dadaed', undefined, 'information-circle-outline', palette.black);
             setLoading(false);
 
             return;
@@ -179,7 +179,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
         if (!(await APCService.matchesCoords(coords, coordsForm))) {
             handleModalToggle(
                 'Blocking business rule: Not allowed device location',
-                ' For anti-fraud purposes, this application requires the user to be using the app in a location relatively close to the user’s residence location (i.e. same state). You are currently far away.'
+                'For anti-fraud purposes, this application requires the user to be using the app in a location relatively close to the user’s residence location (i.e. same state). You are currently far away'
             );
             console.log('Business validation failed!!');
             hasError = true;
@@ -203,7 +203,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                 if (!response.verificationResult) {
                     handleModalToggle(
                         'Blocking anti-hacking rule: GPS coordinates hacking attempted',
-                        'A possible hacking has been detected. The device GPS location does not match the device’s actual location provided by the network carrier. The application’s flow must stop.'
+                        'A possible hacking has been detected. The device GPS location does not match the device’s actual location provided by the network carrier. The application’s flow must stop'
                     );
                     console.log('APC validation failed!!');
                     hasError = true;
@@ -216,6 +216,10 @@ const ResidenceLocation: React.FC<StepProps> = ({
         }
        
     } catch (error) {
+        handleModalToggle(
+            'Error',
+            'The application cannot check your location'
+        );
         console.log('Error');
     }finally{
         setLoading(false);
