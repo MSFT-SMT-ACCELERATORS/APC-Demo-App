@@ -10,7 +10,7 @@ interface ApiClientProviderProps {
 }
 
 export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }) => {
-  const configuration = new Configuration({ basePath: "https://apc-proxy-prv-001.azurewebsites.net" });
+  const configuration = new Configuration({ basePath: "https://apc-proxy-prv-002.azurewebsites.net" });
   const apiClient = new APCApi(configuration);
 
   return (

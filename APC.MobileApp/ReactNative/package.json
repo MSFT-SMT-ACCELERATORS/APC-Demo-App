@@ -7,7 +7,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "openapigen": "npx @openapitools/openapi-generator-cli generate -i http://apc-proxy-prv-001.azurewebsites.net/swagger/v1/swagger.json -g typescript-axios -o ./app/api/generated"
+    "openapigen": "npx @openapitools/openapi-generator-cli generate -i https://apc-proxy-prv-002.azurewebsites.net/swagger/v1/swagger.json -g typescript-axios -o ./app/api/generated"
   },
   "dependencies": {
     "@expo/webpack-config": "^19.0.0",
