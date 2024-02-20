@@ -1,41 +1,61 @@
 import * as React from 'react';
 import { StyleSheet, Text, View, Image, ScrollView, GestureResponderEvent, Modal } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import Colors from '../themes/Colors';
 import ProgressBar from '../components/ProgressBar';
 import palette from '../themes/Colors';
-import { useState } from 'react';
-import { useApiClient } from '../api/ApiClientProvider';
-import AppContainer from '../components/AppContainer';
+import { useEffect, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ResidenceLocation from './ResidenceLocation';
 import StarterPage from './StarterPage';
 import Information from './Information';
-import customStyles from '../themes/CustomStyles';
+import { useStep } from '../utils/StepContext';
+import { useNavigation } from '@react-navigation/native';
 
-const Stack = createNativeStackNavigator();
+interface StepsProps {
+    setLoading: (isLoading: boolean, text?: string) => void;
+}
 
-function Steps() {
-    const navigation = useNavigation();
-    const apiClient = useApiClient();
-    const [value, setValue] = useState('hacked');
-    const [useAPC, setUseAPC] = useState(true);
+const Steps: React.FC<StepsProps> = ({ setLoading }) => {
+    const Stack = createNativeStackNavigator();
     const [progress, setProgress] = useState(0);
-    const StepStack = createNativeStackNavigator();
+    const { setCurrentScreen, currentStep } = useStep();
+
+    useEffect(() => {
+        setCurrentScreen('Steps');
+    }, [setCurrentScreen]);
+
+    const navigation = useNavigation();
+
+    useEffect(() => {
+        switch (currentStep) {
+            case 1:
+                navigation.navigate('ResidenceLocation');
+                break;
+            case 2:
+                navigation.navigate('StarterPage');
+                break;
+            case 3:
+                navigation.navigate('Information');
+                break;
+            default:
+                navigation.navigate('ResidenceLocation');
+                break;
+        }
+    }, [currentStep, navigation]);
+
     return (
         <View style={[styles.container]}>
             <ProgressBar progress={progress} height={20} />
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 <Stack.Screen
                     name="ResidenceLocation"
-                    children={() => <ResidenceLocation setProgress={setProgress} />}
-                    />
+                    children={() => <ResidenceLocation setProgress={setProgress} setLoading={setLoading} />}
+                />
                 <Stack.Screen
                     name="StarterPage"
-                    children={() => <StarterPage setProgress={setProgress} />}
-                    />
-                    <Stack.Screen
-                    children={() => <Information setProgress={setProgress} />}
+                    children={() => <StarterPage setProgress={setProgress} setLoading={setLoading} />}
+                />
+                <Stack.Screen
+                    children={() => <Information setProgress={setProgress} setLoading={setLoading} />}
                     name="Information"
                 />
             </Stack.Navigator>
@@ -48,7 +68,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: palette.primary300,
-      },
+    },
 });
 
 export default Steps;

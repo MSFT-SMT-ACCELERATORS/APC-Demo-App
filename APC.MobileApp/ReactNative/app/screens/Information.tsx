@@ -9,54 +9,141 @@ import StyledText from '../components/StyledText';
 import palette from '../themes/Colors';
 import customStyles from '../themes/CustomStyles';
 import AppContainer from '../components/AppContainer';
+import { Controller, FieldValues, useForm } from 'react-hook-form';
+import { useStep } from '../utils/StepContext';
 
 interface StepProps {
   setProgress: (progress: number) => void;
+  setLoading: (isLoading: boolean) => void;
 }
 
-const Information: React.FC<StepProps> = ({ setProgress }) => {
+const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const navigation = useNavigation();
+  const { setCurrentStep } = useStep();
+  const { control, handleSubmit, formState: { errors } } = useForm();
+
   useEffect(() => {
-    setProgress(75);
-  }, [setProgress]);
+    const unsubscribe = navigation.addListener('focus', () => {
+      setLoading(false);
+      setProgress(75);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  useEffect(() => {
+    setCurrentStep(3);
+  }, [setCurrentStep]);
+
+  const onFormValid = async (data: FieldValues) => {
+    console.log(data);
+    setProgress(100);
+    navigation.navigate('Success');
+  }
+
   return (
     <AppContainer>
       <View style={[styles.parent]}>
         <ScrollView style={[styles.contentContainer]}>
 
           <View style={[styles.title]}>
-            <StyledText customStyle={['title2', 'extrabold']}>Personal Information</StyledText>
+            <StyledText customStyle={['title2', 'extrabold']}>Personal information</StyledText>
             <StyledText style={{ textAlign: 'center' }} customStyle={['title5', 'regular']}>Please complete the required information fields</StyledText>
           </View>
 
           <View style={[styles.separatorContainer, customStyles.mb4]}></View>
           <View style={styles.bodyContent}>
-            <StyledInputText labelText="First Name" placeholder="First Name"></StyledInputText>
-            <StyledInputText labelText="Last Name" placeholder="Last Name"></StyledInputText>
-            <StyledInputText labelText="Street Address" placeholder="Start typing your street... (e.g. 28 Mai...)"></StyledInputText>
-            <StyledInputText labelText="Unit/Apt Number (optional)" placeholder="Address Line 2"></StyledInputText>
-            <StyledInputText labelText="City" placeholder="City"></StyledInputText>
-            <StyledInputText labelText="State" placeholder="Ohio" placeholderTextColor={palette.accent200}></StyledInputText>
-            <StyledInputText labelText="Zip Code" placeholder="Zip Code"></StyledInputText>
+            <Controller
+              name='firstName'
+              control={control}
+              render={({ field }) => (
+                <StyledInputText labelText="First name" placeholder="First name" onChangeText={field.onChange}></StyledInputText>
+              )} />
+
+            <Controller
+              name='lastName'
+              control={control}
+              render={({ field }) => (
+                <StyledInputText labelText="Last name" placeholder="Last name" onChangeText={field.onChange}></StyledInputText>
+              )} />
+
+
+            <Controller
+              name='address'
+              control={control}
+              render={({ field }) => (
+                <StyledInputText labelText="Street address" placeholder="Start typing your street... (e.g. 28 Mai...)" onChangeText={field.onChange}></StyledInputText>
+              )} />
+
+            <Controller
+              name='address2'
+              control={control}
+              render={({ field }) => (
+                <StyledInputText labelText="Unit/Apt number (optional)" placeholder="Address line 2" onChangeText={field.onChange}></StyledInputText>
+              )} />
+
+            <Controller
+              name='city'
+              control={control}
+              render={({ field }) => (
+                <StyledInputText labelText="City" placeholder="City" onChangeText={field.onChange}></StyledInputText>
+              )} />
+
+            <Controller
+              name='state'
+              control={control}
+              render={({ field }) => (
+                <StyledInputText labelText="State" placeholder="State" onChangeText={field.onChange}></StyledInputText>
+              )} />
+
+            <Controller
+              name='zipcode'
+              control={control}
+              render={({ field }) => (
+                <StyledInputText labelText="Zip code" placeholder="Zip code" onChangeText={field.onChange}></StyledInputText>
+              )} />
             <View style={[styles.idContainer]}>
-              <StyledText>Identity Verification</StyledText>
-              <StyledInputText labelText="Your Date of Birth" placeholder="MM/DD/YYYY"></StyledInputText>
-              <StyledInputText labelText="Your Social Security Number (SSN)" placeholder="9 digit number"></StyledInputText>
+              <StyledText>Identity verification</StyledText>
+
+              <Controller
+                name='birthdate'
+                control={control}
+                render={({ field }) => (
+                  <StyledInputText labelText="Your date of birth" placeholder="MM/DD/YYYY" onChangeText={field.onChange}></StyledInputText>
+                )} />
+
+              <Controller
+                name='ssn'
+                control={control}
+                render={({ field }) => (
+                  <StyledInputText labelText="Your social security number (SSN)" placeholder="9 digit number" isSensitiveData={true} onChangeText={field.onChange}></StyledInputText>
+                )} />
             </View>
-            <StyledText color='accent200'>By selecting the 'Confirm Operation' option, you are agreeing to our terms and conditions, and will proceed with the account creation process.</StyledText>
-            <StyledInputText labelText="Email" placeholder="Email"></StyledInputText>
-            <StyledInputText labelText="Password" placeholder="Password"></StyledInputText>
+            <StyledText color='accent200'>By selecting the 'Confirm operation' option, you are agreeing to our terms and conditions, and will proceed with the account creation process.</StyledText>
+            <Controller
+              name='email'
+              control={control}
+              render={({ field }) => (
+                <StyledInputText labelText="Email" placeholder="Email" onChangeText={field.onChange}></StyledInputText>
+              )} />
+
+            <Controller
+              name='password'
+              control={control}
+              render={({ field }) => (
+                <StyledInputText labelText="Password" placeholder="Password" isSensitiveData={true} onChangeText={field.onChange}></StyledInputText>
+              )} />
           </View>
         </ScrollView>
       </View>
 
       <View style={[styles.footer]}>
         <Button
-          title="Request"
+          title="Confirm request"
           style={[styles.button]}
           size='long'
           useGradient={true}
-          onPress={() => { setProgress(100); navigation.navigate('Success') }}
+          onPress={handleSubmit(onFormValid)}
         />
       </View>
     </AppContainer>

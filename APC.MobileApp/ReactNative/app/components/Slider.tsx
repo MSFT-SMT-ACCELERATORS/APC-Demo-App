@@ -2,6 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useRef, useState, useEffect } from 'react';
 import { Text, View, StyleSheet, PanResponder, Animated, DimensionValue, StyleProp, ViewStyle } from 'react-native';
 import Colors from '../themes/Colors';
+import StyledText from './StyledText';
 
 interface Props {
     minValue: number;
@@ -93,8 +94,8 @@ const Slider: React.FC<Props> = ({
     return (
         <View style={[styles.container, style]}>
             <View style={[styles.limitContainer]}>
-                <Text style={styles.limitText}>{formatter(minValue)}</Text>
-                <Text style={styles.limitText}>{formatter(maxValue)}</Text>
+                <StyledText customStyle={['standar']} color='accent200'>{formatter(minValue)}</StyledText>
+                <StyledText customStyle={['standar']} color='accent200'>{formatter(maxValue)}</StyledText>
             </View>
             <View
                 style={[styles.sliderBar]}
@@ -130,7 +131,7 @@ const Slider: React.FC<Props> = ({
                         ]}
                         {...panResponder.panHandlers}
                     >
-                        <Text style={styles.sliderText}>{formatter(sliderValue)}</Text>
+                        <StyledText customStyle={['small']} color='primary300' style={styles.sliderText}>{formatter(sliderValue)}</StyledText>
                     </Animated.View>
                 )}
             </View>
@@ -175,16 +176,12 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         textAlignVertical: 'center',
         verticalAlign: 'middle',
-        color: 'black'
     },
     limitContainer: {
         flexDirection: 'row', 
         justifyContent: 'space-between',          
         marginBottom: 20,
         width: '100%'
-    },
-    limitText: {
-        color: Colors.accent200,
     }
 });
 

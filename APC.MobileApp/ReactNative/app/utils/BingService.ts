@@ -21,5 +21,5 @@ export const translateCoordsToLocation = async (coords: LocationObjectCoords, ve
         } as Location
     } 
 
-    return null;
+    return undefined;
 }

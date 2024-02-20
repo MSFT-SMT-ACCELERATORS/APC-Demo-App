@@ -18,6 +18,7 @@ interface ButtonProps {
   titleSize?: any;
   titleColor?: any;
   onPress: (event: GestureResponderEvent) => void;
+  isActive?: boolean;
   style?: StyleProp<ViewStyle>;
   outline? : boolean;
   size?: ButtonSize;
@@ -27,6 +28,7 @@ interface ButtonProps {
   iconSize?: number;
   iconColor?: string;
   useGradient?: boolean;
+  disabled?: boolean
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -38,24 +40,19 @@ const Button: React.FC<ButtonProps> = ({
   outline = false,
   size = 'normal',
   useGradient = false,
+  isActive = false,
   showIcon = false,
   iconLib = 'FontAwesome',
   iconName,
   iconSize = 20,
   iconColor = palette.neutral,
+  disabled =false
 }) => {
-
-  const [isPressed, setIsPressed] = useState(false);
-
-  // const buttonStyles = [styles.buttonPressed];
-  // if (isPressed) {
-  //   buttonStyles.push(styles.buttonPressed); // Agrega estilos para el estado "presionado"
-  // }
-  // const buttonStyle = ([btnStyles.buttonStyles[size]]);
-
   const buttonStyle = [btnStyles.buttonStyles[size]];
   const buttonBorder = outline ? ([styles.outline]): null;
+
   let IconComponent;
+
   switch (iconLib) {
     case 'FontAwesome':
       IconComponent = FontAwesome;
@@ -70,13 +67,13 @@ const Button: React.FC<ButtonProps> = ({
       IconComponent = Ionicons;
   }
 
+  const disabledStyle = disabled ? styles.disabledButton : {};
+
   const iconElement = showIcon && iconName ? (
     <IconComponent name={iconName} size={iconSize} color={iconColor} />
   ) : null;
 
-
-
-  const textElement =  title ? (
+  const textElement = title ? (
     <StyledText customStyle={[titleSize]} color={titleColor} style={{}}>{title}</StyledText>
   ) : null;
 
@@ -88,8 +85,7 @@ const Button: React.FC<ButtonProps> = ({
   );
 
   return (
-    <TouchableOpacity style={[buttonStyle, buttonBorder, style]} onPress={onPress} onPressIn={() => setIsPressed(true)}
-      onPressOut={() => setIsPressed(false)}>
+    <TouchableOpacity style={[buttonStyle, buttonBorder, style, isActive && styles.buttonPressed,disabledStyle]} onPress={onPress} disabled={disabled}>
       {useGradient? (
         <LinearGradient
           colors={[palette.accent100, palette.accent200]}
@@ -97,9 +93,7 @@ const Button: React.FC<ButtonProps> = ({
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
         >
-
           {content}
-
         </LinearGradient>
       ) : (
         content
@@ -114,7 +108,8 @@ const styles = StyleSheet.create({
   },
    buttonPressed: {
     // Estilos del botón cuando está presionado
-    backgroundColor: '#000',
+    backgroundColor: palette.accent200,
+    color: 'red',
   },
   outline: {
     borderStyle: 'solid',
@@ -129,6 +124,9 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  disabledButton:{
+    opacity: 0.5,
   }
 });
 
