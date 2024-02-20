@@ -35,6 +35,13 @@ namespace APC.Client
                 .Build();
         }
 
+        public async Task<string> GetAccessTokenAsync()
+        {
+            string[] scopes = new[] { "https://management.azure.com//.default" };
+            var result = await _authApp.AcquireTokenForClient(scopes).ExecuteAsync();
+            return result.AccessToken;
+        }
+
         public async Task<HttpResponseMessage> CallApcApiAsync(HttpMethod httpMethod, string endpoint, object? requestContent = null, bool useMock = false)
         {
             if (_settings.IsMockEnabled || useMock)

@@ -10,6 +10,7 @@ namespace APC.Client
         Task<HttpResponseMessage> NumberVerificationVerifyAsync(NumberVerificationContent request, bool useMock = false);
         Task<HttpResponseMessage> SimSwapRetrieveAsync(SimSwapRetrievalContent request, bool useMock = false);
         Task<HttpResponseMessage> SimSwapVerifyAsync(SimSwapVerificationContent request, bool useMock = false);
+        Task<string> GetAccessTokenAsync();
     }
 
 }
