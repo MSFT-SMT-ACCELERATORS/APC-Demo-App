@@ -1,45 +1,45 @@
-﻿using APC.DataModel;
+﻿using APC.Client;
+using APC.DataModel;
 using Microsoft.Extensions.Options;
 
-namespace APC.Client
+public class APCMockService : IAPCMockService
 {
-    public class APCMockService : IAPCMockService
+    private readonly APCMockSettings _settings;
+
+    public APCMockService(IOptions<APCMockSettings> settings)
     {
-        private readonly APCMockSettings _settings;
-
-        public APCMockService(IOptions<APCMockSettings> settings)
-        {
-            _settings = settings.Value;
-        }
-
-        public Task<VerifyLocationResponse> VerifyLocationAsync(VerifyLocationRequest request)
-        {
-            return Task.FromResult(_settings.MockVerifyLocationResponse);
-        }
-
-        public Task<LocationResponse> RetrieveLocationAsync(LocationRequest request)
-        {
-            return Task.FromResult(_settings.MockLocationResponse);
-        }
-
-        public Task<NumberVerificationMatchResponse> VerifyPhoneNumber(NumberVerificationRequest request)
-        {
-            return Task.FromResult(_settings.MockNumberVerificationMatchResponse);
-        }
-
-        public Task<NumberRetrieveResponse> RetrievePhoneNumber(NumberRetrieveRequest request)
-        {
-            return Task.FromResult(_settings.MockNumberRetrieveResponse);
-        }
-
-        public Task<SimSwapInfo> RetrieveSimSwapDate(CreateSimSwapDate request)
-        {
-            return Task.FromResult(_settings.MockSimSwapInfo);
-        }
-
-        public Task<CheckSimSwapInfo> CheckSimSwap(CreateCheckSimSwap request)
-        {
-            return Task.FromResult(_settings.MockCheckSimSwapInfo);
-        }
+        _settings = settings.Value;
     }
+
+    public Task<object> RetrieveMockResultAsync(string apcPath)
+    {
+        return apcPath switch
+        {
+            APCPaths.DeviceLocationVerify => Task.FromResult<object>(_settings.MockDeviceLocationVerificationResult),
+            APCPaths.DeviceNetworkRetrieve => Task.FromResult<object>(_settings.MockNetworkRetrievalResult),
+            APCPaths.NumberVerificationRetrieve => Task.FromResult<object>(_settings.MockNumberRetrievalResult),
+            APCPaths.NumberVerificationVerify => Task.FromResult<object>(_settings.MockNumberVerificationResult),
+            APCPaths.SimSwapRetrieve => Task.FromResult<object>(_settings.MockSimSwapRetrievalResult),
+            APCPaths.SimSwapVerify => Task.FromResult<object>(_settings.MockSimSwapVerificationResult),
+            _ => throw new NotImplementedException($"Mock data not implemented for action: {apcPath}")
+        };
+    }
+
+    public Task<DeviceLocationVerificationResult> DeviceLocationVerifyAsync(DeviceLocationVerificationContent? request = null)
+        => Task.FromResult(_settings.MockDeviceLocationVerificationResult);
+
+    public Task<NetworkRetrievalResult> DeviceNetworkRetrieveAsync(NetworkIdentifier? request = null)
+        => Task.FromResult(_settings.MockNetworkRetrievalResult);
+
+    public Task<NumberRetrievalResult> NumberVerificationRetrieveAsync(NetworkIdentifier? request = null)
+        => Task.FromResult(_settings.MockNumberRetrievalResult);
+
+    public Task<NumberVerificationResult> NumberVerificationVerifyAsync(NumberVerificationContent? request = null)
+        => Task.FromResult(_settings.MockNumberVerificationResult);
+
+    public Task<SimSwapRetrievalResult> SimSwapRetrieveAsync(SimSwapRetrievalContent? request = null)
+        => Task.FromResult(_settings.MockSimSwapRetrievalResult);
+
+    public Task<SimSwapVerificationResult> SimSwapVerifyAsync(SimSwapVerificationContent? request = null)
+        => Task.FromResult(_settings.MockSimSwapVerificationResult);
 }

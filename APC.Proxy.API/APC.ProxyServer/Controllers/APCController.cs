@@ -1,11 +1,12 @@
 using APC.Client;
 using APC.DataModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace APC.ProxyServer.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class APCController : ControllerBase
     {
         private readonly ILogger<APCController> _logger;
@@ -17,96 +18,93 @@ namespace APC.ProxyServer.Controllers
             _apcClient = apcClient;
         }
 
-        [HttpGet("test")]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-        public IActionResult Test(string yourIp)
-        {
-            return Ok(yourIp);
-        }
-
-        [HttpPost("verify-device-location")]
-        [ProducesResponseType(typeof(VerifyLocationResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> VerifyDeviceLocation([FromBody] VerifyLocationRequest request)
+        [HttpPost("device-location/location:verify")]
+        [ProducesResponseType(typeof(DeviceLocationVerificationResult), StatusCodes.Status200OK)]
+        public async Task<IActionResult> DeviceLocationVerify([FromBody] DeviceLocationVerificationContent request)
         {
             return await HandleRequest(
-                request,
-                _apcClient.VerifyLocationAsync,
+                useMock => _apcClient.DeviceLocationVerifyAsync(request, useMock),
                 "Error occurred while verifying device location.");
         }
 
-        [HttpPost("device-location")]
-        [ProducesResponseType(typeof(LocationResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> RetrieveDeviceLocation([FromBody] LocationRequest request)
+        [HttpPost("device-network/network:retrieve")]
+        [ProducesResponseType(typeof(NetworkRetrievalResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> DeviceNetworkRetrieve([FromBody] NetworkIdentifier request)
         {
             return await HandleRequest(
-                request,
-                _apcClient.RetrieveLocationAsync,
-                "Error occurred while retrieving device location.");
+                useMock => _apcClient.DeviceNetworkRetrieveAsync(request, useMock),
+                "Error occurred while retrieving network.");
         }
 
-        [HttpPost("verify")]
-        [ProducesResponseType(typeof(NumberVerificationMatchResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> VerifyPhoneNumber([FromBody] NumberVerificationRequest request)
+        [HttpPost("number-verification/number:retrieve")]
+        [ProducesResponseType(typeof(NumberRetrievalResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> NumberVerificationRetrieve([FromBody] NetworkIdentifier request)
         {
             return await HandleRequest(
-                request,
-                _apcClient.VerifyPhoneNumberAsync,
-                "Error occurred while verifying phone number.");
-        }
-
-        [HttpGet("phone-number")]
-        [ProducesResponseType(typeof(NumberRetrieveResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> RetrievePhoneNumber([FromQuery] NumberRetrieveRequest request)
-        {
-            return await HandleRequest(
-                request,
-                _apcClient.RetrievePhoneNumberAsync,
+                useMock => _apcClient.NumberVerificationRetrieveAsync(request, useMock),
                 "Error occurred while retrieving phone number.");
         }
 
-        [HttpPost("sim-swap/swap-date")]
-        [ProducesResponseType(typeof(SimSwapInfo), StatusCodes.Status200OK)]
-        public async Task<IActionResult> RetrieveSimSwapDate([FromBody] CreateSimSwapDate request)
+        [HttpPost("number-verification/number:verify")]
+        [ProducesResponseType(typeof(NumberVerificationResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> NumberVerificationVerify([FromBody] NumberVerificationContent request)
         {
             return await HandleRequest(
-                request,
-                _apcClient.RetrieveSimSwapDateAsync,
-                "Error occurred while retrieving SIM swap date.");
+                useMock => _apcClient.NumberVerificationVerifyAsync(request, useMock),
+                "Error occurred while verifying phone number.");
         }
 
-        [HttpPost("sim-swap/check-swap")]
-        [ProducesResponseType(typeof(CheckSimSwapInfo), StatusCodes.Status200OK)]
-        public async Task<IActionResult> CheckSimSwap([FromBody] CreateCheckSimSwap request)
+        [HttpPost("sim-swap/sim-swap:retrieve")]
+        [ProducesResponseType(typeof(SimSwapRetrievalResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> SimSwapRetrieve([FromBody] SimSwapRetrievalContent request)
         {
             return await HandleRequest(
-                request,
-                _apcClient.CheckSimSwapAsync,
-                "Error occurred while checking SIM swap.");
+                useMock => _apcClient.SimSwapRetrieveAsync(request, useMock),
+                "Error occurred while retrieving SIM swap information.");
         }
 
-        // Generic method to handle common logic
-        private async Task<IActionResult> HandleRequest<TRequest, TResponse>(
-            TRequest request,
-            Func<TRequest, bool, Task<TResponse>> action,
+        [HttpPost("sim-swap/sim-swap:verify")]
+        [ProducesResponseType(typeof(SimSwapVerificationResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> SimSwapVerify([FromBody] SimSwapVerificationContent request)
+        {
+            return await HandleRequest(
+                useMock => _apcClient.SimSwapVerifyAsync(request, useMock),
+                "Error occurred while verifying SIM swap.");
+        }
+
+
+        private async Task<IActionResult> HandleRequest(
+            Func<bool, Task<HttpResponseMessage>> action,
             string errorMessage)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             try
             {
-                var useMock = HttpContext.Request.Headers.TryGetValue("X-Use-Mock", out var value)
-                              && value.ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
-                var response = await action(request, useMock);
-                return Ok(response);
+                var useMock = HttpContext.Request.Headers.TryGetValue("X-Use-Mock", out var useMockValue)
+                    ? string.Equals(useMockValue, "true", StringComparison.OrdinalIgnoreCase)
+                    : false;
+
+                var responseMessage = await action(useMock);
+
+                if (!responseMessage.IsSuccessStatusCode)
+                {
+                    var errorContent = await responseMessage.Content.ReadAsStringAsync();
+                    return StatusCode((int)responseMessage.StatusCode, errorContent);
+                }
+
+                var content = await responseMessage.Content.ReadAsStringAsync();
+                return Content(content, "application/json");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, errorMessage);
-                return StatusCode(500, "Internal Server Error");
+                return StatusCode(500, $"APC Proxy Internal Server Error: {errorMessage}");
             }
         }
+
     }
 }

@@ -4,43 +4,29 @@ namespace APC.Client
 {
     public class APCMockSettings
     {
-        public VerifyLocationResponse MockVerifyLocationResponse { get; set; } = new VerifyLocationResponse
+        public DeviceLocationVerificationResult MockDeviceLocationVerificationResult { get; set; } = new DeviceLocationVerificationResult
         {
-            LastLocationTime = DateTime.UtcNow,
-            VerificationResult = true,
-            MatchRate = 80
+            VerificationResult = true
         };
-        public LocationResponse MockLocationResponse { get; set; } = new LocationResponse
+        public NetworkRetrievalResult MockNetworkRetrievalResult { get; set; } = new NetworkRetrievalResult
         {
-            LastLocationTime = DateTime.UtcNow,
-            LocationArea = new LocationArea
-            {
-                AreaType = "Circle",
-                Circle = new Circle
-                {
-                    Latitude = 51.5074,
-                    Longitude = -0.1278,
-                    Radius = 1000 
-                }
-            }
+            NetworkCode = "Telefonica_Spain"
         };
-        public NumberVerificationMatchResponse MockNumberVerificationMatchResponse { get; set; } = new NumberVerificationMatchResponse
+        public NumberVerificationResult MockNumberVerificationResult { get; set; } = new NumberVerificationResult
         {
-            DevicePhoneNumberVerified = true
+            VerificationResult = true
         };
-        public NumberRetrieveResponse MockNumberRetrieveResponse { get; set; } = new NumberRetrieveResponse
+        public NumberRetrievalResult MockNumberRetrievalResult { get; set; } = new NumberRetrievalResult
         {
-            DevicePhoneNumber = "+1234567890"
+            PhoneNumber = "+34618698727"
         };
-        public SimSwapInfo MockSimSwapInfo { get; set; } = new SimSwapInfo
+        public SimSwapRetrievalResult MockSimSwapRetrievalResult { get; set; } = new SimSwapRetrievalResult
         {
-            LatestSimChange = DateTime.UtcNow.AddDays(-30)
+            Date = DateTime.UtcNow.AddDays(-8)
         };
-
-        public CheckSimSwapInfo MockCheckSimSwapInfo { get; set; } = new CheckSimSwapInfo
+        public SimSwapVerificationResult MockSimSwapVerificationResult { get; set; } = new SimSwapVerificationResult
         {
-            Swapped = false
+            VerificationResult = true
         };
     }
-
 }
