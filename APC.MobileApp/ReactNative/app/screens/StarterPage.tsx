@@ -150,6 +150,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
 
     if (!phoneNumber) {
       setPhoneNumber(devicePhoneNumber);
+      handleModalToggle("Information message:", "Congratulations, for anti-fraud reasons, we were able to obtain your telephone number directly from your operator telco company so you don't need to write it. Not that you can only request this loan if providing a phone number that is currently being used with the phone, for tracking and security purposes.", palette.accent200, undefined, 'information-circle-outline', palette.black);
       setIsPhoneNumberValid(true);
     } else {
       if (phoneNumber === devicePhoneNumber) {
