@@ -139,35 +139,49 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   };
 
   const autocompletePhoneNumber = async () => {
+  const devicePhoneNumber = await APCService.getPhoneNumber(apiClient);
 
-    if (config?.connectionMode === ConnectionMode.Offline && config.autovalidatePhoneNumber) {
-      setIsPhoneNumberValid(true);
-      handleModalToggle("Information message", "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using", palette.accent200, undefined, 'information-circle-outline', palette.black);
-      return;
-    }
+  switch (config?.connectionMode) {
+    case ConnectionMode.Offline:
+      if (config.autovalidatePhoneNumber) {
+        if (!phoneNumber || phoneNumber === devicePhoneNumber) {
+          setIsPhoneNumberValid(true);
+          setPhoneNumber(devicePhoneNumber);
+          handleModalToggle("Information message", "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using", palette.accent200, undefined, 'information-circle-outline', palette.black);
+        } else {
+          setIsPhoneNumberValid(false);
+          handleModalToggle("Error message:", "Invalid phone number");
+        }
+      }
+      break;
 
-    const devicePhoneNumber = await APCService.getPhoneNumber(apiClient);
+    case ConnectionMode.Mock:
+      if (!phoneNumber || phoneNumber === devicePhoneNumber) {
+        setPhoneNumber(devicePhoneNumber);
+        handleModalToggle("Information message:", "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using", palette.accent200, undefined, 'information-circle-outline', palette.black);
+        setIsPhoneNumberValid(true);
+      } else {
+        setIsPhoneNumberValid(false);
+        handleModalToggle("Error message:", "Invalid phone number");
+      }
+      break;
 
-    if (config?.connectionMode === ConnectionMode.Mock && !phoneNumber) {
-      setPhoneNumber(devicePhoneNumber);
-      handleModalToggle("Information message:", "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using", palette.accent200, undefined, 'information-circle-outline', palette.black);
-      setIsPhoneNumberValid(true);
-    }
-
-    if (!phoneNumber) {
-      setPhoneNumber(devicePhoneNumber);
-      handleModalToggle("Information message:", "Congratulations, for anti-fraud reasons, we were able to obtain your telephone number directly from your operator telco company so you don't need to write it. Not that you can only request this loan if providing a phone number that is currently being used with the phone, for tracking and security purposes", palette.accent200, undefined, 'information-circle-outline', palette.black);
-      setIsPhoneNumberValid(true);
-    } else {
-      if (phoneNumber === devicePhoneNumber) {
+    default:
+      if (!phoneNumber) {
+        setPhoneNumber(devicePhoneNumber);
+        handleModalToggle("Information message:", "Congratulations, for anti-fraud reasons, we were able to obtain your telephone number directly from your operator telco company so you don't need to write it. Note that you can only request this loan if providing a phone number that is currently being used with the phone, for tracking and security purposes", palette.accent200, undefined, 'information-circle-outline', palette.black);
+        setIsPhoneNumberValid(true);
+      } else if (phoneNumber === devicePhoneNumber) {
         setIsPhoneNumberValid(true);
         handleModalToggle("Information message:", "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using", palette.accent200, undefined, 'information-circle-outline', palette.black);
       } else {
         setIsPhoneNumberValid(false);
         handleModalToggle("Error message:", "Invalid phone number");
       }
-    }
-  };
+      break;
+  }
+};
+
 
   return (
     <AppContainer>
