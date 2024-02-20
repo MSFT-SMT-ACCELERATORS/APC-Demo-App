@@ -250,7 +250,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                     }}
                                     render={({ field }) => (
                                         <StyledInputText
-                                            labelText="APC Latitude"
+                                            labelText="Simulated APC Latitude"
                                             value={
                                                 field.value?.toString() || ''
                                             }
@@ -283,7 +283,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                     }}
                                     render={({ field }) => (
                                         <StyledInputText
-                                            labelText="APC Longitude"
+                                            labelText="Simulated APC Longitude"
                                             value={
                                                 field.value?.toString() || ''
                                             }
