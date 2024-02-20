@@ -226,7 +226,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                     control={control}
                                     render={() => (
                                         <CheckboxWithText
-                                            label={'Swapped SIM within last 10 days'}
+                                            label={'Line SIM was swapped recently'}
                                             checked={simSwap}
                                             onToggle={() => {
                                                 setSimSwap(!simSwap);
