@@ -23,39 +23,39 @@ export const getAPCLocation = async (client: APCApi) => {
 
     const ip = await ipify();
 
-    const mockHeader = config.connectionMode == ConnectionMode.Mock ? { headers: { 'X-Use-Mock': true } } : undefined;
-    const response = await client.aPCDeviceLocationPost({
-        deviceId: {
-            ipv4Address: ip,
-            ipv6Address: "ipv6Address",
-            networkAccessIdentifier: "networkAccessIdentifier",
-            phoneNumber: "phoneNumber"
-        },
-        networkId: "networkId"
-    }, mockHeader);
+    // const mockHeader = config.connectionMode == ConnectionMode.Mock ? { headers: { 'X-Use-Mock': true } } : undefined;
+    // const response = await client.aPCDeviceLocationPost({
+    //     deviceId: {
+    //         ipv4Address: ip,
+    //         ipv6Address: "ipv6Address",
+    //         networkAccessIdentifier: "networkAccessIdentifier",
+    //         phoneNumber: "phoneNumber"
+    //     },
+    //     networkId: "networkId"
+    // }, mockHeader);
 
-    const circle = response.data.locationArea?.circle;
+    // const circle = response.data.locationArea?.circle;
 
-    const coords = {
-        latitude: circle?.latitude,
-        longitude: circle?.longitude,
-        accuracy: circle?.radius,
-        altitude: null,
-        altitudeAccuracy: null,
-        heading: null,
-        speed: null
-    } as Location.LocationObjectCoords
+    // const coords = {
+    //     latitude: circle?.latitude,
+    //     longitude: circle?.longitude,
+    //     accuracy: circle?.radius,
+    //     altitude: null,
+    //     altitudeAccuracy: null,
+    //     heading: null,
+    //     speed: null
+    // } as Location.LocationObjectCoords
 
-    const bingLocation = await BingService.translateCoordsToLocation(coords);
-    return { coords: coords, location: bingLocation } as Position;
+    // const bingLocation = await BingService.translateCoordsToLocation(coords);
+    // return { coords: coords, location: bingLocation } as Position;
 }
 
-export const matchesAPCLocation = async (client: APCApi, coords: Location.LocationObjectCoords) => {
-    const apcLocation = await getAPCLocation(client);
+// export const matchesAPCLocation = async (client: APCApi, coords: Location.LocationObjectCoords) => {
+//     const apcLocation = await getAPCLocation(client);
 
-    return {
-        verificationResult: await matchesCoords(coords, apcLocation.coords)
-    }
+//     return {
+//         verificationResult: await matchesCoords(coords, apcLocation.coords)
+//     }
 
 
     // const config = await readConfigurations();
@@ -90,7 +90,7 @@ export const matchesAPCLocation = async (client: APCApi, coords: Location.Locati
 
     // console.log(response.data);
     // return response.data;
-}
+// }
 
 export const getPhoneNumber = async (apiClient: APCApi): Promise<string> => {
     const config = await readConfigurations();
@@ -151,8 +151,8 @@ export const checkSimChange = async (apiClient: APCApi) => {
         phoneNumber: phoneNumber,
         maxAgeHours: 0,
         networkIdentifier: {
-            identifierType: networkCode,
-            identifier: ''
+            identifierType: 'NetworkCode' ,
+            identifier: networkCode
         }
     }, mockHeader)
 
