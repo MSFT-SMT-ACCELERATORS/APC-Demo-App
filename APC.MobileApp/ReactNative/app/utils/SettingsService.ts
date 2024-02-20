@@ -10,7 +10,6 @@ export enum ConnectionMode {
 export type AppConfiguration = {
   connectionMode: ConnectionMode;
   radiusKm: number;
-  residenceLocationRadius: number;
   skipGeolocationCheck: boolean,
   offlineLastSimChange: boolean;
   offlineLatitude: number;
@@ -24,7 +23,6 @@ const CONFIG_KEY = 'app_configuration';
 export const defaultConfig = {
   connectionMode: 'online',
   radiusKm: 10,
-  residenceLocationRadius: 10,
   skipGeolocationCheck: false,
   offlineLatitude: 41.374148252686226,
   offlineLongitude: 2.150492242256705,
