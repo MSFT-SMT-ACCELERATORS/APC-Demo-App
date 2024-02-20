@@ -176,7 +176,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
         // Business validation
         console.log('validating business rule');
-        if (!(await APCService.matchesCoords(coords, coordsForm))) {
+        if (!(await APCService.matchesCoords(coords, coordsForm, config?.residenceLocationRadius!))) {
             handleModalToggle(
                 'Blocking business rule: Not allowed device location',
                 'For anti-fraud purposes, this application requires the user to be using the app in a location relatively close to the user’s residence location (i.e. same state). You are currently far away'
