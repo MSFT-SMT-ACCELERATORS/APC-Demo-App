@@ -27,7 +27,7 @@ export const defaultConfig = {
   offlineLatitude: 39.40425030778461,
   offlineLongitude: -0.41060871792598064,
   offlineLastSimChange: false,
-  offlinePhoneNumber: '',
+  offlinePhoneNumber: '+34 677550625',
   autovalidatePhoneNumber: false,
 } as AppConfiguration;
 
