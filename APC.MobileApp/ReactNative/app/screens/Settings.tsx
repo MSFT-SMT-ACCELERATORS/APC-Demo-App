@@ -75,12 +75,13 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
 
         const formattedData = {
             ...data,
-            radiusKm: typeof data.radiusKm === 'string' ? parseFloat(data.radiusKm) : data.radiusKm,
-            offlineLatitude: typeof data.offlineLatitude === 'string' ? parseFloat(data.offlineLatitude) : data.offlineLatitude,
-            offlineLongitude: typeof data.offlineLongitude === 'string' ? parseFloat(data.offlineLongitude) : data.offlineLongitude,
+            radiusKm: Number(data.radiusKm),
+            offlineLatitude: Number(data.offlineLatitude),
+            offlineLongitude: Number(data.offlineLongitude),
             skipGeolocationCheck: geolocationCheck,
             autovalidatePhoneNumber: updatedAutovalidatePhoneNumber,
             offlineLastSimChange: updatedSimSwap,
+            residenceLocationRadius: Number(data.residenceLocationRadius)
         };
 
         console.log(formattedData);
@@ -121,6 +122,33 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                     color="danger200"
                                 >
                                     {errors.radiusKm.message}
+                                </StyledText>
+                            )}
+
+                             <Controller
+                                name="residenceLocationRadius"
+                                control={control}
+                                rules={{
+                                    validate: {
+                                        isWithinRange: (value) =>
+                                            value <= 10 ||
+                                            'The allowed range is up to 10km.',
+                                    },
+                                }}
+                                render={({ field }) => (
+                                    <StyledInputText
+                                        labelText="Radius Km (allowed deviation for residence location)"
+                                        value={field.value?.toString() || ''}
+                                        onChangeText={field.onChange}
+                                    />
+                                )}
+                            />
+                            {errors.residenceLocationRadius && (
+                                <StyledText
+                                    customStyle={['regular']}
+                                    color="danger200"
+                                >
+                                    {errors.residenceLocationRadius.message}
                                 </StyledText>
                             )}
 
