@@ -85,7 +85,7 @@ const Welcome: React.FC<WelcomeProps> = ({ setLoading }) => {
             size='normal'
             style={customStyles.my4}
             useGradient={true}
-            onPress={() => navigation.navigate('Consents')}
+            onPress={() => navigation.navigate('Steps')}
           />
 
         </View>
