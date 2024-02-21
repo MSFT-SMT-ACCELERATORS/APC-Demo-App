@@ -37,18 +37,20 @@ namespace APC.ProxyServer.Controllers
                 "Error occurred while retrieving network.");
         }
 
-        [HttpPost("number-verification/number:retrieve")]
-        [ProducesResponseType(typeof(NumberRetrievalResult), StatusCodes.Status200OK)]
+        [HttpPost("number-verification/apcauthcallback")]
+        [ProducesResponseType(typeof(NumberVerificationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> NumberVerificationRetrieve([FromBody] NetworkIdentifier request)
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> NumberVerificationRetrieve(string apc_code)
         {
             return await HandleRequest(
-                useMock => _apcClient.NumberVerificationRetrieveAsync(request, useMock),
+                useMock => _apcClient.NumberVerificationCallbackVerifyAsync(new NumberVerificationCallbackResult() { ApcCode = apc_code }, useMock),
                 "Error occurred while retrieving phone number.");
         }
 
         [HttpPost("number-verification/number:verify")]
-        [ProducesResponseType(typeof(NumberVerificationResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status302Found)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> NumberVerificationVerify([FromBody] NumberVerificationContent request)
         {

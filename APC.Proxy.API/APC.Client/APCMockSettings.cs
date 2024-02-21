@@ -16,9 +16,9 @@ namespace APC.Client
         {
             VerificationResult = true
         };
-        public NumberRetrievalResult MockNumberRetrievalResult { get; set; } = new NumberRetrievalResult
+        public NumberVerificationCallbackResult MockNumberCallbackVerificationResult { get; set; } = new NumberVerificationCallbackResult
         {
-            PhoneNumber = "+34618698727"
+            ApcCode = "1234"
         };
         public SimSwapRetrievalResult MockSimSwapRetrievalResult { get; set; } = new SimSwapRetrievalResult
         {

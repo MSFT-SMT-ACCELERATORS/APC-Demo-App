@@ -6,8 +6,7 @@
         public required string GatewayId { get; set; }
         public required string BaseUri { get; set; }
         public bool IsMockEnabled { get; set; }
-        public bool ForwardApiErrors { get; set; } = false;
-
+        public required string NumberVerificationRedirectUri { get; set; }
     }
 
     public class AuthAppCredentials

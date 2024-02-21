@@ -15,14 +15,12 @@ namespace APC.Client
         private readonly HttpClient _httpClient;
         private readonly APCClientSettings _settings;
         private readonly IAPCMockService _mockService;
-        private readonly bool _isMockEnabled;
 
         public APCClient(IHttpClientFactory httpClientFactory, IOptions<APCClientSettings> settings, IAPCMockService mockService)
         {
             _httpClient = httpClientFactory.CreateClient();
             _settings = settings.Value;
             _mockService = mockService;
-            _isMockEnabled = settings.Value.IsMockEnabled;
 
             // Configure httpClient with APC API settings
             _httpClient.BaseAddress = new Uri(settings.Value.BaseUri);
@@ -74,10 +72,13 @@ namespace APC.Client
         public async Task<HttpResponseMessage> DeviceNetworkRetrieveAsync(NetworkIdentifier request, bool useMock = false)
             => await CallApcApiAsync(HttpMethod.Post, APCPaths.DeviceNetworkRetrieve, request, useMock);
 
-        public async Task<HttpResponseMessage> NumberVerificationRetrieveAsync(NetworkIdentifier request, bool useMock = false)
-            => await CallApcApiAsync(HttpMethod.Post, APCPaths.NumberVerificationRetrieve, request, useMock);
-
         public async Task<HttpResponseMessage> NumberVerificationVerifyAsync(NumberVerificationContent request, bool useMock = false)
+        {
+            request.RedirectUri = _settings.NumberVerificationRedirectUri;
+            return await CallApcApiAsync(HttpMethod.Post, APCPaths.NumberVerificationVerify, request, useMock);
+        }
+
+        public async Task<HttpResponseMessage> NumberVerificationCallbackVerifyAsync(NumberVerificationCallbackResult request, bool useMock = false)
             => await CallApcApiAsync(HttpMethod.Post, APCPaths.NumberVerificationVerify, request, useMock);
 
         public async Task<HttpResponseMessage> SimSwapRetrieveAsync(SimSwapRetrievalContent request, bool useMock = false)

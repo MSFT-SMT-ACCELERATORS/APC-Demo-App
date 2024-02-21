@@ -6,7 +6,7 @@ namespace APC.Client
     {
         Task<HttpResponseMessage> DeviceLocationVerifyAsync(DeviceLocationVerificationContent request, bool useMock = false);
         Task<HttpResponseMessage> DeviceNetworkRetrieveAsync(NetworkIdentifier request, bool useMock = false);
-        Task<HttpResponseMessage> NumberVerificationRetrieveAsync(NetworkIdentifier request, bool useMock = false);
+        Task<HttpResponseMessage> NumberVerificationCallbackVerifyAsync(NumberVerificationCallbackResult request, bool useMock = false);
         Task<HttpResponseMessage> NumberVerificationVerifyAsync(NumberVerificationContent request, bool useMock = false);
         Task<HttpResponseMessage> SimSwapRetrieveAsync(SimSwapRetrievalContent request, bool useMock = false);
         Task<HttpResponseMessage> SimSwapVerifyAsync(SimSwapVerificationContent request, bool useMock = false);
