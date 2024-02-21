@@ -65,12 +65,10 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
     }, [navigation]);
 
     const saveConfig: SubmitHandler<AppConfiguration> = async (data) => {
-        let updatedGeolocationCheck = geolocationCheck;
         let updatedAutovalidatePhoneNumber = autovalidatePhoneNumber;
         let updatedSimSwap = simSwap;
 
         if (connectionMode === 'online') {
-            updatedGeolocationCheck = false;
             updatedAutovalidatePhoneNumber = false;
             updatedSimSwap = false;
         }
@@ -80,7 +78,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
             radiusKm: typeof data.radiusKm === 'string' ? parseFloat(data.radiusKm) : data.radiusKm,
             offlineLatitude: typeof data.offlineLatitude === 'string' ? parseFloat(data.offlineLatitude) : data.offlineLatitude,
             offlineLongitude: typeof data.offlineLongitude === 'string' ? parseFloat(data.offlineLongitude) : data.offlineLongitude,
-            skipGeolocationCheck: updatedGeolocationCheck,
+            skipGeolocationCheck: geolocationCheck,
             autovalidatePhoneNumber: updatedAutovalidatePhoneNumber,
             offlineLastSimChange: updatedSimSwap,
         };
@@ -125,6 +123,22 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                     {errors.radiusKm.message}
                                 </StyledText>
                             )}
+
+                            <Controller
+                                    name="skipGeolocationCheck"
+                                    control={control}
+                                    render={() => (
+                                        <CheckboxWithText
+                                            label={
+                                                'Exclude phone location verification'
+                                            }
+                                            checked={geolocationCheck}
+                                            onToggle={() => {
+                                                setGeolocationCheck(!geolocationCheck);
+                                            }}
+                                        />
+                                    )}
+                                ></Controller>
                         </View>
 
 
@@ -200,22 +214,6 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                                 setAutovalidatePhoneNumber(
                                                     !autovalidatePhoneNumber
                                                 );
-                                            }}
-                                        />
-                                    )}
-                                ></Controller>
-
-                                <Controller
-                                    name="skipGeolocationCheck"
-                                    control={control}
-                                    render={() => (
-                                        <CheckboxWithText
-                                            label={
-                                                'Exclude APC phone location verification'
-                                            }
-                                            checked={geolocationCheck}
-                                            onToggle={() => {
-                                                setGeolocationCheck(!geolocationCheck);
                                             }}
                                         />
                                     )}
