@@ -65,24 +65,23 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
     }, [navigation]);
 
     const saveConfig: SubmitHandler<AppConfiguration> = async (data) => {
-        let updatedGeolocationCheck = geolocationCheck;
         let updatedAutovalidatePhoneNumber = autovalidatePhoneNumber;
         let updatedSimSwap = simSwap;
 
         if (connectionMode === 'online') {
-            updatedGeolocationCheck = false;
             updatedAutovalidatePhoneNumber = false;
             updatedSimSwap = false;
         }
 
         const formattedData = {
             ...data,
-            radiusKm: typeof data.radiusKm === 'string' ? parseFloat(data.radiusKm) : data.radiusKm,
-            offlineLatitude: typeof data.offlineLatitude === 'string' ? parseFloat(data.offlineLatitude) : data.offlineLatitude,
-            offlineLongitude: typeof data.offlineLongitude === 'string' ? parseFloat(data.offlineLongitude) : data.offlineLongitude,
-            skipGeolocationCheck: updatedGeolocationCheck,
+            radiusKm: Number(data.radiusKm),
+            offlineLatitude: Number(data.offlineLatitude),
+            offlineLongitude: Number(data.offlineLongitude),
+            skipGeolocationCheck: geolocationCheck,
             autovalidatePhoneNumber: updatedAutovalidatePhoneNumber,
             offlineLastSimChange: updatedSimSwap,
+            residenceLocationRadius: Number(data.residenceLocationRadius)
         };
 
         console.log(formattedData);
@@ -107,6 +106,9 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                         isNumber: (value) =>
                                             !isNaN(value) ||
                                             'The value must be a number.',
+                                        isWithinRange: (value) =>
+                                            value <= 10 ||
+                                            'The allowed range is up to 10km.',
                                     },
                                 }}
                                 render={({ field }) => (
@@ -125,6 +127,49 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                     {errors.radiusKm.message}
                                 </StyledText>
                             )}
+
+                             <Controller
+                                name="residenceLocationRadius"
+                                control={control}
+                                rules={{
+                                    validate: {
+                                        isNumber: (value) =>
+                                            !isNaN(value) ||
+                                            'The value must be a number.',
+                                    },
+                                }}
+                                render={({ field }) => (
+                                    <StyledInputText
+                                        labelText="Radius Km (allowed deviation for residence location)"
+                                        value={field.value?.toString() || ''}
+                                        onChangeText={field.onChange}
+                                    />
+                                )}
+                            />
+                            {errors.residenceLocationRadius && (
+                                <StyledText
+                                    customStyle={['regular']}
+                                    color="danger200"
+                                >
+                                    {errors.residenceLocationRadius.message}
+                                </StyledText>
+                            )}
+
+                            <Controller
+                                    name="skipGeolocationCheck"
+                                    control={control}
+                                    render={() => (
+                                        <CheckboxWithText
+                                            label={
+                                                'Exclude phone location verification'
+                                            }
+                                            checked={geolocationCheck}
+                                            onToggle={() => {
+                                                setGeolocationCheck(!geolocationCheck);
+                                            }}
+                                        />
+                                    )}
+                                ></Controller>
                         </View>
 
 
@@ -200,22 +245,6 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                                 setAutovalidatePhoneNumber(
                                                     !autovalidatePhoneNumber
                                                 );
-                                            }}
-                                        />
-                                    )}
-                                ></Controller>
-
-                                <Controller
-                                    name="skipGeolocationCheck"
-                                    control={control}
-                                    render={() => (
-                                        <CheckboxWithText
-                                            label={
-                                                'Exclude APC phone location verification'
-                                            }
-                                            checked={geolocationCheck}
-                                            onToggle={() => {
-                                                setGeolocationCheck(!geolocationCheck);
                                             }}
                                         />
                                     )}
