@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "Microsoft APC Demo",
+    "slug": "MicrosoftAPCDemo",
+    "version": "0.1.1",
+    "orientation": "portrait",
+    "icon": "./assets/icons/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#3c3c52"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.turingchallenge.MicrosoftAPCDemo",
+      "buildNumber": "8"
+    },
+    "android": {
+      "versionCode": 8,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icons/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.turingchallenge.MicrosoftAPCDemo"
+    },
+    "web": {
+      "favicon": "./assets/icons/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b27a47ba-89da-4b9c-8de8-7e94e6c9d414"
+      }
+    },
+    "owner": "turingchallenge"
+  }
+}
