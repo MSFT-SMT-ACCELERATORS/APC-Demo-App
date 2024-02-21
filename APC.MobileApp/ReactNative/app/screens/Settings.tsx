@@ -106,6 +106,9 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                         isNumber: (value) =>
                                             !isNaN(value) ||
                                             'The value must be a number.',
+                                        isWithinRange: (value) =>
+                                            value <= 10 ||
+                                            'The allowed range is up to 10km.',
                                     },
                                 }}
                                 render={({ field }) => (
@@ -130,9 +133,9 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                 control={control}
                                 rules={{
                                     validate: {
-                                        isWithinRange: (value) =>
-                                            value <= 10 ||
-                                            'The allowed range is up to 10km.',
+                                        isNumber: (value) =>
+                                            !isNaN(value) ||
+                                            'The value must be a number.',
                                     },
                                 }}
                                 render={({ field }) => (
