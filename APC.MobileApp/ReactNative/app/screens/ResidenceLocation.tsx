@@ -15,6 +15,8 @@ import {
 } from 'react-native-paper';
 import StyledText from '../components/StyledText';
 import { useEffect, useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import Icon from 'react-native-vector-icons/AntDesign';
 import AppContainer from '../components/AppContainer';
 import CheckboxWithText from '../components/CheckBox';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
@@ -31,8 +33,6 @@ import {
     ConnectionMode,
 } from '../utils/SettingsService';
 import CustomModal from '../components/CustomModal';
-import { Ionicons } from '@expo/vector-icons';
-import Icon from 'react-native-vector-icons/AntDesign';
 
 interface StepProps {
     setProgress: (progress: number) => void;
@@ -176,7 +176,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
         // Business validation
         console.log('validating business rule');
-        if (!(await APCService.matchesCoords(coords, coordsForm))) {
+        if (!(await APCService.matchesCoords(coords, coordsForm, config?.residenceLocationRadius!)) && !config?.skipGeolocationCheck) {
             handleModalToggle(
                 'Blocking business rule: Not allowed device location',
                 'For anti-fraud purposes, this application requires the user to be using the app in a location relatively close to the user’s residence location (i.e. same state). You are currently far away'
@@ -214,9 +214,10 @@ const ResidenceLocation: React.FC<StepProps> = ({
        
     } catch (error) {
         handleModalToggle(
-            'Error',
+            'Warning',
             'The application cannot check your location'
         );
+        setShouldNavigate(true)
         console.log('Error');
     }finally{
         setLoading(false);

@@ -190,7 +190,7 @@ export const getLocationCoords = (latitude: number, longitude: number, accuracy:
     } as Location.LocationObjectCoords
 }
 
-export const matchesCoords = async (coordA: Location.LocationObjectCoords, coordB: Location.LocationObjectCoords): Promise<Boolean> => {
+export const matchesCoords = async (coordA: Location.LocationObjectCoords, coordB: Location.LocationObjectCoords, coordC: number): Promise<Boolean> => {
 
     function calcHaversineDistance(coordA: Location.LocationObjectCoords, coordB: Location.LocationObjectCoords): number {
         const earthRadius = 6371e3; // Earth radius (m)

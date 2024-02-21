@@ -187,10 +187,9 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
 
     default:
       if (!phoneNumber) {
-        message = "Congratulations, for anti-fraud reasons, we were able to obtain your telephone number directly from your operator telco company so you don't need to write it. Note that you can only request this loan if providing a phone number that is currently being used with the phone, for tracking and security purposes";
-        title = "Information message:";
-        isValid = true;
-        setPhoneNumber(devicePhoneNumber);
+        message = "In order to validate your phone number, we need you to provide a valid phone number.";
+        title = "Phone number needed";
+        isValid = false;
       } else if (phoneNumber === devicePhoneNumber) {
         message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
         title = "Information message:";
