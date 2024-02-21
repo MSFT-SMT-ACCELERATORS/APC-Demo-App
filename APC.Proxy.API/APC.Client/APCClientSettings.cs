@@ -2,10 +2,19 @@
 {
     public class APCClientSettings
     {
-        public required string APCAccessKey { get; set; }
-        public required string APCAppId { get; set; }
-        public required string APCBaseUri { get; set; }
+        public required AuthAppCredentials AuthAppCredentials { get; set; }
+        public required string GatewayId { get; set; }
+        public required string BaseUri { get; set; }
         public bool IsMockEnabled { get; set; }
+        public bool ForwardApiErrors { get; set; } = false;
+
     }
 
+    public class AuthAppCredentials
+    {
+        public required string ClientId { get; set; }
+        public required string ClientSecret { get; set; }
+        public required string TenantId { get; set; }
+
+    }
 }

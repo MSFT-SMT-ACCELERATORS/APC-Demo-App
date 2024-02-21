@@ -54,9 +54,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                 const config = await readConfigurations();
                 reset(config);
                 setGeolocationCheck(config.skipGeolocationCheck || false);
-                setAutovalidatePhoneNumber(
-                    config.autovalidatePhoneNumber || false
-                );
+                setAutovalidatePhoneNumber(config.autovalidatePhoneNumber || false);
                 setSimSwap(config.offlineLastSimChange || false);
             };
 
@@ -67,28 +65,31 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
     }, [navigation]);
 
     const saveConfig: SubmitHandler<AppConfiguration> = async (data) => {
+        let updatedGeolocationCheck = geolocationCheck;
+        let updatedAutovalidatePhoneNumber = autovalidatePhoneNumber;
+        let updatedSimSwap = simSwap;
+
+        if (connectionMode === 'online') {
+            updatedGeolocationCheck = false;
+            updatedAutovalidatePhoneNumber = false;
+            updatedSimSwap = false;
+        }
+
         const formattedData = {
             ...data,
-            radiusKm:
-                typeof data.radiusKm === 'string'
-                    ? parseFloat(data.radiusKm)
-                    : data.radiusKm,
-            offlineLatitude:
-                typeof data.offlineLatitude === 'string'
-                    ? parseFloat(data.offlineLatitude)
-                    : data.offlineLatitude,
-            offlineLongitude:
-                typeof data.offlineLongitude === 'string'
-                    ? parseFloat(data.offlineLongitude)
-                    : data.offlineLongitude,
-            skipGeolocationCheck: geolocationCheck,
-            autovalidatePhoneNumber,
-            offlineLastSimChange: simSwap,
+            radiusKm: typeof data.radiusKm === 'string' ? parseFloat(data.radiusKm) : data.radiusKm,
+            offlineLatitude: typeof data.offlineLatitude === 'string' ? parseFloat(data.offlineLatitude) : data.offlineLatitude,
+            offlineLongitude: typeof data.offlineLongitude === 'string' ? parseFloat(data.offlineLongitude) : data.offlineLongitude,
+            skipGeolocationCheck: updatedGeolocationCheck,
+            autovalidatePhoneNumber: updatedAutovalidatePhoneNumber,
+            offlineLastSimChange: updatedSimSwap,
         };
+
         console.log(formattedData);
         storeConfigurations(formattedData);
         navigation.navigate('Welcome');
     };
+
 
     return (
         <AppContainer>
@@ -225,7 +226,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                     control={control}
                                     render={() => (
                                         <CheckboxWithText
-                                            label={'Swapped SIM within last 10 days'}
+                                            label={'Line SIM was swapped recently'}
                                             checked={simSwap}
                                             onToggle={() => {
                                                 setSimSwap(!simSwap);
@@ -249,7 +250,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                     }}
                                     render={({ field }) => (
                                         <StyledInputText
-                                            labelText="APC Latitude"
+                                            labelText="Simulated APC Latitude"
                                             value={
                                                 field.value?.toString() || ''
                                             }
@@ -282,7 +283,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                     }}
                                     render={({ field }) => (
                                         <StyledInputText
-                                            labelText="APC Longitude"
+                                            labelText="Simulated APC Longitude"
                                             value={
                                                 field.value?.toString() || ''
                                             }

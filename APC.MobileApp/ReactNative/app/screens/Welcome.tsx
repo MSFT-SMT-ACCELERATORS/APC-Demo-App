@@ -10,10 +10,8 @@ import palette from '../themes/Colors';
 import StyledText from '../components/StyledText';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import NetInfo from '@react-native-community/netinfo';
-import Icon from 'react-native-vector-icons/AntDesign';
-
-
+import CustomModal from '../components/CustomModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface WelcomeProps {
   setLoading: (isLoading: boolean, text?: string) => void;
@@ -21,20 +19,34 @@ interface WelcomeProps {
 
 const Welcome: React.FC<WelcomeProps> = ({ setLoading }) => {
   const navigation = useNavigation();
-  const [isWifiConnected, setIsWifiConnected] = useState(false);
+  const [wifiModalVisible, setWifiModalVisible] = useState<boolean>(true)
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       setLoading(false);
     });
 
-    const networkUnsubscribe = NetInfo.addEventListener(state => {
-      const wifiConnected = state.isConnected && state.type === 'wifi' || false;
-      setIsWifiConnected(wifiConnected);
-    });
+    const checkIfModalDisplayed = async () => {
+      try {
+        const modalDisplayed = await AsyncStorage.getItem('modalDisplayed');
+
+        if (modalDisplayed !== 'true') {
+          setWifiModalVisible(true);
+        }
+      } catch (error) {
+        console.error('Error checking modal display status:', error);
+      }
+    };
+
+    checkIfModalDisplayed();
 
     return unsubscribe;
   }, [navigation]);
+
+  const closeModal = async () => {
+    setWifiModalVisible(false);
+    await AsyncStorage.setItem('modalDisplayed', 'true');
+  };
 
   return (
     <AppContainer >
@@ -54,12 +66,14 @@ const Welcome: React.FC<WelcomeProps> = ({ setLoading }) => {
           />
         </View>
 
-        {/* {isWifiConnected && 
-            <StyledText style={ styles.warningMessage }>
-                <Icon name="warning" size={20} color={palette.accent200} />
-                {' '} This demo app relays on Cell-Network and currently needs the Wi-Fi to be disabled in the phone
-            </StyledText>
-        } */}
+        <CustomModal 
+          visible={wifiModalVisible} 
+          onClose={closeModal}
+          backgroundColor={palette.danger100}
+          title={'Warning'} 
+          text={'Important, in order to use Azure Programmable Connectivity (APC) APIs you need to disable the Wi-Fi in your phone, since APC APIs needs to make identifications and verifications based on your cell line/data, not with the Wi-Fi communication.'} 
+          iconName={'warning'}
+        />
 
         <View style={[styles.bodyContainer]}>
           <Image source={require('../../assets/images/logo.png')} style={styles.image} resizeMode='contain' />

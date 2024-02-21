@@ -24,10 +24,10 @@ export const defaultConfig = {
   connectionMode: 'online',
   radiusKm: 10,
   skipGeolocationCheck: false,
-  offlineLatitude: 39.40425030778461,
-  offlineLongitude: -0.41060871792598064,
+  offlineLatitude: 41.374148252686226,
+  offlineLongitude: 2.150492242256705,
   offlineLastSimChange: false,
-  offlinePhoneNumber: '',
+  offlinePhoneNumber: '+34 677550625',
   autovalidatePhoneNumber: false,
 } as AppConfiguration;
 

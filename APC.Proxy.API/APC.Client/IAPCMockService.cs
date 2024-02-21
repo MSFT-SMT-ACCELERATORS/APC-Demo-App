@@ -4,12 +4,12 @@ namespace APC.Client
 {
     public interface IAPCMockService
     {
-        Task<VerifyLocationResponse> VerifyLocationAsync(VerifyLocationRequest request);
-        Task<LocationResponse> RetrieveLocationAsync(LocationRequest request);
-        Task<NumberVerificationMatchResponse> VerifyPhoneNumber(NumberVerificationRequest request);
-        Task<NumberRetrieveResponse> RetrievePhoneNumber(NumberRetrieveRequest request);
-        Task<SimSwapInfo> RetrieveSimSwapDate(CreateSimSwapDate request);
-        Task<CheckSimSwapInfo> CheckSimSwap(CreateCheckSimSwap request);
+        Task<object> RetrieveMockResultAsync(string apcPath);
+        Task<DeviceLocationVerificationResult> DeviceLocationVerifyAsync(DeviceLocationVerificationContent? request = null);
+        Task<NetworkRetrievalResult> DeviceNetworkRetrieveAsync(NetworkIdentifier? request = null);
+        Task<NumberRetrievalResult> NumberVerificationRetrieveAsync(NetworkIdentifier? request = null);
+        Task<NumberVerificationResult> NumberVerificationVerifyAsync(NumberVerificationContent? request = null);
+        Task<SimSwapRetrievalResult> SimSwapRetrieveAsync(SimSwapRetrievalContent? request = null);
+        Task<SimSwapVerificationResult> SimSwapVerifyAsync(SimSwapVerificationContent? request = null);
     }
-
 }

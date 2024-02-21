@@ -138,6 +138,9 @@ const ResidenceLocation: React.FC<StepProps> = ({
     };
 
     const onFormValid = async (data: FieldValues) => {
+        try {
+            
+        
         console.log('Submitted Data:', data);
         setLoading(true, 'Validating your data...');
 
@@ -150,7 +153,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
         if (data.Country === 'Select a country' || !selectedCity) {
             console.log('Selection required');
-            handleModalToggle('Selection required', 'Please select a valid option from the "Select a country" dropdown to proceed.', '#dadaed', undefined, 'information-circle-outline', palette.black);
+            handleModalToggle('Selection required', 'Please select a valid option from the "Select a country" dropdown to proceed', '#dadaed', undefined, 'information-circle-outline', palette.black);
             setLoading(false);
 
             return;
@@ -176,21 +179,19 @@ const ResidenceLocation: React.FC<StepProps> = ({
         if (!(await APCService.matchesCoords(coords, coordsForm))) {
             handleModalToggle(
                 'Blocking business rule: Not allowed device location',
-                ' For anti-fraud purposes, this application requires the user to be using the app in a location relatively close to the user’s residence location (i.e. same state). You are currently far away.'
+                'For anti-fraud purposes, this application requires the user to be using the app in a location relatively close to the user’s residence location (i.e. same state). You are currently far away'
             );
             console.log('Business validation failed!!');
             hasError = true;
         } else {
 
             if (config?.skipGeolocationCheck) {
-                // handleModalToggle('APC unchecked', '', palette.accent200, false);
                 setShouldNavigate(true);
                 setLoading(false);
-
                 return
             }
             if (!data.UseAPC) {
-                handleModalToggle('APC unchecked', '', palette.accent200, undefined, 'information-circle-outline', palette.black);
+                handleModalToggle('Warning', 'The application has not been able to check the validity of your location through our service', palette.warning, undefined, 'information-circle-outline', palette.black);
                 setShouldNavigate(true);
                 console.log('Business validation success!!');
             } else {  //APC Validation
@@ -202,7 +203,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                 if (!response.verificationResult) {
                     handleModalToggle(
                         'Blocking anti-hacking rule: GPS coordinates hacking attempted',
-                        'A possible hacking has been detected. The device GPS location does not match the device’s actual location provided by the network carrier. The application’s flow must stop.'
+                        'A possible hacking has been detected. The device GPS location does not match the device’s actual location provided by the network carrier. The application’s flow must stop'
                     );
                     console.log('APC validation failed!!');
                     hasError = true;
@@ -213,10 +214,16 @@ const ResidenceLocation: React.FC<StepProps> = ({
                 }
             }
         }
-
-
-
+       
+    } catch (error) {
+        handleModalToggle(
+            'Error',
+            'The application cannot check your location'
+        );
+        console.log('Error');
+    }finally{
         setLoading(false);
+    }
     };
 
     const showTooltip = () => setTooltipVisible(true);
@@ -289,19 +296,6 @@ const ResidenceLocation: React.FC<StepProps> = ({
                             name="Country"
                             control={control}
                             defaultValue=""
-                            // rules={{
-                            //   required: 'This field is required',
-                            //   pattern: {
-                            //     value: /^[a-zA-Z ]*$/,
-                            //     message: 'No numbers allowed',
-                            //   },
-                            //   validate: {
-                            //     startsWithCapital: (value: string) => {
-                            //       const otherValue = getValues('StateProvince'); // we can check other field values
-                            //       return value.charAt(0) === value.charAt(0).toUpperCase() || 'City must start with a capital letter';
-                            //     }
-                            //   },
-                            // }}
                             render={({ field }) => (
                                 <RNPickerSelect
                                     style={pickerStyle}
@@ -766,7 +760,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
 const styles = StyleSheet.create({
     parent: {
-        width: ' 100%',
+        width: '100%',
         flex: 1,
         backgroundColor: palette.primary300,
     },
@@ -874,7 +868,7 @@ const styles = StyleSheet.create({
         backgroundColor: palette.neutral,
     },
     tooltipContent: {
-        color: palette.accent300,
+        color: palette.accent200,
     },
     iconPicker: {
         paddingTop: 12,
