@@ -141,43 +141,66 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const autocompletePhoneNumber = async () => {
   const devicePhoneNumber = await APCService.getPhoneNumber(apiClient);
 
+  let message, title, isValid;
+
   switch (config?.connectionMode) {
     case ConnectionMode.Offline:
       if (config.autovalidatePhoneNumber) {
-        if (!phoneNumber || phoneNumber === devicePhoneNumber) {
-          setIsPhoneNumberValid(true);
+        if (!phoneNumber) {
+          message = "In order to validate your phone number, we need you to provide a valid phone number.";
+          title = "Phone number needed";
+          isValid = false;
+        } else if (phoneNumber === devicePhoneNumber) {
+          message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
+          title = "Information message";
+          isValid = true;
           setPhoneNumber(devicePhoneNumber);
-          handleModalToggle("Information message", "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using", palette.accent200, undefined, 'information-circle-outline', palette.black);
         } else {
-          setIsPhoneNumberValid(false);
-          handleModalToggle("Error message:", "Invalid phone number");
+          message = "Invalid phone number";
+          title = "Error message:";
+          isValid = false;
         }
+        handleModalToggle(title, message, palette.accent200, undefined, 'information-circle-outline', palette.black);
+        setIsPhoneNumberValid(isValid);
       }
       break;
 
     case ConnectionMode.Mock:
-      if (!phoneNumber || phoneNumber === devicePhoneNumber) {
+      if (!phoneNumber) {
+        message = "In order to validate your phone number, we need you to provide a valid phone number.";
+        title = "Phone number needed";
+        isValid = false;
+        handleModalToggle(title, message, palette.accent200, undefined, 'information-circle-outline', palette.black);
+      } else if (phoneNumber === devicePhoneNumber) {
+        message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
+        title = "Information message:";
+        isValid = true;
         setPhoneNumber(devicePhoneNumber);
-        handleModalToggle("Information message:", "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using", palette.accent200, undefined, 'information-circle-outline', palette.black);
-        setIsPhoneNumberValid(true);
       } else {
-        setIsPhoneNumberValid(false);
-        handleModalToggle("Error message:", "Invalid phone number");
+        message = "Invalid phone number";
+        title = "Error message:";
+        isValid = false;
       }
+      handleModalToggle(title, message, palette.accent200, undefined, 'information-circle-outline', palette.black);
+      setIsPhoneNumberValid(isValid);
       break;
 
     default:
       if (!phoneNumber) {
-        setPhoneNumber(devicePhoneNumber);
-        handleModalToggle("Information message:", "Congratulations, for anti-fraud reasons, we were able to obtain your telephone number directly from your operator telco company so you don't need to write it. Note that you can only request this loan if providing a phone number that is currently being used with the phone, for tracking and security purposes", palette.accent200, undefined, 'information-circle-outline', palette.black);
-        setIsPhoneNumberValid(true);
+        message = "In order to validate your phone number, we need you to provide a valid phone number.";
+        title = "Phone number needed";
+        isValid = false;
       } else if (phoneNumber === devicePhoneNumber) {
-        setIsPhoneNumberValid(true);
-        handleModalToggle("Information message:", "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using", palette.accent200, undefined, 'information-circle-outline', palette.black);
+        message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
+        title = "Information message:";
+        isValid = true;
       } else {
-        setIsPhoneNumberValid(false);
-        handleModalToggle("Error message:", "Invalid phone number");
+        message = "Invalid phone number";
+        title = "Error message:";
+        isValid = false;
       }
+      handleModalToggle(title, message, palette.accent200, undefined, 'information-circle-outline', palette.black);
+      setIsPhoneNumberValid(isValid);
       break;
   }
 };
