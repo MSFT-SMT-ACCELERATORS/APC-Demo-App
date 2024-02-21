@@ -79,7 +79,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
     setLoading(true, "Validating your data...");
     
     // APC validation
-    const response = await APCService.checkSimChange(apiClient);
+    const response = await APCService.checkSimChange(apiClient, phoneNumber);
     console.log("SIMSWAP: ", response);
 
     if (response) {
@@ -139,7 +139,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   };
 
   const autocompletePhoneNumber = async () => {
-  const devicePhoneNumber = await APCService.getPhoneNumber(apiClient);
+  const devicePhoneNumber = await APCService.getPhoneNumber(apiClient, phoneNumber);
 
   let message, title, isValid;
 

@@ -139,8 +139,8 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
     const onFormValid = async (data: FieldValues) => {
         try {
-            
-        
+        const networkCode = await APCService.getNetworkCode(apiClient);
+        console.log(`El código de red es: ${networkCode}`);
         console.log('Submitted Data:', data);
         setLoading(true, 'Validating your data...');
 
@@ -196,11 +196,8 @@ const ResidenceLocation: React.FC<StepProps> = ({
                 console.log('Business validation success!!');
             } else {  //APC Validation
                 console.log('USING APC validating apc matches location');
-                const response = await APCService.matchesAPCLocation(
-                    apiClient,
-                    coords
-                );
-                if (!response.verificationResult) {
+                const response = await APCService.verificateAPCLocation(apiClient);
+                if (!response) {
                     handleModalToggle(
                         'Blocking anti-hacking rule: GPS coordinates hacking attempted',
                         'A possible hacking has been detected. The device GPS location does not match the device’s actual location provided by the network carrier. The application’s flow must stop'
@@ -254,7 +251,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
             .then(setGPSPosition)
             .catch(console.error);
 
-        APCService.getAPCLocation(apiClient)
+        APCService.verificateAPCLocation(apiClient)
             .then(setAPCPosition)
             .catch(console.error);
 
