@@ -4,7 +4,7 @@ import { Platform } from 'react-native';
 import axios from 'axios'
 import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration, ConnectionMode } from './SettingsService'
 import { useApiClient } from '../api/ApiClientProvider';
-import { APCApi } from '../api/generated';
+import { APCApi, AuthApi, Configuration } from '../api/generated';
 import * as BingService from '../utils/BingService'
 import { LocationObjectCoords } from 'expo-location';
 
@@ -14,81 +14,140 @@ export interface Position {
     location?: BingService.Location;
 }
 
-export const getAPCLocation = async (client: APCApi) => {
+export const verificateAPCLocation = async (apiClient: APCApi, optionCoords: LocationObjectCoords) => {
     const config = await readConfigurations();
 
+    const ip = await ipify();
+    const coords = await getDeviceGPSLocation();
+    let accuracy = coords.coords.accuracy === null ? undefined : coords.coords.accuracy;
     if (config.connectionMode == ConnectionMode.Offline) {
-        return { coords: getLocationCoords(config.offlineLatitude, config.offlineLongitude) } as Position;
+        const fakeCoords = { coords: getLocationCoords(config.offlineLatitude, config.offlineLongitude) } as Position;
+        return matchesCoords(optionCoords, fakeCoords.coords, config.radiusKm);
     }
+
+    const networkCode = await getNetworkCode(apiClient);
+    const mockHeader = config.connectionMode == ConnectionMode.Mock ? { headers: { 'X-Use-Mock': true } } : undefined;
+    console.log(coords.coords.latitude + "--" + coords.coords.longitude + "--" + accuracy + " --" + networkCode);
+    const response = await apiClient.apiAPCDeviceLocationLocationverifyPost({
+        networkIdentifier: {
+            identifierType: "NetworkCode",
+            identifier: networkCode
+        },
+        latitude: coords.coords.latitude,
+        longitude: coords.coords.longitude,
+        accuracy: accuracy,
+        device: {
+            ipv4Address: {
+                ipv4: ip,
+                port: 0
+            }
+        }
+    }, mockHeader);
+
+    console.log("Respuesta completa:", JSON.stringify(response, null, 2));
+
+    console.log("VALIDACION: " + response.data.verificationResult);
+
+    return response.data.verificationResult;
+}
+
+export const getPhoneNumber = async (apiClient: APCApi, phoneNumber: string): Promise<boolean> => {
+    const config = await readConfigurations();
+
+    console.log(phoneNumber);
+    const mockHeader = config.connectionMode == ConnectionMode.Mock ? { headers: { 'X-Use-Mock': true } } : undefined;
+    if (config.connectionMode == ConnectionMode.Offline) {
+        return config.autovalidatePhoneNumber;
+    }
+
+    const networkCode = await getNetworkCode(apiClient);
+    const response = await apiClient.apiAPCNumberVerificationNumberverifyPost({
+        networkIdentifier: {
+            identifierType: 'NetworkCode',
+            identifier: networkCode
+        },
+        phoneNumber: phoneNumber,
+        redirectUri: ''
+    }, mockHeader);
+
+    console.log("Respuesta completa:", JSON.stringify(response, null, 2));
+
+    return response.data.verificationResult ?? false;
+}
+
+
+export const getNetworkCode = async (apiClient: APCApi): Promise<string> => {
+
+    const config = await readConfigurations();
+    if (config.connectionMode == ConnectionMode.Mock || config.connectionMode == ConnectionMode.Offline) {
+        return 'Telefonica_Spain'
+    }
+
+    // const mockHeader = config.connectionMode == ConnectionMode.Mock ? { headers: { 'X-Use-Mock': true } } : undefined;
+    //'90.167.43.219'
 
     const ip = await ipify();
 
-    const mockHeader = config.connectionMode == ConnectionMode.Mock ? { headers: { 'X-Use-Mock': true } } : undefined;
-    const response = await client.aPCDeviceLocationPost({
-        deviceId: {
-            ipv4Address: ip,
-            ipv6Address: "ipv6Address",
-            networkAccessIdentifier: "networkAccessIdentifier",
-            phoneNumber: "phoneNumber"
-        },
-        networkId: "networkId"
-    }, mockHeader);
+    const response = await apiClient.apiAPCDeviceNetworkNetworkretrievePost({
+        identifierType: 'IPv4',
+        identifier: ip
+    });
+    // console.log("Respuesta completa:", JSON.stringify(response, null, 2));
 
-    const circle = response.data.locationArea?.circle;
-
-    const coords = {
-        latitude: circle?.latitude,
-        longitude: circle?.longitude,
-        accuracy: circle?.radius,
-        altitude: null,
-        altitudeAccuracy: null,
-        heading: null,
-        speed: null
-    } as Location.LocationObjectCoords
-
-    const bingLocation = await BingService.translateCoordsToLocation(coords);
-    return { coords: coords, location: bingLocation } as Position;
+    console.log("CODE: " + response.data.networkCode);
+    return response.data.networkCode ?? 'Empty';
 }
 
-export const matchesAPCLocation = async (client: APCApi, coords: Location.LocationObjectCoords) => {
-    const apcLocation = await getAPCLocation(client);
-    const config = await readConfigurations()
-
-    return {
-        verificationResult: await matchesCoords(coords, apcLocation.coords, config.radiusKm)
-    }
-}
-
-export const getPhoneNumber = async (apiClient: APCApi): Promise<string> => {
-    const config = await readConfigurations();
-
-    if (config.connectionMode == ConnectionMode.Mock || config.connectionMode == ConnectionMode.Offline) {
-        return config.offlinePhoneNumber;
-    }
-
-    const publicIp = await ipify();
-
-    const response = await apiClient.aPCPhoneNumberGet("networkId", "deviceIdPhoneNumber", "deviceIdNetworkAccessIdentifier", publicIp, "deviceIdIpv6Address");
-
-    return response.data.devicePhoneNumber ?? "";
-}
-
-export const checkSimChange = async (apiClient: APCApi) => {
+export const checkSimChange = async (apiClient: APCApi, phoneNumber: string) => {
     const config = await readConfigurations();
 
     if (config.connectionMode == ConnectionMode.Offline) {
         return config.offlineLastSimChange;
     }
 
-    const phoneNumber = await getPhoneNumber(apiClient);
-
+    const networkCode = await getNetworkCode(apiClient);
     const mockHeader = config.connectionMode == ConnectionMode.Mock ? { headers: { 'X-Use-Mock': true } } : undefined;
-    const response = await apiClient.aPCCheckSwapPost({ network: 'network', phoneNumber: { number: phoneNumber } }, mockHeader)
+    const response = await apiClient.apiAPCSimSwapSimSwapverifyPost({
+        phoneNumber: phoneNumber,
+        maxAgeHours: 0,
+        networkIdentifier: {
+            identifierType: 'NetworkCode',
+            identifier: networkCode
+        }
+    }, mockHeader)
 
-    return response.data.swapped;
+    console.log("Respuesta completa simswap:", JSON.stringify(response, null, 2));
+
+    return response.data.verificationResult;
 }
 
 
+
+// export const getDeviceGPSLocation = async () => {
+//     async function getLocationPermission() {
+//         console.log("Requesting gps permission...");
+//         const { status } = await Location.requestForegroundPermissionsAsync();
+//         if (status !== 'granted') {
+//             console.error('Permission to access location was denied');
+//             return;
+//         }
+//         console.log("Requesting gps permission... OK");
+//     }
+
+//     const config = await readConfigurations();
+//     await getLocationPermission();
+
+//     let location: Location.LocationObject;
+//     console.log("Getting current position...");
+
+//     location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+//     console.log("Getting current position... OK");
+
+//     const bingLocation = config.connectionMode != ConnectionMode.Offline ? await BingService.translateCoordsToLocation(location.coords) : undefined;
+
+//     return { coords: location.coords, location: bingLocation } as Position;
+
+// }
 
 export const getDeviceGPSLocation = async () => {
     async function getLocationPermission() {
@@ -108,15 +167,17 @@ export const getDeviceGPSLocation = async () => {
     console.log("Getting current position...");
 
     location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+    let coords = location.coords;
+    coords = getLocationCoords(41.3851, 2.1734, 0);
     console.log("Getting current position... OK");
 
-    const bingLocation = config.connectionMode != ConnectionMode.Offline ? await BingService.translateCoordsToLocation(location.coords) : undefined;
+    const bingLocation = config.connectionMode != ConnectionMode.Offline ? await BingService.translateCoordsToLocation(coords) : undefined;
 
-    return { coords: location.coords, location: bingLocation } as Position;
+    return { coords: coords, location: bingLocation } as Position;
 
 }
 
-export const getLocationCoords = (latitude: number, longitude: number, accuracy: number = 1000) => {
+export const getLocationCoords = (latitude: number, longitude: number, accuracy: number = 200) => {
     return {
         latitude: latitude,
         longitude: longitude,
@@ -144,8 +205,10 @@ export const matchesCoords = async (coordA: Location.LocationObjectCoords, coord
         return earthRadius * c;
     }
 
+    const config = await readConfigurations();
+
     const distance = calcHaversineDistance(coordA, coordB);
-    const maxAllowedDistance = (coordA.accuracy ?? 0) + (coordB.accuracy ?? 0) + coordC * 1000;
+    const maxAllowedDistance = (coordA.accuracy ?? 0) + (coordB.accuracy ?? 0) + config.radiusKm * 1000;
 
     return distance <= maxAllowedDistance;
 }

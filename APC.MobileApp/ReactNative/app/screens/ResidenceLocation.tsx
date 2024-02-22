@@ -139,8 +139,8 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
     const onFormValid = async (data: FieldValues) => {
         try {
-            
-        
+        const networkCode = await APCService.getNetworkCode(apiClient);
+        console.log(`El código de red es: ${networkCode}`);
         console.log('Submitted Data:', data);
         setLoading(true, 'Validating your data...');
 
@@ -176,7 +176,13 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
         // Business validation
         console.log('validating business rule');
-        if (!(await APCService.matchesCoords(coords, coordsForm, config?.residenceLocationRadius!)) && !config?.skipGeolocationCheck) {
+         if (config?.skipGeolocationCheck) {
+                setShouldNavigate(true);
+                setLoading(false);
+                return
+            }
+
+        if (!(await APCService.matchesCoords(coords, coordsForm, config?.residenceLocationRadius!))) {
             handleModalToggle(
                 'Blocking business rule: Not allowed device location',
                 'For anti-fraud purposes, this application requires the user to be using the app in a location relatively close to the user’s residence location (i.e. same state). You are currently far away'
@@ -184,23 +190,14 @@ const ResidenceLocation: React.FC<StepProps> = ({
             console.log('Business validation failed!!');
             hasError = true;
         } else {
-
-            if (config?.skipGeolocationCheck) {
-                setShouldNavigate(true);
-                setLoading(false);
-                return
-            }
             if (!data.UseAPC) {
                 handleModalToggle('Warning', 'The application has not been able to check the validity of your location through our service', palette.warning, undefined, 'information-circle-outline', palette.black);
                 setShouldNavigate(true);
                 console.log('Business validation success!!');
             } else {  //APC Validation
                 console.log('USING APC validating apc matches location');
-                const response = await APCService.matchesAPCLocation(
-                    apiClient,
-                    coords
-                );
-                if (!response.verificationResult) {
+                const response = await APCService.verificateAPCLocation(apiClient, coords);
+                if (!response) {
                     handleModalToggle(
                         'Blocking anti-hacking rule: GPS coordinates hacking attempted',
                         'A possible hacking has been detected. The device GPS location does not match the device’s actual location provided by the network carrier. The application’s flow must stop'
@@ -216,11 +213,17 @@ const ResidenceLocation: React.FC<StepProps> = ({
         }
        
     } catch (error) {
+         if (config?.skipGeolocationCheck) {
+            setShouldNavigate(true);
+            setLoading(false);
+            return
+        }
+        
         handleModalToggle(
             'Warning',
             'The application cannot check your location'
         );
-        setShouldNavigate(true)
+        // setShouldNavigate(true)
         console.log('Error');
     }finally{
         setLoading(false);
@@ -255,9 +258,9 @@ const ResidenceLocation: React.FC<StepProps> = ({
             .then(setGPSPosition)
             .catch(console.error);
 
-        APCService.getAPCLocation(apiClient)
-            .then(setAPCPosition)
-            .catch(console.error);
+        // APCService.verificateAPCLocation(apiClient)
+        //     .then(setAPCPosition)
+        //     .catch(console.error);
 
         const firstCountry = cities
             .map((item) => item.country)
@@ -651,7 +654,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                                                     }
                                                                 />
                                                             </View>
-                                                            <View
+                                                            {/* <View
                                                                 style={
                                                                     styles.optionSubtitleContainer
                                                                 }
@@ -706,7 +709,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                                                         </StyledText>
                                                                     </View>
                                                                 ) : null}
-                                                            </View>
+                                                            </View> */}
                                                         </Pressable>
                                                     )}
                                                 />

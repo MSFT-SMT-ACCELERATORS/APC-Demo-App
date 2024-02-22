@@ -139,8 +139,70 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   };
 
   const autocompletePhoneNumber = async () => {
-  const devicePhoneNumber = await APCService.getPhoneNumber(apiClient, phoneNumber);
+    const devicePhoneNumber = await APCService.getPhoneNumber(apiClient, phoneNumber);
+    let message, title, isValid;
 
+<<<<<<< HEAD
+    switch (config?.connectionMode) {
+      case ConnectionMode.Offline:
+        if (config.autovalidatePhoneNumber) {
+          if (!phoneNumber) {
+            message = "In order to validate your phone number, we need you to provide a valid phone number.";
+            title = "Phone number needed";
+            isValid = false;
+          } else if (devicePhoneNumber) {
+            message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
+            title = "Information message";
+            isValid = true;
+          } else {
+            message = "Invalid phone number";
+            title = "Error message:";
+            isValid = false;
+          }
+          handleModalToggle(title, message, palette.accent200, undefined, 'information-circle-outline', palette.black);
+          setIsPhoneNumberValid(isValid);
+        }
+        break;
+
+      case ConnectionMode.Mock:
+        if (!phoneNumber) {
+          message = "In order to validate your phone number, we need you to provide a valid phone number.";
+          title = "Phone number needed";
+          isValid = false;
+          handleModalToggle(title, message, palette.accent200, undefined, 'information-circle-outline', palette.black);
+        } else if (devicePhoneNumber) {
+          message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
+          title = "Information message:";
+          isValid = true;
+        } else {
+          message = "Invalid phone number";
+          title = "Error message:";
+          isValid = false;
+        }
+        handleModalToggle(title, message, palette.accent200, undefined, 'information-circle-outline', palette.black);
+        setIsPhoneNumberValid(isValid);
+        break;
+
+      default:
+        if (!phoneNumber) {
+          message = "In order to validate your phone number, we need you to provide a valid phone number.";
+          title = "Phone number needed";
+          isValid = false;
+        } else if (devicePhoneNumber) {
+          message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
+          title = "Information message:";
+          isValid = true;
+        } else {
+          message = "Invalid phone number";
+          title = "Error message:";
+          isValid = false;
+        }
+        handleModalToggle(title, message, palette.accent200, undefined, 'information-circle-outline', palette.black);
+        setIsPhoneNumberValid(isValid);
+        break;
+    }
+  };
+=======
   let message, title, isValid, backgroundColor, icon, iconColor;
 
   switch (config?.connectionMode) {
@@ -163,16 +225,14 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
         icon = 'warning-outline'
         iconColor = palette.danger200;
         isValid = false;
-      } else if (devicePhoneNumber) {
+      } else if (phoneNumber === devicePhoneNumber) {
         message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
         title = "Information message";
-        icon = 'information-circle-outline'
-        iconColor = palette.black;
         backgroundColor = palette.accent200,
         isValid = true;
       } else {
-        message = "Sorry but in order to request a loan with this application your provided phone number must coincide with your phone line’s number that you are currently using with your phone";
-        title = "Business blocking rule";
+        message = "Invalid phone number";
+        title = "Error message:";
         backgroundColor = palette.danger100,
         icon = 'warning-outline'
         iconColor = palette.danger200;
@@ -191,16 +251,17 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
         iconColor = palette.danger200;
         icon = 'warning-outline'
         isValid = false;
-      } else if (devicePhoneNumber) {
+      } else if (phoneNumber === devicePhoneNumber) {
         message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
         title = "Information message:";
         backgroundColor = palette.accent200,
         icon = 'information-circle-outline'
         iconColor = palette.black;
         isValid = true;
+        setPhoneNumber(devicePhoneNumber);
       } else {
-        message = "Sorry but in order to request a loan with this application your provided phone number must coincide with your phone line’s number that you are currently using with your phone";
-        title = "Business blocking rule";
+        message = "Invalid phone number";
+        title = "Error message:";
         backgroundColor = palette.danger100,
         icon = 'warning-outline'
         iconColor = palette.danger200;
@@ -218,7 +279,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
         icon = 'warning-outline'
         iconColor = palette.danger200;
         isValid = false;
-      } else if (devicePhoneNumber) {
+      } else if (phoneNumber === devicePhoneNumber) {
         message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
         title = "Information message:";
         backgroundColor = palette.accent200,
@@ -226,8 +287,8 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
         iconColor = palette.black;
         isValid = true;
       } else {
-        message = "Sorry but in order to request a loan with this application your provided phone number must coincide with your phone line’s number that you are currently using with your phone";
-        title = "Business blocking rule";
+        message = "Invalid phone number";
+        title = "Error message:";
         backgroundColor = palette.danger100,
         icon = 'warning-outline'
         iconColor = palette.danger200;
@@ -238,6 +299,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
       break;
   }
 };
+>>>>>>> develop
 
 
   return (
@@ -505,7 +567,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
 
       <CustomModal
         visible={modalVisible}
-        onClose={() => handleModalToggle('', '', '', false,'','')}
+        onClose={() => handleModalToggle('', '', '', false, '', '')}
         showIcon={showModalIcon}
         iconName={modalIconName}
         iconColor={modalIconColor}

@@ -26,280 +26,191 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
- * @interface CheckSimSwapInfo
+ * @interface DeviceLocationVerificationContent
  */
-export interface CheckSimSwapInfo {
+export interface DeviceLocationVerificationContent {
     /**
      * 
-     * @type {boolean}
-     * @memberof CheckSimSwapInfo
+     * @type {NetworkIdentifier}
+     * @memberof DeviceLocationVerificationContent
      */
-    'swapped'?: boolean;
-}
-/**
- * 
- * @export
- * @interface Circle
- */
-export interface Circle {
+    'networkIdentifier'?: NetworkIdentifier;
     /**
      * 
      * @type {number}
-     * @memberof Circle
+     * @memberof DeviceLocationVerificationContent
      */
     'latitude'?: number;
     /**
      * 
      * @type {number}
-     * @memberof Circle
+     * @memberof DeviceLocationVerificationContent
      */
     'longitude'?: number;
     /**
      * 
      * @type {number}
-     * @memberof Circle
+     * @memberof DeviceLocationVerificationContent
      */
-    'radius'?: number;
+    'accuracy'?: number;
+    /**
+     * 
+     * @type {LocationDevice}
+     * @memberof DeviceLocationVerificationContent
+     */
+    'device'?: LocationDevice;
 }
 /**
  * 
  * @export
- * @interface CreateCheckSimSwap
+ * @interface DeviceLocationVerificationResult
  */
-export interface CreateCheckSimSwap {
+export interface DeviceLocationVerificationResult {
     /**
      * 
-     * @type {PhoneNumber}
-     * @memberof CreateCheckSimSwap
+     * @type {boolean}
+     * @memberof DeviceLocationVerificationResult
      */
-    'phoneNumber'?: PhoneNumber;
+    'verificationResult'?: boolean;
+}
+/**
+ * 
+ * @export
+ * @interface Ipv4Address
+ */
+export interface Ipv4Address {
     /**
      * 
      * @type {string}
-     * @memberof CreateCheckSimSwap
+     * @memberof Ipv4Address
      */
-    'network'?: string | null;
+    'ipv4'?: string | null;
     /**
      * 
      * @type {number}
-     * @memberof CreateCheckSimSwap
+     * @memberof Ipv4Address
      */
-    'maxAge'?: number;
+    'port'?: number;
 }
 /**
  * 
  * @export
- * @interface CreateSimSwapDate
+ * @interface Ipv6Address
  */
-export interface CreateSimSwapDate {
-    /**
-     * 
-     * @type {PhoneNumber}
-     * @memberof CreateSimSwapDate
-     */
-    'phoneNumber'?: PhoneNumber;
+export interface Ipv6Address {
     /**
      * 
      * @type {string}
-     * @memberof CreateSimSwapDate
+     * @memberof Ipv6Address
      */
-    'network'?: string | null;
+    'ipv6'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof Ipv6Address
+     */
+    'port'?: number;
 }
 /**
  * 
  * @export
- * @interface DeviceId
+ * @interface LocationDevice
  */
-export interface DeviceId {
+export interface LocationDevice {
     /**
      * 
      * @type {string}
-     * @memberof DeviceId
-     */
-    'phoneNumber'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof DeviceId
+     * @memberof LocationDevice
      */
     'networkAccessIdentifier'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof DeviceId
+     * @memberof LocationDevice
      */
-    'ipv4Address'?: string | null;
+    'phoneNumber'?: string | null;
     /**
      * 
-     * @type {string}
-     * @memberof DeviceId
+     * @type {Ipv4Address}
+     * @memberof LocationDevice
      */
-    'ipv6Address'?: string | null;
+    'ipv4Address'?: Ipv4Address;
+    /**
+     * 
+     * @type {Ipv6Address}
+     * @memberof LocationDevice
+     */
+    'ipv6Address'?: Ipv6Address;
 }
 /**
  * 
  * @export
- * @interface DeviceNumber
+ * @interface NetworkIdentifier
  */
-export interface DeviceNumber {
+export interface NetworkIdentifier {
     /**
      * 
      * @type {string}
-     * @memberof DeviceNumber
+     * @memberof NetworkIdentifier
+     */
+    'identifierType'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof NetworkIdentifier
+     */
+    'identifier'?: string | null;
+}
+/**
+ * 
+ * @export
+ * @interface NetworkRetrievalResult
+ */
+export interface NetworkRetrievalResult {
+    /**
+     * 
+     * @type {string}
+     * @memberof NetworkRetrievalResult
+     */
+    'networkCode'?: string | null;
+}
+/**
+ * 
+ * @export
+ * @interface NumberVerificationContent
+ */
+export interface NumberVerificationContent {
+    /**
+     * 
+     * @type {NetworkIdentifier}
+     * @memberof NumberVerificationContent
+     */
+    'networkIdentifier'?: NetworkIdentifier;
+    /**
+     * 
+     * @type {string}
+     * @memberof NumberVerificationContent
      */
     'phoneNumber'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof DeviceNumber
+     * @memberof NumberVerificationContent
      */
-    'hashedPhoneNumber'?: string | null;
+    'redirectUri'?: string | null;
 }
 /**
  * 
  * @export
- * @interface ErrorInfo
+ * @interface NumberVerificationResult
  */
-export interface ErrorInfo {
-    /**
-     * 
-     * @type {number}
-     * @memberof ErrorInfo
-     */
-    'status'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof ErrorInfo
-     */
-    'code'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof ErrorInfo
-     */
-    'message'?: string | null;
-}
-/**
- * 
- * @export
- * @interface LocationArea
- */
-export interface LocationArea {
-    /**
-     * 
-     * @type {string}
-     * @memberof LocationArea
-     */
-    'areaType'?: string | null;
-    /**
-     * 
-     * @type {Circle}
-     * @memberof LocationArea
-     */
-    'circle'?: Circle;
-}
-/**
- * 
- * @export
- * @interface LocationRequest
- */
-export interface LocationRequest {
-    /**
-     * 
-     * @type {DeviceId}
-     * @memberof LocationRequest
-     */
-    'deviceId'?: DeviceId;
-    /**
-     * 
-     * @type {string}
-     * @memberof LocationRequest
-     */
-    'networkId'?: string | null;
-}
-/**
- * 
- * @export
- * @interface LocationResponse
- */
-export interface LocationResponse {
-    /**
-     * 
-     * @type {LocationArea}
-     * @memberof LocationResponse
-     */
-    'locationArea'?: LocationArea;
-    /**
-     * 
-     * @type {string}
-     * @memberof LocationResponse
-     */
-    'lastLocationTime'?: string;
-}
-/**
- * 
- * @export
- * @interface NumberRetrieveResponse
- */
-export interface NumberRetrieveResponse {
-    /**
-     * 
-     * @type {string}
-     * @memberof NumberRetrieveResponse
-     */
-    'devicePhoneNumber'?: string | null;
-}
-/**
- * 
- * @export
- * @interface NumberVerificationMatchResponse
- */
-export interface NumberVerificationMatchResponse {
+export interface NumberVerificationResult {
     /**
      * 
      * @type {boolean}
-     * @memberof NumberVerificationMatchResponse
+     * @memberof NumberVerificationResult
      */
-    'devicePhoneNumberVerified'?: boolean;
-}
-/**
- * 
- * @export
- * @interface NumberVerificationRequest
- */
-export interface NumberVerificationRequest {
-    /**
-     * 
-     * @type {DeviceNumber}
-     * @memberof NumberVerificationRequest
-     */
-    'deviceNumber'?: DeviceNumber;
-    /**
-     * 
-     * @type {string}
-     * @memberof NumberVerificationRequest
-     */
-    'networkID'?: string | null;
-    /**
-     * 
-     * @type {DeviceId}
-     * @memberof NumberVerificationRequest
-     */
-    'deviceId'?: DeviceId;
-}
-/**
- * 
- * @export
- * @interface PhoneNumber
- */
-export interface PhoneNumber {
-    /**
-     * 
-     * @type {string}
-     * @memberof PhoneNumber
-     */
-    'number'?: string | null;
+    'verificationResult'?: boolean;
 }
 /**
  * 
@@ -343,71 +254,85 @@ export interface ProblemDetails {
 /**
  * 
  * @export
- * @interface SimSwapInfo
+ * @interface SimSwapRetrievalContent
  */
-export interface SimSwapInfo {
+export interface SimSwapRetrievalContent {
     /**
      * 
      * @type {string}
-     * @memberof SimSwapInfo
+     * @memberof SimSwapRetrievalContent
      */
-    'latestSimChange'?: string;
+    'phoneNumber'?: string | null;
+    /**
+     * 
+     * @type {NetworkIdentifier}
+     * @memberof SimSwapRetrievalContent
+     */
+    'networkIdentifier'?: NetworkIdentifier;
 }
 /**
  * 
  * @export
- * @interface VerifyLocationRequest
+ * @interface SimSwapRetrievalResult
  */
-export interface VerifyLocationRequest {
-    /**
-     * 
-     * @type {DeviceId}
-     * @memberof VerifyLocationRequest
-     */
-    'deviceId': DeviceId;
+export interface SimSwapRetrievalResult {
     /**
      * 
      * @type {string}
-     * @memberof VerifyLocationRequest
+     * @memberof SimSwapRetrievalResult
      */
-    'networkId': string;
+    'date'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface SimSwapVerificationContent
+ */
+export interface SimSwapVerificationContent {
     /**
      * 
-     * @type {LocationArea}
-     * @memberof VerifyLocationRequest
+     * @type {string}
+     * @memberof SimSwapVerificationContent
      */
-    'locationArea': LocationArea;
+    'phoneNumber'?: string | null;
     /**
      * 
      * @type {number}
-     * @memberof VerifyLocationRequest
+     * @memberof SimSwapVerificationContent
      */
-    'maxAge'?: number;
+    'maxAgeHours'?: number;
+    /**
+     * 
+     * @type {NetworkIdentifier}
+     * @memberof SimSwapVerificationContent
+     */
+    'networkIdentifier'?: NetworkIdentifier;
 }
 /**
  * 
  * @export
- * @interface VerifyLocationResponse
+ * @interface SimSwapVerificationResult
  */
-export interface VerifyLocationResponse {
-    /**
-     * 
-     * @type {string}
-     * @memberof VerifyLocationResponse
-     */
-    'lastLocationTime'?: string;
+export interface SimSwapVerificationResult {
     /**
      * 
      * @type {boolean}
-     * @memberof VerifyLocationResponse
+     * @memberof SimSwapVerificationResult
      */
     'verificationResult'?: boolean;
+}
+/**
+ * 
+ * @export
+ * @interface TokenResponse
+ */
+export interface TokenResponse {
     /**
      * 
-     * @type {number}
-     * @memberof VerifyLocationResponse
+     * @type {string}
+     * @memberof TokenResponse
      */
-    'matchRate'?: number | null;
+    'token'?: string | null;
 }
 
 /**
@@ -418,12 +343,12 @@ export const APCApiAxiosParamCreator = function (configuration?: Configuration) 
     return {
         /**
          * 
-         * @param {CreateCheckSimSwap} [createCheckSimSwap] 
+         * @param {DeviceLocationVerificationContent} [deviceLocationVerificationContent] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        aPCCheckSwapPost: async (createCheckSimSwap?: CreateCheckSimSwap, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/APC/check-swap`;
+        apiAPCDeviceLocationLocationverifyPost: async (deviceLocationVerificationContent?: DeviceLocationVerificationContent, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/APC/device-location/location:verify`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -442,7 +367,7 @@ export const APCApiAxiosParamCreator = function (configuration?: Configuration) 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createCheckSimSwap, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(deviceLocationVerificationContent, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -451,12 +376,12 @@ export const APCApiAxiosParamCreator = function (configuration?: Configuration) 
         },
         /**
          * 
-         * @param {LocationRequest} [locationRequest] 
+         * @param {NetworkIdentifier} [networkIdentifier] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        aPCDeviceLocationPost: async (locationRequest?: LocationRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/APC/device-location`;
+        apiAPCDeviceNetworkNetworkretrievePost: async (networkIdentifier?: NetworkIdentifier, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/APC/device-network/network:retrieve`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -475,7 +400,7 @@ export const APCApiAxiosParamCreator = function (configuration?: Configuration) 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(locationRequest, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(networkIdentifier, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -484,16 +409,12 @@ export const APCApiAxiosParamCreator = function (configuration?: Configuration) 
         },
         /**
          * 
-         * @param {string} [networkID] 
-         * @param {string} [deviceIdPhoneNumber] 
-         * @param {string} [deviceIdNetworkAccessIdentifier] 
-         * @param {string} [deviceIdIpv4Address] 
-         * @param {string} [deviceIdIpv6Address] 
+         * @param {string} [apcCode] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        aPCPhoneNumberGet: async (networkID?: string, deviceIdPhoneNumber?: string, deviceIdNetworkAccessIdentifier?: string, deviceIdIpv4Address?: string, deviceIdIpv6Address?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/APC/phone-number`;
+        apiAPCNumberVerificationApcauthcallbackGet: async (apcCode?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/APC/number-verification/apcauthcallback`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -505,24 +426,8 @@ export const APCApiAxiosParamCreator = function (configuration?: Configuration) 
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-            if (networkID !== undefined) {
-                localVarQueryParameter['NetworkID'] = networkID;
-            }
-
-            if (deviceIdPhoneNumber !== undefined) {
-                localVarQueryParameter['DeviceId.PhoneNumber'] = deviceIdPhoneNumber;
-            }
-
-            if (deviceIdNetworkAccessIdentifier !== undefined) {
-                localVarQueryParameter['DeviceId.NetworkAccessIdentifier'] = deviceIdNetworkAccessIdentifier;
-            }
-
-            if (deviceIdIpv4Address !== undefined) {
-                localVarQueryParameter['DeviceId.Ipv4Address'] = deviceIdIpv4Address;
-            }
-
-            if (deviceIdIpv6Address !== undefined) {
-                localVarQueryParameter['DeviceId.Ipv6Address'] = deviceIdIpv6Address;
+            if (apcCode !== undefined) {
+                localVarQueryParameter['apcCode'] = apcCode;
             }
 
 
@@ -538,12 +443,12 @@ export const APCApiAxiosParamCreator = function (configuration?: Configuration) 
         },
         /**
          * 
-         * @param {CreateSimSwapDate} [createSimSwapDate] 
+         * @param {NumberVerificationContent} [numberVerificationContent] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        aPCSwapDatePost: async (createSimSwapDate?: CreateSimSwapDate, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/APC/swap-date`;
+        apiAPCNumberVerificationNumberverifyPost: async (numberVerificationContent?: NumberVerificationContent, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/APC/number-verification/number:verify`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -562,7 +467,7 @@ export const APCApiAxiosParamCreator = function (configuration?: Configuration) 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createSimSwapDate, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(numberVerificationContent, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -571,46 +476,12 @@ export const APCApiAxiosParamCreator = function (configuration?: Configuration) 
         },
         /**
          * 
-         * @param {string} [yourIp] 
+         * @param {SimSwapRetrievalContent} [simSwapRetrievalContent] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        aPCTestGet: async (yourIp?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/APC/test`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            if (yourIp !== undefined) {
-                localVarQueryParameter['yourIp'] = yourIp;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {VerifyLocationRequest} [verifyLocationRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        aPCVerifyDeviceLocationPost: async (verifyLocationRequest?: VerifyLocationRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/APC/verify-device-location`;
+        apiAPCSimSwapSimSwapretrievePost: async (simSwapRetrievalContent?: SimSwapRetrievalContent, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/APC/sim-swap/sim-swap:retrieve`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -629,7 +500,7 @@ export const APCApiAxiosParamCreator = function (configuration?: Configuration) 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(verifyLocationRequest, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(simSwapRetrievalContent, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -638,12 +509,12 @@ export const APCApiAxiosParamCreator = function (configuration?: Configuration) 
         },
         /**
          * 
-         * @param {NumberVerificationRequest} [numberVerificationRequest] 
+         * @param {SimSwapVerificationContent} [simSwapVerificationContent] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        aPCVerifyPost: async (numberVerificationRequest?: NumberVerificationRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/APC/verify`;
+        apiAPCSimSwapSimSwapverifyPost: async (simSwapVerificationContent?: SimSwapVerificationContent, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/APC/sim-swap/sim-swap:verify`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -662,7 +533,7 @@ export const APCApiAxiosParamCreator = function (configuration?: Configuration) 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(numberVerificationRequest, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(simSwapVerificationContent, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -681,90 +552,74 @@ export const APCApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {CreateCheckSimSwap} [createCheckSimSwap] 
+         * @param {DeviceLocationVerificationContent} [deviceLocationVerificationContent] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async aPCCheckSwapPost(createCheckSimSwap?: CreateCheckSimSwap, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CheckSimSwapInfo>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.aPCCheckSwapPost(createCheckSimSwap, options);
+        async apiAPCDeviceLocationLocationverifyPost(deviceLocationVerificationContent?: DeviceLocationVerificationContent, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeviceLocationVerificationResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiAPCDeviceLocationLocationverifyPost(deviceLocationVerificationContent, options);
             const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['APCApi.aPCCheckSwapPost']?.[index]?.url;
+            const operationBasePath = operationServerMap['APCApi.apiAPCDeviceLocationLocationverifyPost']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
         /**
          * 
-         * @param {LocationRequest} [locationRequest] 
+         * @param {NetworkIdentifier} [networkIdentifier] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async aPCDeviceLocationPost(locationRequest?: LocationRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<LocationResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.aPCDeviceLocationPost(locationRequest, options);
+        async apiAPCDeviceNetworkNetworkretrievePost(networkIdentifier?: NetworkIdentifier, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NetworkRetrievalResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiAPCDeviceNetworkNetworkretrievePost(networkIdentifier, options);
             const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['APCApi.aPCDeviceLocationPost']?.[index]?.url;
+            const operationBasePath = operationServerMap['APCApi.apiAPCDeviceNetworkNetworkretrievePost']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
         /**
          * 
-         * @param {string} [networkID] 
-         * @param {string} [deviceIdPhoneNumber] 
-         * @param {string} [deviceIdNetworkAccessIdentifier] 
-         * @param {string} [deviceIdIpv4Address] 
-         * @param {string} [deviceIdIpv6Address] 
+         * @param {string} [apcCode] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async aPCPhoneNumberGet(networkID?: string, deviceIdPhoneNumber?: string, deviceIdNetworkAccessIdentifier?: string, deviceIdIpv4Address?: string, deviceIdIpv6Address?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NumberRetrieveResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.aPCPhoneNumberGet(networkID, deviceIdPhoneNumber, deviceIdNetworkAccessIdentifier, deviceIdIpv4Address, deviceIdIpv6Address, options);
+        async apiAPCNumberVerificationApcauthcallbackGet(apcCode?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NumberVerificationResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiAPCNumberVerificationApcauthcallbackGet(apcCode, options);
             const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['APCApi.aPCPhoneNumberGet']?.[index]?.url;
+            const operationBasePath = operationServerMap['APCApi.apiAPCNumberVerificationApcauthcallbackGet']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
         /**
          * 
-         * @param {CreateSimSwapDate} [createSimSwapDate] 
+         * @param {NumberVerificationContent} [numberVerificationContent] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async aPCSwapDatePost(createSimSwapDate?: CreateSimSwapDate, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SimSwapInfo>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.aPCSwapDatePost(createSimSwapDate, options);
+        async apiAPCNumberVerificationNumberverifyPost(numberVerificationContent?: NumberVerificationContent, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NumberVerificationResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiAPCNumberVerificationNumberverifyPost(numberVerificationContent, options);
             const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['APCApi.aPCSwapDatePost']?.[index]?.url;
+            const operationBasePath = operationServerMap['APCApi.apiAPCNumberVerificationNumberverifyPost']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
         /**
          * 
-         * @param {string} [yourIp] 
+         * @param {SimSwapRetrievalContent} [simSwapRetrievalContent] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async aPCTestGet(yourIp?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.aPCTestGet(yourIp, options);
+        async apiAPCSimSwapSimSwapretrievePost(simSwapRetrievalContent?: SimSwapRetrievalContent, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SimSwapRetrievalResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiAPCSimSwapSimSwapretrievePost(simSwapRetrievalContent, options);
             const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['APCApi.aPCTestGet']?.[index]?.url;
+            const operationBasePath = operationServerMap['APCApi.apiAPCSimSwapSimSwapretrievePost']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
         /**
          * 
-         * @param {VerifyLocationRequest} [verifyLocationRequest] 
+         * @param {SimSwapVerificationContent} [simSwapVerificationContent] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async aPCVerifyDeviceLocationPost(verifyLocationRequest?: VerifyLocationRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<VerifyLocationResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.aPCVerifyDeviceLocationPost(verifyLocationRequest, options);
+        async apiAPCSimSwapSimSwapverifyPost(simSwapVerificationContent?: SimSwapVerificationContent, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SimSwapVerificationResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiAPCSimSwapSimSwapverifyPost(simSwapVerificationContent, options);
             const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['APCApi.aPCVerifyDeviceLocationPost']?.[index]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
-        },
-        /**
-         * 
-         * @param {NumberVerificationRequest} [numberVerificationRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async aPCVerifyPost(numberVerificationRequest?: NumberVerificationRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NumberVerificationMatchResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.aPCVerifyPost(numberVerificationRequest, options);
-            const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['APCApi.aPCVerifyPost']?.[index]?.url;
+            const operationBasePath = operationServerMap['APCApi.apiAPCSimSwapSimSwapverifyPost']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
     }
@@ -779,70 +634,57 @@ export const APCApiFactory = function (configuration?: Configuration, basePath?:
     return {
         /**
          * 
-         * @param {CreateCheckSimSwap} [createCheckSimSwap] 
+         * @param {DeviceLocationVerificationContent} [deviceLocationVerificationContent] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        aPCCheckSwapPost(createCheckSimSwap?: CreateCheckSimSwap, options?: any): AxiosPromise<CheckSimSwapInfo> {
-            return localVarFp.aPCCheckSwapPost(createCheckSimSwap, options).then((request) => request(axios, basePath));
+        apiAPCDeviceLocationLocationverifyPost(deviceLocationVerificationContent?: DeviceLocationVerificationContent, options?: any): AxiosPromise<DeviceLocationVerificationResult> {
+            return localVarFp.apiAPCDeviceLocationLocationverifyPost(deviceLocationVerificationContent, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {LocationRequest} [locationRequest] 
+         * @param {NetworkIdentifier} [networkIdentifier] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        aPCDeviceLocationPost(locationRequest?: LocationRequest, options?: any): AxiosPromise<LocationResponse> {
-            return localVarFp.aPCDeviceLocationPost(locationRequest, options).then((request) => request(axios, basePath));
+        apiAPCDeviceNetworkNetworkretrievePost(networkIdentifier?: NetworkIdentifier, options?: any): AxiosPromise<NetworkRetrievalResult> {
+            return localVarFp.apiAPCDeviceNetworkNetworkretrievePost(networkIdentifier, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {string} [networkID] 
-         * @param {string} [deviceIdPhoneNumber] 
-         * @param {string} [deviceIdNetworkAccessIdentifier] 
-         * @param {string} [deviceIdIpv4Address] 
-         * @param {string} [deviceIdIpv6Address] 
+         * @param {string} [apcCode] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        aPCPhoneNumberGet(networkID?: string, deviceIdPhoneNumber?: string, deviceIdNetworkAccessIdentifier?: string, deviceIdIpv4Address?: string, deviceIdIpv6Address?: string, options?: any): AxiosPromise<NumberRetrieveResponse> {
-            return localVarFp.aPCPhoneNumberGet(networkID, deviceIdPhoneNumber, deviceIdNetworkAccessIdentifier, deviceIdIpv4Address, deviceIdIpv6Address, options).then((request) => request(axios, basePath));
+        apiAPCNumberVerificationApcauthcallbackGet(apcCode?: string, options?: any): AxiosPromise<NumberVerificationResult> {
+            return localVarFp.apiAPCNumberVerificationApcauthcallbackGet(apcCode, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {CreateSimSwapDate} [createSimSwapDate] 
+         * @param {NumberVerificationContent} [numberVerificationContent] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        aPCSwapDatePost(createSimSwapDate?: CreateSimSwapDate, options?: any): AxiosPromise<SimSwapInfo> {
-            return localVarFp.aPCSwapDatePost(createSimSwapDate, options).then((request) => request(axios, basePath));
+        apiAPCNumberVerificationNumberverifyPost(numberVerificationContent?: NumberVerificationContent, options?: any): AxiosPromise<NumberVerificationResult> {
+            return localVarFp.apiAPCNumberVerificationNumberverifyPost(numberVerificationContent, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {string} [yourIp] 
+         * @param {SimSwapRetrievalContent} [simSwapRetrievalContent] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        aPCTestGet(yourIp?: string, options?: any): AxiosPromise<string> {
-            return localVarFp.aPCTestGet(yourIp, options).then((request) => request(axios, basePath));
+        apiAPCSimSwapSimSwapretrievePost(simSwapRetrievalContent?: SimSwapRetrievalContent, options?: any): AxiosPromise<SimSwapRetrievalResult> {
+            return localVarFp.apiAPCSimSwapSimSwapretrievePost(simSwapRetrievalContent, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {VerifyLocationRequest} [verifyLocationRequest] 
+         * @param {SimSwapVerificationContent} [simSwapVerificationContent] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        aPCVerifyDeviceLocationPost(verifyLocationRequest?: VerifyLocationRequest, options?: any): AxiosPromise<VerifyLocationResponse> {
-            return localVarFp.aPCVerifyDeviceLocationPost(verifyLocationRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {NumberVerificationRequest} [numberVerificationRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        aPCVerifyPost(numberVerificationRequest?: NumberVerificationRequest, options?: any): AxiosPromise<NumberVerificationMatchResponse> {
-            return localVarFp.aPCVerifyPost(numberVerificationRequest, options).then((request) => request(axios, basePath));
+        apiAPCSimSwapSimSwapverifyPost(simSwapVerificationContent?: SimSwapVerificationContent, options?: any): AxiosPromise<SimSwapVerificationResult> {
+            return localVarFp.apiAPCSimSwapSimSwapverifyPost(simSwapVerificationContent, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -856,83 +698,165 @@ export const APCApiFactory = function (configuration?: Configuration, basePath?:
 export class APCApi extends BaseAPI {
     /**
      * 
-     * @param {CreateCheckSimSwap} [createCheckSimSwap] 
+     * @param {DeviceLocationVerificationContent} [deviceLocationVerificationContent] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof APCApi
      */
-    public aPCCheckSwapPost(createCheckSimSwap?: CreateCheckSimSwap, options?: RawAxiosRequestConfig) {
-        return APCApiFp(this.configuration).aPCCheckSwapPost(createCheckSimSwap, options).then((request) => request(this.axios, this.basePath));
+    public apiAPCDeviceLocationLocationverifyPost(deviceLocationVerificationContent?: DeviceLocationVerificationContent, options?: RawAxiosRequestConfig) {
+        return APCApiFp(this.configuration).apiAPCDeviceLocationLocationverifyPost(deviceLocationVerificationContent, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {LocationRequest} [locationRequest] 
+     * @param {NetworkIdentifier} [networkIdentifier] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof APCApi
      */
-    public aPCDeviceLocationPost(locationRequest?: LocationRequest, options?: RawAxiosRequestConfig) {
-        return APCApiFp(this.configuration).aPCDeviceLocationPost(locationRequest, options).then((request) => request(this.axios, this.basePath));
+    public apiAPCDeviceNetworkNetworkretrievePost(networkIdentifier?: NetworkIdentifier, options?: RawAxiosRequestConfig) {
+        return APCApiFp(this.configuration).apiAPCDeviceNetworkNetworkretrievePost(networkIdentifier, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {string} [networkID] 
-     * @param {string} [deviceIdPhoneNumber] 
-     * @param {string} [deviceIdNetworkAccessIdentifier] 
-     * @param {string} [deviceIdIpv4Address] 
-     * @param {string} [deviceIdIpv6Address] 
+     * @param {string} [apcCode] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof APCApi
      */
-    public aPCPhoneNumberGet(networkID?: string, deviceIdPhoneNumber?: string, deviceIdNetworkAccessIdentifier?: string, deviceIdIpv4Address?: string, deviceIdIpv6Address?: string, options?: RawAxiosRequestConfig) {
-        return APCApiFp(this.configuration).aPCPhoneNumberGet(networkID, deviceIdPhoneNumber, deviceIdNetworkAccessIdentifier, deviceIdIpv4Address, deviceIdIpv6Address, options).then((request) => request(this.axios, this.basePath));
+    public apiAPCNumberVerificationApcauthcallbackGet(apcCode?: string, options?: RawAxiosRequestConfig) {
+        return APCApiFp(this.configuration).apiAPCNumberVerificationApcauthcallbackGet(apcCode, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {CreateSimSwapDate} [createSimSwapDate] 
+     * @param {NumberVerificationContent} [numberVerificationContent] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof APCApi
      */
-    public aPCSwapDatePost(createSimSwapDate?: CreateSimSwapDate, options?: RawAxiosRequestConfig) {
-        return APCApiFp(this.configuration).aPCSwapDatePost(createSimSwapDate, options).then((request) => request(this.axios, this.basePath));
+    public apiAPCNumberVerificationNumberverifyPost(numberVerificationContent?: NumberVerificationContent, options?: RawAxiosRequestConfig) {
+        return APCApiFp(this.configuration).apiAPCNumberVerificationNumberverifyPost(numberVerificationContent, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {string} [yourIp] 
+     * @param {SimSwapRetrievalContent} [simSwapRetrievalContent] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof APCApi
      */
-    public aPCTestGet(yourIp?: string, options?: RawAxiosRequestConfig) {
-        return APCApiFp(this.configuration).aPCTestGet(yourIp, options).then((request) => request(this.axios, this.basePath));
+    public apiAPCSimSwapSimSwapretrievePost(simSwapRetrievalContent?: SimSwapRetrievalContent, options?: RawAxiosRequestConfig) {
+        return APCApiFp(this.configuration).apiAPCSimSwapSimSwapretrievePost(simSwapRetrievalContent, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {VerifyLocationRequest} [verifyLocationRequest] 
+     * @param {SimSwapVerificationContent} [simSwapVerificationContent] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof APCApi
      */
-    public aPCVerifyDeviceLocationPost(verifyLocationRequest?: VerifyLocationRequest, options?: RawAxiosRequestConfig) {
-        return APCApiFp(this.configuration).aPCVerifyDeviceLocationPost(verifyLocationRequest, options).then((request) => request(this.axios, this.basePath));
+    public apiAPCSimSwapSimSwapverifyPost(simSwapVerificationContent?: SimSwapVerificationContent, options?: RawAxiosRequestConfig) {
+        return APCApiFp(this.configuration).apiAPCSimSwapSimSwapverifyPost(simSwapVerificationContent, options).then((request) => request(this.axios, this.basePath));
     }
+}
 
+
+
+/**
+ * AuthApi - axios parameter creator
+ * @export
+ */
+export const AuthApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiAuthTokenGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/Auth/token`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * AuthApi - functional programming interface
+ * @export
+ */
+export const AuthApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = AuthApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiAuthTokenGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TokenResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiAuthTokenGet(options);
+            const index = configuration?.serverIndex ?? 0;
+            const operationBasePath = operationServerMap['AuthApi.apiAuthTokenGet']?.[index]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * AuthApi - factory interface
+ * @export
+ */
+export const AuthApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = AuthApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiAuthTokenGet(options?: any): AxiosPromise<TokenResponse> {
+            return localVarFp.apiAuthTokenGet(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * AuthApi - object-oriented interface
+ * @export
+ * @class AuthApi
+ * @extends {BaseAPI}
+ */
+export class AuthApi extends BaseAPI {
     /**
      * 
-     * @param {NumberVerificationRequest} [numberVerificationRequest] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof APCApi
+     * @memberof AuthApi
      */
-    public aPCVerifyPost(numberVerificationRequest?: NumberVerificationRequest, options?: RawAxiosRequestConfig) {
-        return APCApiFp(this.configuration).aPCVerifyPost(numberVerificationRequest, options).then((request) => request(this.axios, this.basePath));
+    public apiAuthTokenGet(options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).apiAuthTokenGet(options).then((request) => request(this.axios, this.basePath));
     }
 }
 
