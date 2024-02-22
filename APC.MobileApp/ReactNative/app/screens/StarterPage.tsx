@@ -166,11 +166,13 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
       } else if (devicePhoneNumber) {
         message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
         title = "Information message";
+        icon = 'information-circle-outline'
+        iconColor = palette.black;
         backgroundColor = palette.accent200,
         isValid = true;
       } else {
-        message = "Invalid phone number";
-        title = "Error message:";
+        message = "Sorry but in order to request a loan with this application your provided phone number must coincide with your phone line’s number that you are currently using with your phone";
+        title = "Business blocking rule";
         backgroundColor = palette.danger100,
         icon = 'warning-outline'
         iconColor = palette.danger200;
@@ -197,8 +199,8 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
         iconColor = palette.black;
         isValid = true;
       } else {
-        message = "Invalid phone number";
-        title = "Error message:";
+        message = "Sorry but in order to request a loan with this application your provided phone number must coincide with your phone line’s number that you are currently using with your phone";
+        title = "Business blocking rule";
         backgroundColor = palette.danger100,
         icon = 'warning-outline'
         iconColor = palette.danger200;
@@ -224,8 +226,8 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
         iconColor = palette.black;
         isValid = true;
       } else {
-        message = "Invalid phone number";
-        title = "Error message:";
+        message = "Sorry but in order to request a loan with this application your provided phone number must coincide with your phone line’s number that you are currently using with your phone";
+        title = "Business blocking rule";
         backgroundColor = palette.danger100,
         icon = 'warning-outline'
         iconColor = palette.danger200;

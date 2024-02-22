@@ -14,16 +14,17 @@ export interface Position {
     location?: BingService.Location;
 }
 
-export const verificateAPCLocation = async (apiClient: APCApi) => {
+export const verificateAPCLocation = async (apiClient: APCApi, optionCoords: LocationObjectCoords) => {
     const config = await readConfigurations();
-
-    if (config.connectionMode == ConnectionMode.Offline) {
-        return { coords: getLocationCoords(config.offlineLatitude, config.offlineLongitude) } as Position;
-    }
 
     const ip = await ipify();
     const coords = await getDeviceGPSLocation();
     let accuracy = coords.coords.accuracy === null ? undefined : coords.coords.accuracy;
+    if (config.connectionMode == ConnectionMode.Offline) {
+        const fakeCoords = { coords: getLocationCoords(config.offlineLatitude, config.offlineLongitude) } as Position;
+        return matchesCoords(optionCoords, fakeCoords.coords, config.radiusKm);
+    }
+
     const networkCode = await getNetworkCode(apiClient);
     const mockHeader = config.connectionMode == ConnectionMode.Mock ? { headers: { 'X-Use-Mock': true } } : undefined;
     console.log(coords.coords.latitude + "--" + coords.coords.longitude + "--" + accuracy + " --" + networkCode);
@@ -52,16 +53,11 @@ export const verificateAPCLocation = async (apiClient: APCApi) => {
 
 export const getPhoneNumber = async (apiClient: APCApi, phoneNumber: string): Promise<boolean> => {
     const config = await readConfigurations();
-    let code;
 
     console.log(phoneNumber);
     const mockHeader = config.connectionMode == ConnectionMode.Mock ? { headers: { 'X-Use-Mock': true } } : undefined;
-    if (config.connectionMode == ConnectionMode.Mock) {
-        const result = await apiClient.apiAPCNumberVerificationApcauthcallbackPost("mock", mockHeader);
-        console.log(result.data.verificationResult);
-        return result.data.verificationResult ?? false;
-    } else if (config.connectionMode == ConnectionMode.Offline) {
-        return true;
+    if (config.connectionMode == ConnectionMode.Offline) {
+        return config.autovalidatePhoneNumber;
     }
 
     const networkCode = await getNetworkCode(apiClient);
@@ -74,19 +70,9 @@ export const getPhoneNumber = async (apiClient: APCApi, phoneNumber: string): Pr
         redirectUri: ''
     }, mockHeader);
 
-    if(response.status == 302){
-        const redirectUrl = response.headers.location;
-        console.log('URL de redirección:', redirectUrl);
-        const urlParams = new URLSearchParams(response.headers.search);
-        code = urlParams.get('apc_code');
-        console.log('codigo redirección:', code);
-
-    }
-
-    const result = await apiClient.apiAPCNumberVerificationApcauthcallbackPost(code ?? undefined, mockHeader);
     console.log("Respuesta completa:", JSON.stringify(response, null, 2));
 
-    return result.data.verificationResult ?? false;
+    return response.data.verificationResult ?? false;
 }
 
 

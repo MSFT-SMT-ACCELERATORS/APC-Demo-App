@@ -197,12 +197,6 @@ export interface NumberVerificationContent {
      * @type {string}
      * @memberof NumberVerificationContent
      */
-    'hashedPhoneNumber'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof NumberVerificationContent
-     */
     'redirectUri'?: string | null;
 }
 /**
@@ -419,7 +413,7 @@ export const APCApiAxiosParamCreator = function (configuration?: Configuration) 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiAPCNumberVerificationApcauthcallbackPost: async (apcCode?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiAPCNumberVerificationApcauthcallbackGet: async (apcCode?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/APC/number-verification/apcauthcallback`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -428,12 +422,12 @@ export const APCApiAxiosParamCreator = function (configuration?: Configuration) 
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
             if (apcCode !== undefined) {
-                localVarQueryParameter['apc_code'] = apcCode;
+                localVarQueryParameter['apcCode'] = apcCode;
             }
 
 
@@ -586,10 +580,10 @@ export const APCApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiAPCNumberVerificationApcauthcallbackPost(apcCode?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NumberVerificationResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiAPCNumberVerificationApcauthcallbackPost(apcCode, options);
+        async apiAPCNumberVerificationApcauthcallbackGet(apcCode?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NumberVerificationResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiAPCNumberVerificationApcauthcallbackGet(apcCode, options);
             const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['APCApi.apiAPCNumberVerificationApcauthcallbackPost']?.[index]?.url;
+            const operationBasePath = operationServerMap['APCApi.apiAPCNumberVerificationApcauthcallbackGet']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
         /**
@@ -598,7 +592,7 @@ export const APCApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiAPCNumberVerificationNumberverifyPost(numberVerificationContent?: NumberVerificationContent, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async apiAPCNumberVerificationNumberverifyPost(numberVerificationContent?: NumberVerificationContent, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NumberVerificationResult>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.apiAPCNumberVerificationNumberverifyPost(numberVerificationContent, options);
             const index = configuration?.serverIndex ?? 0;
             const operationBasePath = operationServerMap['APCApi.apiAPCNumberVerificationNumberverifyPost']?.[index]?.url;
@@ -662,8 +656,8 @@ export const APCApiFactory = function (configuration?: Configuration, basePath?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiAPCNumberVerificationApcauthcallbackPost(apcCode?: string, options?: any): AxiosPromise<NumberVerificationResult> {
-            return localVarFp.apiAPCNumberVerificationApcauthcallbackPost(apcCode, options).then((request) => request(axios, basePath));
+        apiAPCNumberVerificationApcauthcallbackGet(apcCode?: string, options?: any): AxiosPromise<NumberVerificationResult> {
+            return localVarFp.apiAPCNumberVerificationApcauthcallbackGet(apcCode, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -671,7 +665,7 @@ export const APCApiFactory = function (configuration?: Configuration, basePath?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiAPCNumberVerificationNumberverifyPost(numberVerificationContent?: NumberVerificationContent, options?: any): AxiosPromise<void> {
+        apiAPCNumberVerificationNumberverifyPost(numberVerificationContent?: NumberVerificationContent, options?: any): AxiosPromise<NumberVerificationResult> {
             return localVarFp.apiAPCNumberVerificationNumberverifyPost(numberVerificationContent, options).then((request) => request(axios, basePath));
         },
         /**
@@ -731,8 +725,8 @@ export class APCApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof APCApi
      */
-    public apiAPCNumberVerificationApcauthcallbackPost(apcCode?: string, options?: RawAxiosRequestConfig) {
-        return APCApiFp(this.configuration).apiAPCNumberVerificationApcauthcallbackPost(apcCode, options).then((request) => request(this.axios, this.basePath));
+    public apiAPCNumberVerificationApcauthcallbackGet(apcCode?: string, options?: RawAxiosRequestConfig) {
+        return APCApiFp(this.configuration).apiAPCNumberVerificationApcauthcallbackGet(apcCode, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

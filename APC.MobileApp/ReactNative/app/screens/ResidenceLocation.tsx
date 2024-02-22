@@ -196,7 +196,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                 console.log('Business validation success!!');
             } else {  //APC Validation
                 console.log('USING APC validating apc matches location');
-                const response = await APCService.verificateAPCLocation(apiClient);
+                const response = await APCService.verificateAPCLocation(apiClient, coords);
                 if (!response) {
                     handleModalToggle(
                         'Blocking anti-hacking rule: GPS coordinates hacking attempted',
