@@ -10,6 +10,7 @@ import palette from '../themes/Colors';
 import StyledText from '../components/StyledText';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
+import NetInfo from '@react-native-community/netinfo';
 import CustomModal from '../components/CustomModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -20,17 +21,23 @@ interface WelcomeProps {
 const Welcome: React.FC<WelcomeProps> = ({ setLoading }) => {
   const navigation = useNavigation();
   const [wifiModalVisible, setWifiModalVisible] = useState<boolean>(true)
+  const [isWifiConnected, setIsWifiConnected] = useState(false);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       setLoading(false);
     });
 
+    NetInfo.addEventListener(state => {
+      const wifiConnected = state.isConnected && state.type === 'wifi' || false;
+      setIsWifiConnected(wifiConnected);
+    });
+
     const checkIfModalDisplayed = async () => {
       try {
         const modalDisplayed = await AsyncStorage.getItem('modalDisplayed');
 
-        if (modalDisplayed !== 'true') {
+        if (modalDisplayed !== 'true' && isWifiConnected) {
           setWifiModalVisible(true);
         }
       } catch (error) {
@@ -71,8 +78,8 @@ const Welcome: React.FC<WelcomeProps> = ({ setLoading }) => {
           onClose={closeModal}
           backgroundColor={palette.danger100}
           title={'Warning'} 
-          text={'Important, in order to use Azure Programmable Connectivity (APC) APIs you need to disable the Wi-Fi in your phone, since APC APIs needs to make identifications and verifications based on your cell line/data, not with the Wi-Fi communication.'} 
-          iconName={'warning'}
+          text={'Important, in order to use this demo app that uses Azure Programmable Connectivity (APC) APIs you need to disable the Wi-Fi in your phone, since APC APIs needs to make identifications and verificatiosn based on your cell line/data, not with the Wi-Fi communication'} 
+          iconName={'warning-outline'}
         />
 
         <View style={[styles.bodyContainer]}>
