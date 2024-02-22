@@ -176,7 +176,13 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
         // Business validation
         console.log('validating business rule');
-        if (!(await APCService.matchesCoords(coords, coordsForm, config?.residenceLocationRadius!)) && !config?.skipGeolocationCheck) {
+         if (config?.skipGeolocationCheck) {
+                setShouldNavigate(true);
+                setLoading(false);
+                return
+            }
+
+        if (!(await APCService.matchesCoords(coords, coordsForm, config?.residenceLocationRadius!))) {
             handleModalToggle(
                 'Blocking business rule: Not allowed device location',
                 'For anti-fraud purposes, this application requires the user to be using the app in a location relatively close to the user’s residence location (i.e. same state). You are currently far away'
@@ -184,12 +190,6 @@ const ResidenceLocation: React.FC<StepProps> = ({
             console.log('Business validation failed!!');
             hasError = true;
         } else {
-
-            if (config?.skipGeolocationCheck) {
-                setShouldNavigate(true);
-                setLoading(false);
-                return
-            }
             if (!data.UseAPC) {
                 handleModalToggle('Warning', 'The application has not been able to check the validity of your location through our service', palette.warning, undefined, 'information-circle-outline', palette.black);
                 setShouldNavigate(true);
@@ -216,6 +216,12 @@ const ResidenceLocation: React.FC<StepProps> = ({
         }
        
     } catch (error) {
+         if (config?.skipGeolocationCheck) {
+            setShouldNavigate(true);
+            setLoading(false);
+            return
+        }
+        
         handleModalToggle(
             'Warning',
             'The application cannot check your location'
@@ -651,7 +657,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                                                     }
                                                                 />
                                                             </View>
-                                                            <View
+                                                            {/* <View
                                                                 style={
                                                                     styles.optionSubtitleContainer
                                                                 }
@@ -706,7 +712,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                                                         </StyledText>
                                                                     </View>
                                                                 ) : null}
-                                                            </View>
+                                                            </View> */}
                                                         </Pressable>
                                                     )}
                                                 />
