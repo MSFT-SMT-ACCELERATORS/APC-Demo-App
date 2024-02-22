@@ -141,47 +141,71 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const autocompletePhoneNumber = async () => {
   const devicePhoneNumber = await APCService.getPhoneNumber(apiClient);
 
-  let message, title, isValid;
+  let message, title, isValid, backgroundColor, icon, iconColor;
 
   switch (config?.connectionMode) {
     case ConnectionMode.Offline:
       if (config.autovalidatePhoneNumber) {
-        if (!phoneNumber) {
-          message = "In order to validate your phone number, we need you to provide a valid phone number.";
-          title = "Phone number needed";
-          isValid = false;
-        } else if (phoneNumber === devicePhoneNumber) {
-          message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
-          title = "Information message";
-          isValid = true;
-          setPhoneNumber(devicePhoneNumber);
-        } else {
-          message = "Invalid phone number";
-          title = "Error message:";
-          isValid = false;
-        }
-        handleModalToggle(title, message, palette.accent200, undefined, 'information-circle-outline', palette.black);
+        message = "Congratulations, your phone number was validated.";
+        title = "Information message";
+        icon = 'information-circle-outline'
+        iconColor = palette.black;
+        backgroundColor = palette.accent200,
+        isValid = true;
+        handleModalToggle(title, message, backgroundColor, undefined, icon, iconColor);
         setIsPhoneNumberValid(isValid);
+        return
       }
-      break;
+      if (!phoneNumber) {
+        message = "In order to validate your phone number, we need you to provide a valid phone number.";
+        title = "Phone number needed";
+        backgroundColor = palette.danger100;
+        icon = 'warning-outline'
+        iconColor = palette.danger200;
+        isValid = false;
+      } else if (phoneNumber === devicePhoneNumber) {
+        message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
+        title = "Information message";
+        backgroundColor = palette.accent200,
+        isValid = true;
+      } else {
+        message = "Invalid phone number";
+        title = "Error message:";
+        backgroundColor = palette.danger100,
+        icon = 'warning-outline'
+        iconColor = palette.danger200;
+        isValid = false;
+      }
+      handleModalToggle(title, message, backgroundColor, undefined, icon, iconColor);
+      setIsPhoneNumberValid(isValid);
+    
+    break;
 
     case ConnectionMode.Mock:
       if (!phoneNumber) {
         message = "In order to validate your phone number, we need you to provide a valid phone number.";
         title = "Phone number needed";
+        backgroundColor = palette.danger100,
+        iconColor = palette.danger200;
+        icon = 'warning-outline'
         isValid = false;
-        handleModalToggle(title, message, palette.accent200, undefined, 'information-circle-outline', palette.black);
       } else if (phoneNumber === devicePhoneNumber) {
         message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
         title = "Information message:";
+        backgroundColor = palette.accent200,
+        icon = 'information-circle-outline'
+        iconColor = palette.black;
         isValid = true;
         setPhoneNumber(devicePhoneNumber);
       } else {
         message = "Invalid phone number";
         title = "Error message:";
+        backgroundColor = palette.danger100,
+        icon = 'warning-outline'
+        iconColor = palette.danger200;
         isValid = false;
       }
-      handleModalToggle(title, message, palette.accent200, undefined, 'information-circle-outline', palette.black);
+      handleModalToggle(title, message, backgroundColor, undefined, icon, iconColor);
       setIsPhoneNumberValid(isValid);
       break;
 
@@ -189,17 +213,26 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
       if (!phoneNumber) {
         message = "In order to validate your phone number, we need you to provide a valid phone number.";
         title = "Phone number needed";
+        backgroundColor = palette.danger100,
+        icon = 'warning-outline'
+        iconColor = palette.danger200;
         isValid = false;
       } else if (phoneNumber === devicePhoneNumber) {
         message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
         title = "Information message:";
+        backgroundColor = palette.accent200,
+        icon = 'information-circle-outline'
+        iconColor = palette.black;
         isValid = true;
       } else {
         message = "Invalid phone number";
         title = "Error message:";
+        backgroundColor = palette.danger100,
+        icon = 'warning-outline'
+        iconColor = palette.danger200;
         isValid = false;
       }
-      handleModalToggle(title, message, palette.accent200, undefined, 'information-circle-outline', palette.black);
+      handleModalToggle(title, message, backgroundColor, undefined, icon, iconColor);
       setIsPhoneNumberValid(isValid);
       break;
   }
