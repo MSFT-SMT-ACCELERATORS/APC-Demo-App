@@ -50,16 +50,19 @@ export const verificateAPCLocation = async (apiClient: APCApi) => {
     return response.data.verificationResult;
 }
 
-export const getPhoneNumber = async (apiClient: APCApi, phoneNumber: string): Promise<string> => {
+export const getPhoneNumber = async (apiClient: APCApi, phoneNumber: string): Promise<boolean> => {
     const config = await readConfigurations();
+    let code;
 
-    if (config.connectionMode == ConnectionMode.Mock || config.connectionMode == ConnectionMode.Offline) {
-        return config.offlinePhoneNumber;
+    console.log(phoneNumber);
+    const mockHeader = config.connectionMode == ConnectionMode.Mock ? { headers: { 'X-Use-Mock': true } } : undefined;
+    if (config.connectionMode == ConnectionMode.Mock) {
+        const result = await apiClient.apiAPCNumberVerificationApcauthcallbackPost("mock", mockHeader);
+        console.log(result.data.verificationResult);
+        return result.data.verificationResult ?? false;
+    } else if (config.connectionMode == ConnectionMode.Offline) {
+        return true;
     }
-    // if (config.connectionMode == ConnectionMode.Offline) {
-    //     return config.offlinePhoneNumber;
-    // }
-    // const mockHeader = config.connectionMode == ConnectionMode.Mock ? { headers: { 'X-Use-Mock': true } } : undefined;
 
     const networkCode = await getNetworkCode(apiClient);
     const response = await apiClient.apiAPCNumberVerificationNumberverifyPost({
@@ -67,13 +70,23 @@ export const getPhoneNumber = async (apiClient: APCApi, phoneNumber: string): Pr
             identifierType: 'NetworkCode',
             identifier: networkCode
         },
-        phoneNumber: '+34682055596',
+        phoneNumber: phoneNumber,
         redirectUri: ''
-    });
+    }, mockHeader);
 
+    if(response.status == 302){
+        const redirectUrl = response.headers.location;
+        console.log('URL de redirección:', redirectUrl);
+        const urlParams = new URLSearchParams(response.headers.search);
+        code = urlParams.get('apc_code');
+        console.log('codigo redirección:', code);
+
+    }
+
+    const result = await apiClient.apiAPCNumberVerificationApcauthcallbackPost(code ?? undefined, mockHeader);
     console.log("Respuesta completa:", JSON.stringify(response, null, 2));
 
-    return '';
+    return result.data.verificationResult ?? false;
 }
 
 
@@ -91,9 +104,9 @@ export const getNetworkCode = async (apiClient: APCApi): Promise<string> => {
 
     const response = await apiClient.apiAPCDeviceNetworkNetworkretrievePost({
         identifierType: 'IPv4',
-        identifier: '90.167.43.219'
+        identifier: ip
     });
-    console.log("Respuesta completa:", JSON.stringify(response, null, 2));
+    // console.log("Respuesta completa:", JSON.stringify(response, null, 2));
 
     console.log("CODE: " + response.data.networkCode);
     return response.data.networkCode ?? 'Empty';
@@ -117,7 +130,7 @@ export const checkSimChange = async (apiClient: APCApi, phoneNumber: string) => 
         }
     }, mockHeader)
 
-    console.log("Respuesta completa:", JSON.stringify(response, null, 2));
+    console.log("Respuesta completa simswap:", JSON.stringify(response, null, 2));
 
     return response.data.verificationResult;
 }

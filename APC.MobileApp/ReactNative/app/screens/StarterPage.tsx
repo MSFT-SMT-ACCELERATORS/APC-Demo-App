@@ -77,7 +77,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const onFormValid = async (data: FieldValues) => {
     console.log(data);
     setLoading(true, "Validating your data...");
-    
+
     // APC validation
     const response = await APCService.checkSimChange(apiClient, phoneNumber);
     console.log("SIMSWAP: ", response);
@@ -139,22 +139,40 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   };
 
   const autocompletePhoneNumber = async () => {
-  const devicePhoneNumber = await APCService.getPhoneNumber(apiClient, phoneNumber);
+    const devicePhoneNumber = await APCService.getPhoneNumber(apiClient, phoneNumber);
+    let message, title, isValid;
 
-  let message, title, isValid;
+    switch (config?.connectionMode) {
+      case ConnectionMode.Offline:
+        if (config.autovalidatePhoneNumber) {
+          if (!phoneNumber) {
+            message = "In order to validate your phone number, we need you to provide a valid phone number.";
+            title = "Phone number needed";
+            isValid = false;
+          } else if (devicePhoneNumber) {
+            message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
+            title = "Information message";
+            isValid = true;
+          } else {
+            message = "Invalid phone number";
+            title = "Error message:";
+            isValid = false;
+          }
+          handleModalToggle(title, message, palette.accent200, undefined, 'information-circle-outline', palette.black);
+          setIsPhoneNumberValid(isValid);
+        }
+        break;
 
-  switch (config?.connectionMode) {
-    case ConnectionMode.Offline:
-      if (config.autovalidatePhoneNumber) {
+      case ConnectionMode.Mock:
         if (!phoneNumber) {
           message = "In order to validate your phone number, we need you to provide a valid phone number.";
           title = "Phone number needed";
           isValid = false;
-        } else if (phoneNumber === devicePhoneNumber) {
+          handleModalToggle(title, message, palette.accent200, undefined, 'information-circle-outline', palette.black);
+        } else if (devicePhoneNumber) {
           message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
-          title = "Information message";
+          title = "Information message:";
           isValid = true;
-          setPhoneNumber(devicePhoneNumber);
         } else {
           message = "Invalid phone number";
           title = "Error message:";
@@ -162,48 +180,27 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
         }
         handleModalToggle(title, message, palette.accent200, undefined, 'information-circle-outline', palette.black);
         setIsPhoneNumberValid(isValid);
-      }
-      break;
+        break;
 
-    case ConnectionMode.Mock:
-      if (!phoneNumber) {
-        message = "In order to validate your phone number, we need you to provide a valid phone number.";
-        title = "Phone number needed";
-        isValid = false;
+      default:
+        if (!phoneNumber) {
+          message = "In order to validate your phone number, we need you to provide a valid phone number.";
+          title = "Phone number needed";
+          isValid = false;
+        } else if (devicePhoneNumber) {
+          message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
+          title = "Information message:";
+          isValid = true;
+        } else {
+          message = "Invalid phone number";
+          title = "Error message:";
+          isValid = false;
+        }
         handleModalToggle(title, message, palette.accent200, undefined, 'information-circle-outline', palette.black);
-      } else if (phoneNumber === devicePhoneNumber) {
-        message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
-        title = "Information message:";
-        isValid = true;
-        setPhoneNumber(devicePhoneNumber);
-      } else {
-        message = "Invalid phone number";
-        title = "Error message:";
-        isValid = false;
-      }
-      handleModalToggle(title, message, palette.accent200, undefined, 'information-circle-outline', palette.black);
-      setIsPhoneNumberValid(isValid);
-      break;
-
-    default:
-      if (!phoneNumber) {
-        message = "In order to validate your phone number, we need you to provide a valid phone number.";
-        title = "Phone number needed";
-        isValid = false;
-      } else if (phoneNumber === devicePhoneNumber) {
-        message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
-        title = "Information message:";
-        isValid = true;
-      } else {
-        message = "Invalid phone number";
-        title = "Error message:";
-        isValid = false;
-      }
-      handleModalToggle(title, message, palette.accent200, undefined, 'information-circle-outline', palette.black);
-      setIsPhoneNumberValid(isValid);
-      break;
-  }
-};
+        setIsPhoneNumberValid(isValid);
+        break;
+    }
+  };
 
 
   return (
@@ -237,7 +234,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
               control={control}
               render={() => (
                 <View style={styles.phoneNumberField}>
-                <StyledText style={styles.plusIcon}>+</StyledText>
+                  <StyledText style={styles.plusIcon}>+</StyledText>
                   <StyledInputText
                     style={styles.phoneInput}
                     labelText="Phone number (Include country code)"
@@ -468,17 +465,17 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
         </StyledText>
       </Modal>
 
-      
+
       <CustomModal
         visible={modalVisible}
-        onClose={() => handleModalToggle('', '', '', false,'','')}
+        onClose={() => handleModalToggle('', '', '', false, '', '')}
         showIcon={showModalIcon}
         iconName={modalIconName}
         iconColor={modalIconColor}
         title={modalTitle}
         text={modalText}
         backgroundColor={modalBackground}
-        
+
       />
 
     </AppContainer>

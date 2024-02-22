@@ -217,7 +217,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
             'Warning',
             'The application cannot check your location'
         );
-        setShouldNavigate(true)
+        // setShouldNavigate(true)
         console.log('Error');
     }finally{
         setLoading(false);
@@ -252,9 +252,9 @@ const ResidenceLocation: React.FC<StepProps> = ({
             .then(setGPSPosition)
             .catch(console.error);
 
-        APCService.verificateAPCLocation(apiClient)
-            .then(setAPCPosition)
-            .catch(console.error);
+        // APCService.verificateAPCLocation(apiClient)
+        //     .then(setAPCPosition)
+        //     .catch(console.error);
 
         const firstCountry = cities
             .map((item) => item.country)
