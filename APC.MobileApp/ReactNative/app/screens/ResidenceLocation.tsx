@@ -243,7 +243,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
     const hideTooltip = () => setTooltipVisible(false);
 
     useEffect(() => {
-        setCurrentStep(1);
+        setCurrentStep(2);
       }, [setCurrentStep]);
 
     useEffect(() => {
@@ -258,7 +258,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             setLoading(false);
-            setProgress(25);
+            setProgress(66.6);
         });
 
         return unsubscribe;

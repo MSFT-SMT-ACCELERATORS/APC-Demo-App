@@ -63,8 +63,6 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const [modalBackground, setModalBackground] = useState('');
   const [shouldNavigate, setShouldNavigate] = useState(false);
 
-console.log("START");
-
   const handleModalToggle = (title: string, text: string, backgroundColor: string = palette.danger100, showIcon: boolean = true, iconName: string = 'warning-outline', iconColor: string = palette.danger200) => {
     setModalVisible(!modalVisible);
     setModalIcon(showIcon);
@@ -113,7 +111,7 @@ console.log("START");
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       setLoading(false);
-      setProgress(50);
+      setProgress(33.3);
     });
 
     return unsubscribe;
