@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using System.Net.Http;
 
 namespace APC.Client
 {
@@ -18,7 +19,7 @@ namespace APC.Client
 
         public APCClient(IHttpClientFactory httpClientFactory, IOptions<APCClientSettings> settings, IAPCMockService mockService)
         {
-            _httpClient = httpClientFactory.CreateClient();
+            _httpClient = httpClientFactory.CreateClient("NoRedirectClient");
             _settings = settings.Value;
             _mockService = mockService;
 
@@ -40,18 +41,34 @@ namespace APC.Client
             return result.AccessToken;
         }
 
-        public async Task<HttpResponseMessage> CallApcApiAsync(HttpMethod httpMethod, string endpoint, object? requestContent = null, bool useMock = false)
-        {
-            if (_settings.IsMockEnabled || useMock)
-            {
-                var mockResult = await _mockService.RetrieveMockResultAsync(endpoint);
-                var mockResponse = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = new StringContent(JsonSerializer.Serialize(mockResult), Encoding.UTF8, "application/json")
-                };
-                return mockResponse;
-            }
+        public async Task<HttpResponseMessage> DeviceLocationVerifyAsync(DeviceLocationVerificationContent request, bool useMock = false)
+            => await CallApcApiAsync(HttpMethod.Post, APCPaths.DeviceLocationVerify, request, useMock);
 
+        public async Task<HttpResponseMessage> DeviceNetworkRetrieveAsync(NetworkIdentifier request, bool useMock = false)
+            => await CallApcApiAsync(HttpMethod.Post, APCPaths.DeviceNetworkRetrieve, request, useMock);
+
+        public async Task<HttpResponseMessage> SimSwapRetrieveAsync(SimSwapRetrievalContent request, bool useMock = false)
+            => await CallApcApiAsync(HttpMethod.Post, APCPaths.SimSwapRetrieve, request, useMock);
+
+        public async Task<HttpResponseMessage> SimSwapVerifyAsync(SimSwapVerificationContent request, bool useMock = false)
+            => await CallApcApiAsync(HttpMethod.Post, APCPaths.SimSwapVerify, request, useMock);
+
+        public async Task<HttpResponseMessage> NumberVerificationCallbackVerifyAsync(NumberVerificationCallbackResult request, bool useMock = false)
+            => await CallApcApiAsync(HttpMethod.Post, APCPaths.NumberVerificationVerify, request, useMock);
+
+        public async Task<HttpResponseMessage> NumberVerificationVerifyAsync(NumberVerificationContent request, bool useMock = false)
+        {
+            request.RedirectUri = _settings.NumberVerificationRedirectUri;
+            return await CallApcApiAsync(HttpMethod.Post, APCPaths.NumberVerificationVerify, request, useMock);
+        }
+
+        private async Task<HttpResponseMessage> CallApcApiAsync(HttpMethod httpMethod, string endpoint, object? requestContent = null, bool useMock = false)
+            => (_settings.IsMockEnabled || useMock)
+            ? await CallApcMockAsync(endpoint) 
+            : await CallApcApiAsync(httpMethod, endpoint, requestContent);
+
+        private async Task<HttpResponseMessage> CallApcApiAsync(HttpMethod httpMethod, string endpoint, object? requestContent = null)
+        {
             var accessToken = await GetAccessTokenAsync();
             var request = new HttpRequestMessage(httpMethod, endpoint)
             {
@@ -61,30 +78,28 @@ namespace APC.Client
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
 
-            var response = await _httpClient.SendAsync(request);
+            // Use HttpCompletionOption.ResponseHeadersRead for HTTP 302
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+
+            //if (response.StatusCode == HttpStatusCode.Redirect)
+            //    await CallApcApiAsync(HttpMethod.Get,  endpoint: response.Headers.Location.ToString(), requestContent:null, useMock: false);
 
             return response;
         }
 
-        public async Task<HttpResponseMessage> DeviceLocationVerifyAsync(DeviceLocationVerificationContent request, bool useMock = false)
-            => await CallApcApiAsync(HttpMethod.Post, APCPaths.DeviceLocationVerify, request, useMock);
+        private async Task<HttpResponseMessage> CallApcMockAsync(string endpoint) {
 
-        public async Task<HttpResponseMessage> DeviceNetworkRetrieveAsync(NetworkIdentifier request, bool useMock = false)
-            => await CallApcApiAsync(HttpMethod.Post, APCPaths.DeviceNetworkRetrieve, request, useMock);
+                var mockResult = await _mockService.RetrieveMockResultAsync(endpoint);
 
-        public async Task<HttpResponseMessage> NumberVerificationVerifyAsync(NumberVerificationContent request, bool useMock = false)
-        {
-            request.RedirectUri = _settings.NumberVerificationRedirectUri;
-            return await CallApcApiAsync(HttpMethod.Post, APCPaths.NumberVerificationVerify, request, useMock);
-        }
-
-        public async Task<HttpResponseMessage> NumberVerificationCallbackVerifyAsync(NumberVerificationCallbackResult request, bool useMock = false)
-            => await CallApcApiAsync(HttpMethod.Post, APCPaths.NumberVerificationVerify, request, useMock);
-
-        public async Task<HttpResponseMessage> SimSwapRetrieveAsync(SimSwapRetrievalContent request, bool useMock = false)
-            => await CallApcApiAsync(HttpMethod.Post, APCPaths.SimSwapRetrieve, request, useMock);
-
-        public async Task<HttpResponseMessage> SimSwapVerifyAsync(SimSwapVerificationContent request, bool useMock = false)
-            => await CallApcApiAsync(HttpMethod.Post, APCPaths.SimSwapVerify, request, useMock);
+                var mockResponse = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(
+                        JsonSerializer.Serialize(
+                            mockResult,
+                            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }),
+                            Encoding.UTF8, "application/json")
+                };
+                return mockResponse;
+            }
     }
 }

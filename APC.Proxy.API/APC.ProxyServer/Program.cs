@@ -4,11 +4,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Required for HttpClientFactory
-builder.Services.AddHttpClient();
-
+builder.Services.AddHttpClient("NoRedirectClient")
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+        AllowAutoRedirect = false,
+    });
 // Bind the section of appsettings.json to the APCClientSettings class
 builder.Services.Configure<APCClientSettings>(builder.Configuration.GetSection("APCClientSettings"));
-builder.Services.Configure<APCMockSettings>(builder.Configuration.GetSection("APCMockSettings"));
+builder.Services.Configure<APCMockSettings>(builder.Configuration.GetSection("MockSettings"));
 
 
 // Register APCClient and APCMockService
@@ -23,11 +26,11 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 app.UseHttpsRedirection();
 

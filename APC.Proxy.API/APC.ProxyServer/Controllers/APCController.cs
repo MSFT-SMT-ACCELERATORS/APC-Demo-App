@@ -2,6 +2,7 @@ using APC.Client;
 using APC.DataModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace APC.ProxyServer.Controllers
 {
@@ -22,6 +23,14 @@ namespace APC.ProxyServer.Controllers
         [ProducesResponseType(typeof(DeviceLocationVerificationResult), StatusCodes.Status200OK)]
         public async Task<IActionResult> DeviceLocationVerify([FromBody] DeviceLocationVerificationContent request)
         {
+            if (request.Device.Ipv4Address != null)
+            {
+                _logger.LogWarning($"Location triggered IP in request: {request.Device.Ipv4Address.Ipv4}, ip caller {Request.HttpContext.Connection.RemoteIpAddress}, port {Request.HttpContext.Connection.RemotePort}");
+
+                request.Device.Ipv4Address.Port = Request.HttpContext.Connection.RemotePort;
+                request.Device.Ipv4Address.Ipv4 = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            }
+
             return await HandleRequest(
                 useMock => _apcClient.DeviceLocationVerifyAsync(request, useMock),
                 "Error occurred while verifying device location.");
@@ -37,21 +46,22 @@ namespace APC.ProxyServer.Controllers
                 "Error occurred while retrieving network.");
         }
 
-        [HttpPost("number-verification/apcauthcallback")]
+        [HttpGet("number-verification/apcauthcallback")]
         [ProducesResponseType(typeof(NumberVerificationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> NumberVerificationRetrieve(string apc_code)
+        public async Task<IActionResult> NumberVerificationRetrieve(string apcCode)
         {
             return await HandleRequest(
-                useMock => _apcClient.NumberVerificationCallbackVerifyAsync(new NumberVerificationCallbackResult() { ApcCode = apc_code }, useMock),
+                useMock => _apcClient.NumberVerificationCallbackVerifyAsync(new NumberVerificationCallbackResult() { ApcCode = apcCode }, useMock),
                 "Error occurred while retrieving phone number.");
         }
 
         [HttpPost("number-verification/number:verify")]
         [ProducesResponseType(typeof(string), StatusCodes.Status302Found)]
+        [ProducesResponseType(typeof(NumberVerificationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> NumberVerificationVerify([FromBody] NumberVerificationContent request)
         {
             return await HandleRequest(
@@ -92,12 +102,15 @@ namespace APC.ProxyServer.Controllers
 
                 var responseMessage = await action(useMock);
 
+                if (responseMessage.StatusCode == HttpStatusCode.Redirect)
+                    //return new OkObjectResult(responseMessage.Headers.Location.ToString());
+                    return Redirect(responseMessage.Headers.Location?.ToString());
+
                 if (!responseMessage.IsSuccessStatusCode)
                 {
                     var errorContent = await responseMessage.Content.ReadAsStringAsync();
                     return StatusCode((int)responseMessage.StatusCode, errorContent);
                 }
-
                 var content = await responseMessage.Content.ReadAsStringAsync();
                 return Content(content, "application/json");
             }
