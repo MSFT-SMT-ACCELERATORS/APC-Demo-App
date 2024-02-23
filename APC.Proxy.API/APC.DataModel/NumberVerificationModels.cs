@@ -8,8 +8,8 @@
     public class NumberVerificationContent
     {
         public required NetworkIdentifier NetworkIdentifier { get; set; }
-        public string? PhoneNumber { get; set; }
-        public string? HashedPhoneNumber { get; set; }
+        public required string PhoneNumber { get; set; }
+        // public string? HashedPhoneNumber { get; set; }
         public required string RedirectUri { get; set; }
     }
 
