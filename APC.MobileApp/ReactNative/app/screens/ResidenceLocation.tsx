@@ -33,6 +33,7 @@ import {
     ConnectionMode,
 } from '../utils/SettingsService';
 import CustomModal from '../components/CustomModal';
+import * as Location from 'expo-location';
 
 interface StepProps {
     setProgress: (progress: number) => void;
@@ -58,6 +59,22 @@ const ResidenceLocation: React.FC<StepProps> = ({
     const [modalIconName, setIcon] = useState('');
     const [modalIconColor, setColorIcon] = useState('');
     const [shouldNavigate, setShouldNavigate] = useState(false);
+
+    const [hasLocationPermission, setHasLocationPermission] = useState<boolean | null>(null);
+
+    useEffect(() => {
+        (async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            console.log('STATUS:' + status);
+            if (status !== 'granted') {
+                setHasLocationPermission(false);
+                return;
+            }
+
+            setHasLocationPermission(true);
+        })();
+    }, []);
+
 
     const handleModalToggle = (
         title: string,
@@ -175,7 +192,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
             // Business validation
             console.log('validating business rule');
-            if (config?.skipGeolocationCheck) {
+            if (config?.skipGeolocationCheck || !hasLocationPermission) {
                 setShouldNavigate(true);
                 setLoading(false);
                 return
@@ -446,7 +463,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                             </StyledText>
                         )}
 
-                        {!skipGeolocationCheck && (
+                        {!skipGeolocationCheck && hasLocationPermission && (
                             <View style={styles.btnGroup}>
                                 <StyledText style={styles.comparisonTitle}>
                                     Internal comparison with:
