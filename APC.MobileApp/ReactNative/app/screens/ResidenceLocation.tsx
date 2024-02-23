@@ -34,6 +34,7 @@ import {
 } from '../utils/SettingsService';
 import CustomModal from '../components/CustomModal';
 import * as Location from 'expo-location';
+import { useStep } from '../utils/StepContext';
 
 interface StepProps {
     setProgress: (progress: number) => void;
@@ -46,6 +47,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
 }) => {
     const navigation = useNavigation();
     const apiClient = useApiClient();
+    const { setCurrentStep } = useStep();
     const [hackedGPS, setHackedGPS] = useState<LocationObjectCoords>();
     const [gpsPosition, setGPSPosition] = useState<Position>();
     const [config, setConfig] = useState<AppConfiguration>();
@@ -241,9 +243,13 @@ const ResidenceLocation: React.FC<StepProps> = ({
     const hideTooltip = () => setTooltipVisible(false);
 
     useEffect(() => {
+        setCurrentStep(1);
+      }, [setCurrentStep]);
+
+    useEffect(() => {
         if (!modalVisible && shouldNavigate) {
             setTimeout(() => {
-                navigation.navigate('StarterPage');
+                navigation.navigate('Information');
                 setShouldNavigate(false);
             }, 100);
         }

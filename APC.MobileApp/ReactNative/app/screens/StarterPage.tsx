@@ -63,6 +63,8 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const [modalBackground, setModalBackground] = useState('');
   const [shouldNavigate, setShouldNavigate] = useState(false);
 
+console.log("START");
+
   const handleModalToggle = (title: string, text: string, backgroundColor: string = palette.danger100, showIcon: boolean = true, iconName: string = 'warning-outline', iconColor: string = palette.danger200) => {
     setModalVisible(!modalVisible);
     setModalIcon(showIcon);
@@ -102,7 +104,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   useEffect(() => {
     if (!modalVisible && shouldNavigate) {
       setTimeout(() => {
-        navigation.navigate('Information');
+        navigation.navigate('ResidenceLocation');
         setShouldNavigate(false);
       }, 100);
     }
@@ -117,9 +119,6 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
     return unsubscribe;
   }, [navigation]);
 
-  useEffect(() => {
-    setCurrentStep(2);
-  }, [setCurrentStep]);
 
   useEffect(() => {
     readConfigurations().then(setConfig);
