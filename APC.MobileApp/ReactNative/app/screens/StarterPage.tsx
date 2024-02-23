@@ -78,22 +78,25 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
     console.log(data);
     setLoading(true, "Validating your data...");
 
-    // APC validation
-    const response = await APCService.checkSimChange(apiClient, phoneNumber);
-    console.log("SIMSWAP: ", response);
+    try {
+      // APC validation
+      const response = await APCService.checkSimChange(apiClient, phoneNumber);
+      console.log("SIMSWAP: ", response);
 
-    if (response) {
-      console.log("SIM swap detected");
-      handleModalToggle("SIM swap detected", "A recent SIM change has been detected on this device, for security reasons you cannot continue with this local request");
+      if (response) {
+        console.log("SIM swap detected");
+        handleModalToggle("SIM swap detected", "A recent SIM change has been detected on this device, for security reasons you cannot continue with this local request");
 
-    } else {
-      console.log("SIM swap not detected");
-      handleModalToggle("SIM swap not detected", "For security reasons we checked that your phone line didn’t have any SIM swap recently. You can continue with this loan request.", palette.accent200, true, 'information-circle-outline', palette.black);
-      setShouldNavigate(true);
+      } else {
+        console.log("SIM swap not detected");
+        handleModalToggle("SIM swap not detected", "For security reasons we checked that your phone line didn’t have any SIM swap recently. You can continue with this loan request.", palette.accent200, true, 'information-circle-outline', palette.black);
+        setShouldNavigate(true);
+      }
+    } catch (error) {
+      console.log('Error' + error);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
-
   }
 
   useEffect(() => {
@@ -139,105 +142,36 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   };
 
   const autocompletePhoneNumber = async () => {
-  const devicePhoneNumber = await APCService.getPhoneNumber(apiClient, phoneNumber);
+    const devicePhoneNumber = await APCService.getPhoneNumber(apiClient, phoneNumber);
 
-  let message, title, isValid, backgroundColor, icon, iconColor;
+    let message, title, isValid, backgroundColor, icon, iconColor;
 
-  switch (config?.connectionMode) {
-    case ConnectionMode.Offline:
-      if (config.autovalidatePhoneNumber) {
-        message = "Congratulations, your phone number was validated.";
-        title = "Information message";
-        icon = 'information-circle-outline'
-        iconColor = palette.black;
-        backgroundColor = palette.accent200,
+    if (!phoneNumber) {
+      message = "In order to validate your phone number, we need you to provide a valid phone number.";
+      title = "Phone number needed";
+      backgroundColor = palette.danger100;
+      icon = 'warning-outline'
+      iconColor = palette.danger200;
+      isValid = false;
+    } else if (devicePhoneNumber) {
+      message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
+      title = "Information message";
+      icon = 'information-circle-outline'
+      iconColor = palette.black;
+      backgroundColor = palette.accent200,
         isValid = true;
-        handleModalToggle(title, message, backgroundColor, undefined, icon, iconColor);
-        setIsPhoneNumberValid(isValid);
-        return
-      }
-      if (!phoneNumber) {
-        message = "In order to validate your phone number, we need you to provide a valid phone number.";
-        title = "Phone number needed";
-        backgroundColor = palette.danger100;
+    } else {
+      message = "Sorry but in order to request a loan with this application your provided phone number must coincide with your phone line’s number that you are currently using with your phone";
+      title = "Business blocking rule";
+      backgroundColor = palette.danger100,
         icon = 'warning-outline'
-        iconColor = palette.danger200;
-        isValid = false;
-      } else if (devicePhoneNumber) {
-        message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
-        title = "Information message";
-        icon = 'information-circle-outline'
-        iconColor = palette.black;
-        backgroundColor = palette.accent200,
-        isValid = true;
-      } else {
-        message = "Sorry but in order to request a loan with this application your provided phone number must coincide with your phone line’s number that you are currently using with your phone";
-        title = "Business blocking rule";
-        backgroundColor = palette.danger100,
-        icon = 'warning-outline'
-        iconColor = palette.danger200;
-        isValid = false;
-      }
-      handleModalToggle(title, message, backgroundColor, undefined, icon, iconColor);
-      setIsPhoneNumberValid(isValid);
-    
-    break;
+      iconColor = palette.danger200;
+      isValid = false;
+    }
+    handleModalToggle(title, message, backgroundColor, undefined, icon, iconColor);
+    setIsPhoneNumberValid(isValid);
 
-    case ConnectionMode.Mock:
-      if (!phoneNumber) {
-        message = "In order to validate your phone number, we need you to provide a valid phone number.";
-        title = "Phone number needed";
-        backgroundColor = palette.danger100,
-        iconColor = palette.danger200;
-        icon = 'warning-outline'
-        isValid = false;
-      } else if (devicePhoneNumber) {
-        message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
-        title = "Information message:";
-        backgroundColor = palette.accent200,
-        icon = 'information-circle-outline'
-        iconColor = palette.black;
-        isValid = true;
-      } else {
-        message = "Sorry but in order to request a loan with this application your provided phone number must coincide with your phone line’s number that you are currently using with your phone";
-        title = "Business blocking rule";
-        backgroundColor = palette.danger100,
-        icon = 'warning-outline'
-        iconColor = palette.danger200;
-        isValid = false;
-      }
-      handleModalToggle(title, message, backgroundColor, undefined, icon, iconColor);
-      setIsPhoneNumberValid(isValid);
-      break;
-
-    default:
-      if (!phoneNumber) {
-        message = "In order to validate your phone number, we need you to provide a valid phone number.";
-        title = "Phone number needed";
-        backgroundColor = palette.danger100,
-        icon = 'warning-outline'
-        iconColor = palette.danger200;
-        isValid = false;
-      } else if (devicePhoneNumber) {
-        message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
-        title = "Information message:";
-        backgroundColor = palette.accent200,
-        icon = 'information-circle-outline'
-        iconColor = palette.black;
-        isValid = true;
-      } else {
-        message = "Sorry but in order to request a loan with this application your provided phone number must coincide with your phone line’s number that you are currently using with your phone";
-        title = "Business blocking rule";
-        backgroundColor = palette.danger100,
-        icon = 'warning-outline'
-        iconColor = palette.danger200;
-        isValid = false;
-      }
-      handleModalToggle(title, message, backgroundColor, undefined, icon, iconColor);
-      setIsPhoneNumberValid(isValid);
-      break;
-  }
-};
+  };
 
 
   return (
@@ -505,7 +439,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
 
       <CustomModal
         visible={modalVisible}
-        onClose={() => handleModalToggle('', '', '', false,'','')}
+        onClose={() => handleModalToggle('', '', '', false, '', '')}
         showIcon={showModalIcon}
         iconName={modalIconName}
         iconColor={modalIconColor}

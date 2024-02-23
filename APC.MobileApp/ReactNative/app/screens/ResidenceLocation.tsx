@@ -47,10 +47,9 @@ const ResidenceLocation: React.FC<StepProps> = ({
     const apiClient = useApiClient();
     const [hackedGPS, setHackedGPS] = useState<LocationObjectCoords>();
     const [gpsPosition, setGPSPosition] = useState<Position>();
-    const [apcPosition, setAPCPosition] = useState<Position>();
     const [config, setConfig] = useState<AppConfiguration>();
+    const [skipGeolocationCheck, setSkipLocation] = useState<boolean>(true);
     const [tooltipVisible, setTooltipVisible] = useState<boolean>(false);
-
     const [modalVisible, setModalVisible] = useState(false);
     const [modalTitle, setModalTitle] = useState('');
     const [modalText, setModalText] = useState('');
@@ -139,95 +138,86 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
     const onFormValid = async (data: FieldValues) => {
         try {
-        const networkCode = await APCService.getNetworkCode(apiClient);
-        console.log(`El código de red es: ${networkCode}`);
-        console.log('Submitted Data:', data);
-        setLoading(true, 'Validating your data...');
+            const networkCode = await APCService.getNetworkCode(apiClient);
+            console.log(`El código de red es: ${networkCode}`);
+            console.log('Submitted Data:', data);
+            setLoading(true, 'Validating your data...');
 
-        const selectedCity = cities.filter(
-            (d) =>
-                d.country == data.Country &&
-                d.state == data.StateProvince &&
-                d.city == data.City
-        )[0];
+            const selectedCity = cities.filter(
+                (d) =>
+                    d.country == data.Country &&
+                    d.state == data.StateProvince &&
+                    d.city == data.City
+            )[0];
 
-        if (data.Country === 'Select a country' || !selectedCity) {
-            console.log('Selection required');
-            handleModalToggle('Selection required', 'Please select a valid option from the "Select a country" dropdown to proceed', '#dadaed', undefined, 'information-circle-outline', palette.black);
-            setLoading(false);
+            if (data.Country === 'Select a country' || !selectedCity) {
+                console.log('Selection required');
+                handleModalToggle('Selection required', 'Please select a valid option from the "Select a country" dropdown to proceed', '#dadaed', undefined, 'information-circle-outline', palette.black);
+                setLoading(false);
 
-            return;
-        }
+                return;
+            }
 
-        let coordsForm = APCService.getLocationCoords(
-            selectedCity.latitude,
-            selectedCity.longitude
-        );
-        console.log('Get: device gps location');
-        let coordsGPS = await APCService.getDeviceGPSLocation();
-        console.log('Get: device gps location OK');
+            let coordsForm = APCService.getLocationCoords(
+                selectedCity.latitude,
+                selectedCity.longitude
+            );
+            console.log('Get: device gps location');
+            let coordsGPS = await APCService.getDeviceGPSLocation();
+            console.log('Get: device gps location OK');
 
-        let coords: LocationObjectCoords;
-        if (data.GPSOption == 'true') coords = coordsGPS.coords;
-        else coords = coordsForm;
+            let coords: LocationObjectCoords;
+            if (data.GPSOption == 'true') coords = coordsGPS.coords;
+            else coords = coordsForm;
 
-        let hasError = false;
+            let hasError = false;
 
 
-        // Business validation
-        console.log('validating business rule');
-         if (config?.skipGeolocationCheck) {
+            // Business validation
+            console.log('validating business rule');
+            if (config?.skipGeolocationCheck) {
                 setShouldNavigate(true);
                 setLoading(false);
                 return
             }
 
-        if (!(await APCService.matchesCoords(coords, coordsForm, config?.residenceLocationRadius!))) {
-            handleModalToggle(
-                'Blocking business rule: Not allowed device location',
-                'For anti-fraud purposes, this application requires the user to be using the app in a location relatively close to the user’s residence location (i.e. same state). You are currently far away'
-            );
-            console.log('Business validation failed!!');
-            hasError = true;
-        } else {
-            if (!data.UseAPC) {
-                handleModalToggle('Warning', 'The application has not been able to check the validity of your location through our service', palette.warning, undefined, 'information-circle-outline', palette.black);
-                setShouldNavigate(true);
-                console.log('Business validation success!!');
-            } else {  //APC Validation
-                console.log('USING APC validating apc matches location');
-                const response = await APCService.verificateAPCLocation(apiClient, coords);
-                if (!response) {
-                    handleModalToggle(
-                        'Blocking anti-hacking rule: GPS coordinates hacking attempted',
-                        'A possible hacking has been detected. The device GPS location does not match the device’s actual location provided by the network carrier. The application’s flow must stop'
-                    );
-                    console.log('APC validation failed!!');
-                    hasError = true;
-                } else {
-                    handleModalToggle('Information message', 'Congratulations, you have been verified in a location close to your residence location so you can continue with the loan request', palette.accent200, undefined, 'information-circle-outline', palette.black);
+            if (!(await APCService.matchesCoords(coords, coordsForm, config?.residenceLocationRadius!))) {
+                handleModalToggle(
+                    'Blocking business rule: Not allowed device location',
+                    'For anti-fraud purposes, this application requires the user to be using the app in a location relatively close to the user’s residence location (i.e. same state). You are currently far away'
+                );
+                console.log('Business validation failed!!');
+                hasError = true;
+            } else {
+                if (!data.UseAPC) {
+                    handleModalToggle('Warning', 'The application has not been able to check the validity of your location through our service', palette.warning, undefined, 'information-circle-outline', palette.black);
                     setShouldNavigate(true);
-                    console.log('APC validation success!!');
+                    console.log('Business validation success!!');
+                } else {  //APC Validation
+                    console.log('USING APC validating apc matches location');
+                    const response = await APCService.verificateAPCLocation(apiClient, coords);
+                    if (!response) {
+                        handleModalToggle(
+                            'Blocking anti-hacking rule: GPS coordinates hacking attempted',
+                            'A possible hacking has been detected. The device GPS location does not match the device’s actual location provided by the network carrier. The application’s flow must stop'
+                        );
+                        console.log('APC validation failed!!');
+                        hasError = true;
+                    } else {
+                        handleModalToggle('Information message', 'Congratulations, you have been verified in a location close to your residence location so you can continue with the loan request', palette.accent200, undefined, 'information-circle-outline', palette.black);
+                        setShouldNavigate(true);
+                        console.log('APC validation success!!');
+                    }
                 }
             }
-        }
-       
-    } catch (error) {
-         if (config?.skipGeolocationCheck) {
+
+        } catch (error) {
+            setSkipLocation(true);
+            handleModalToggle('Warning', 'The application cannot check your location', palette.warning, undefined, 'information-circle-outline', palette.black);
             setShouldNavigate(true);
+        } finally {
             setLoading(false);
-            return
         }
-        
-        handleModalToggle(
-            'Warning',
-            'The application cannot check your location'
-        );
-        // setShouldNavigate(true)
-        console.log('Error');
-    }finally{
-        setLoading(false);
-    }
     };
 
     const showTooltip = () => setTooltipVisible(true);
@@ -253,14 +243,9 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
     useEffect(() => {
         readConfigurations().then(setConfig);
-
         APCService.getDeviceGPSLocation()
             .then(setGPSPosition)
             .catch(console.error);
-
-        // APCService.verificateAPCLocation(apiClient)
-        //     .then(setAPCPosition)
-        //     .catch(console.error);
 
         const firstCountry = cities
             .map((item) => item.country)
@@ -269,6 +254,12 @@ const ResidenceLocation: React.FC<StepProps> = ({
         handleCountryChange(firstCountry);
     }, []);
 
+    useEffect(() => {
+        if (config) {
+          setSkipLocation(config.skipGeolocationCheck ?? false);
+          console.log('LOC' + skipGeolocationCheck + " " + config.skipGeolocationCheck);
+        }
+      }, [config, skipGeolocationCheck]);
     return (
         <AppContainer>
             <View style={[styles.parent]}>
@@ -305,7 +296,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                     style={pickerStyle}
                                     darkTheme={true}
                                     value={field.value || ''}
-                                    
+
                                     onValueChange={handleCountryChange}
                                     useNativeAndroidPickerStyle={false}
                                     Icon={() => {
@@ -455,7 +446,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                             </StyledText>
                         )}
 
-                        {!config?.skipGeolocationCheck && (
+                        {!skipGeolocationCheck && (
                             <View style={styles.btnGroup}>
                                 <StyledText style={styles.comparisonTitle}>
                                     Internal comparison with:

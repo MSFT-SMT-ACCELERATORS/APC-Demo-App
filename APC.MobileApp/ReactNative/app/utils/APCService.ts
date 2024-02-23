@@ -19,7 +19,9 @@ export const verificateAPCLocation = async (apiClient: APCApi, optionCoords: Loc
 
     const ip = await ipify();
     const coords = await getDeviceGPSLocation();
-    let accuracy = coords.coords.accuracy === null ? undefined : coords.coords.accuracy;
+    let accuracy = coords.coords.accuracy === null ? 2 : coords.coords.accuracy;   //Accuracy should be between 2-200 both included
+    accuracy = accuracy <= 1 ?  2 : accuracy;
+    accuracy = accuracy > 200 ?  200 : accuracy;
     if (config.connectionMode == ConnectionMode.Offline) {
         const fakeCoords = { coords: getLocationCoords(config.offlineLatitude, config.offlineLongitude) } as Position;
         return matchesCoords(optionCoords, fakeCoords.coords, config.radiusKm);
@@ -44,7 +46,7 @@ export const verificateAPCLocation = async (apiClient: APCApi, optionCoords: Loc
         }
     }, mockHeader);
 
-    console.log("Respuesta completa:", JSON.stringify(response, null, 2));
+    console.log("Completed response LOCATION:", JSON.stringify(response, null, 2));
 
     console.log("VALIDACION: " + response.data.verificationResult);
 
@@ -70,7 +72,7 @@ export const getPhoneNumber = async (apiClient: APCApi, phoneNumber: string): Pr
         redirectUri: ''
     }, mockHeader);
 
-    console.log("Respuesta completa:", JSON.stringify(response, null, 2));
+    console.log("Completed response phoneNumber:", JSON.stringify(response, null, 2));
 
     return response.data.verificationResult ?? false;
 }
@@ -116,38 +118,12 @@ export const checkSimChange = async (apiClient: APCApi, phoneNumber: string) => 
         }
     }, mockHeader)
 
-    console.log("Respuesta completa simswap:", JSON.stringify(response, null, 2));
+    console.log("Completed response simswap:", JSON.stringify(response, null, 2));
 
     return response.data.verificationResult;
 }
 
 
-
-// export const getDeviceGPSLocation = async () => {
-//     async function getLocationPermission() {
-//         console.log("Requesting gps permission...");
-//         const { status } = await Location.requestForegroundPermissionsAsync();
-//         if (status !== 'granted') {
-//             console.error('Permission to access location was denied');
-//             return;
-//         }
-//         console.log("Requesting gps permission... OK");
-//     }
-
-//     const config = await readConfigurations();
-//     await getLocationPermission();
-
-//     let location: Location.LocationObject;
-//     console.log("Getting current position...");
-
-//     location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-//     console.log("Getting current position... OK");
-
-//     const bingLocation = config.connectionMode != ConnectionMode.Offline ? await BingService.translateCoordsToLocation(location.coords) : undefined;
-
-//     return { coords: location.coords, location: bingLocation } as Position;
-
-// }
 
 export const getDeviceGPSLocation = async () => {
     async function getLocationPermission() {
@@ -167,15 +143,41 @@ export const getDeviceGPSLocation = async () => {
     console.log("Getting current position...");
 
     location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-    let coords = location.coords;
-    coords = getLocationCoords(41.3851, 2.1734, 0);
     console.log("Getting current position... OK");
 
-    const bingLocation = config.connectionMode != ConnectionMode.Offline ? await BingService.translateCoordsToLocation(coords) : undefined;
+    const bingLocation = config.connectionMode != ConnectionMode.Offline ? await BingService.translateCoordsToLocation(location.coords) : undefined;
 
-    return { coords: coords, location: bingLocation } as Position;
+    return { coords: location.coords, location: bingLocation } as Position;
 
 }
+
+// export const getDeviceGPSLocation = async () => {
+//     async function getLocationPermission() {
+//         console.log("Requesting gps permission...");
+//         const { status } = await Location.requestForegroundPermissionsAsync();
+//         if (status !== 'granted') {
+//             console.error('Permission to access location was denied');
+//             return;
+//         }
+//         console.log("Requesting gps permission... OK");
+//     }
+
+//     const config = await readConfigurations();
+//     await getLocationPermission();
+
+//     let location: Location.LocationObject;
+//     console.log("Getting current position...");
+
+//     location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+//     let coords = location.coords;
+//     coords = getLocationCoords(41.3851, 2.1734, 0);
+//     console.log("Getting current position... OK");
+
+//     const bingLocation = config.connectionMode != ConnectionMode.Offline ? await BingService.translateCoordsToLocation(coords) : undefined;
+
+//     return { coords: coords, location: bingLocation } as Position;
+
+// }
 
 export const getLocationCoords = (latitude: number, longitude: number, accuracy: number = 200) => {
     return {
@@ -189,7 +191,7 @@ export const getLocationCoords = (latitude: number, longitude: number, accuracy:
     } as Location.LocationObjectCoords
 }
 
-export const matchesCoords = async (coordA: Location.LocationObjectCoords, coordB: Location.LocationObjectCoords, coordC: number): Promise<Boolean> => {
+export const matchesCoords = async (coordA: Location.LocationObjectCoords, coordB: Location.LocationObjectCoords, radius: number): Promise<Boolean> => {
 
     function calcHaversineDistance(coordA: Location.LocationObjectCoords, coordB: Location.LocationObjectCoords): number {
         const earthRadius = 6371e3; // Earth radius (m)
@@ -205,10 +207,8 @@ export const matchesCoords = async (coordA: Location.LocationObjectCoords, coord
         return earthRadius * c;
     }
 
-    const config = await readConfigurations();
-
     const distance = calcHaversineDistance(coordA, coordB);
-    const maxAllowedDistance = (coordA.accuracy ?? 0) + (coordB.accuracy ?? 0) + config.radiusKm * 1000;
+    const maxAllowedDistance = (coordA.accuracy ?? 0) + (coordB.accuracy ?? 0) + radius * 1000;
 
     return distance <= maxAllowedDistance;
 }
@@ -221,7 +221,7 @@ export const getIPAddress = async () => {
             const ip = await Network.getIpAddressAsync();
             return ip;
         } catch (error) {
-            console.error("Error al obtener la dirección IP en el dispositivo móvil", error);
+            console.error("Error obtaining IP address on mobile device", error);
         }
     }
 }
@@ -233,7 +233,7 @@ export const ipify = async () => {
 
         return data.ip;
     } catch (error) {
-        console.error("Error al obtener la dirección IP en la web", error);
+        console.error("Error obtaining IP address on the web", error);
         return "-";
     }
 }
