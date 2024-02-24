@@ -16,7 +16,7 @@ namespace APC.DataModel
     public class SimSwapVerificationContent
     {
         public required string PhoneNumber { get; set; }
-        public int MaxAgeHours { get; set; }
+        public int MaxAgeHours { get; set; } = 240;
         public required NetworkIdentifier NetworkIdentifier { get; set; }
     }
 

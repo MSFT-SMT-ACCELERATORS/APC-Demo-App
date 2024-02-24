@@ -3,6 +3,7 @@ using APC.DataModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Net;
+using System.Text.Json;
 
 namespace APC.ProxyServer.Controllers
 {
@@ -31,6 +32,11 @@ namespace APC.ProxyServer.Controllers
                 request.Device.Ipv4Address.Ipv4 = Request.HttpContext.Connection.RemoteIpAddress.ToString();
             }
 
+            // MWC FIX:
+            request.Accuracy = request.Accuracy > 20 ? 20 : request.Accuracy;
+
+            _logger.LogInformation($"Request model: {JsonSerializer.Serialize(request)}");
+
             return await HandleRequest(
                 useMock => _apcClient.DeviceLocationVerifyAsync(request, useMock),
                 "Error occurred while verifying device location.");
@@ -41,6 +47,8 @@ namespace APC.ProxyServer.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeviceNetworkRetrieve([FromBody] NetworkIdentifier request)
         {
+            _logger.LogInformation($"Request model: {JsonSerializer.Serialize(request)}");
+
             return await HandleRequest(
                 useMock => _apcClient.DeviceNetworkRetrieveAsync(request, useMock),
                 "Error occurred while retrieving network.");
@@ -64,6 +72,8 @@ namespace APC.ProxyServer.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> NumberVerificationVerify([FromBody] NumberVerificationContent request)
         {
+            _logger.LogInformation($"Request model: {JsonSerializer.Serialize(request)}");
+
             return await HandleRequest(
                 useMock => _apcClient.NumberVerificationVerifyAsync(request, useMock),
                 "Error occurred while verifying phone number.");
@@ -84,11 +94,19 @@ namespace APC.ProxyServer.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> SimSwapVerify([FromBody] SimSwapVerificationContent request)
         {
+            // MWC FIX:
+            request.PhoneNumber = request.PhoneNumber.StartsWith("+") ? request.PhoneNumber : $"+{request.PhoneNumber}";
+            request.MaxAgeHours = 20;
+
             return await HandleRequest(
                 useMock => _apcClient.SimSwapVerifyAsync(request, useMock),
                 "Error occurred while verifying SIM swap.");
         }
 
+        private void LogRequest(string message)
+        {
+
+        }
 
         private async Task<IActionResult> HandleRequest(
             Func<bool, Task<HttpResponseMessage>> action,
@@ -99,6 +117,8 @@ namespace APC.ProxyServer.Controllers
                 var useMock = HttpContext.Request.Headers.TryGetValue("X-Use-Mock", out var useMockValue)
                     ? string.Equals(useMockValue, "true", StringComparison.OrdinalIgnoreCase)
                     : false;
+
+                _logger.LogInformation($"Request initiated with UseMock: {useMock}");
 
                 var responseMessage = await action(useMock);
 
@@ -112,6 +132,9 @@ namespace APC.ProxyServer.Controllers
                     return StatusCode((int)responseMessage.StatusCode, errorContent);
                 }
                 var content = await responseMessage.Content.ReadAsStringAsync();
+
+                // _logger.LogInformation($"Content response: {content}");
+
                 return Content(content, "application/json");
             }
             catch (Exception ex)
