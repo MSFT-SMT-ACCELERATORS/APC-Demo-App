@@ -13,17 +13,17 @@ namespace APC.Client
     public class APCClient : IAPCClient
     {
         private readonly IConfidentialClientApplication _authApp;
-        private readonly HttpClient _httpClient;
+        private readonly HttpClient _apcHttpClient;
         private readonly APCClientSettings _settings;
 
         public APCClient(IHttpClientFactory httpClientFactory, IOptions<APCClientSettings> settings)
         {
-            _httpClient = httpClientFactory.CreateClient("NoRedirectClient");
+            _apcHttpClient = httpClientFactory.CreateClient("NoRedirectClient");
             _settings = settings.Value;
 
             // Configure httpClient with APC API settings
-            _httpClient.BaseAddress = new Uri(settings.Value.BaseUri);
-            _httpClient.DefaultRequestHeaders.Add("apc-gateway-id", _settings.GatewayId);
+            _apcHttpClient.BaseAddress = new Uri(settings.Value.BaseUri);
+            _apcHttpClient.DefaultRequestHeaders.Add("apc-gateway-id", _settings.GatewayId);
 
             // Configuration to retrieve Entra ID authentication tokens for Application accessing the APC Gateway
             _authApp = ConfidentialClientApplicationBuilder.Create(settings.Value.AuthAppCredentials.ClientId)
@@ -55,10 +55,7 @@ namespace APC.Client
             => await CallApcApiAsync(HttpMethod.Post, APCPaths.NumberVerificationVerify, request);
 
         public async Task<HttpResponseMessage> NumberVerificationVerifyAsync(NumberVerificationContent request)
-        {
-            request.RedirectUri = _settings.NumberVerificationRedirectUri;
-            return await CallApcApiAsync(HttpMethod.Post, APCPaths.NumberVerificationVerify, request);
-        }
+            => await CallApcApiAsync(HttpMethod.Post, APCPaths.NumberVerificationVerify, request);
 
         private async Task<HttpResponseMessage> CallApcApiAsync(HttpMethod httpMethod, string endpoint, object? requestContent = null)
         {
@@ -72,7 +69,7 @@ namespace APC.Client
             request.Headers.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
 
             // Use HttpCompletionOption.ResponseHeadersRead for HTTP 302
-            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            var response = await _apcHttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 
             return response;
         }
