@@ -61,7 +61,6 @@ const ResidenceLocation: React.FC<StepProps> = ({
     const [modalIconName, setIcon] = useState('');
     const [modalIconColor, setColorIcon] = useState('');
     const [shouldNavigate, setShouldNavigate] = useState(false);
-
     const [hasLocationPermission, setHasLocationPermission] = useState<boolean | null>(null);
 
     useEffect(() => {
@@ -209,7 +208,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                 hasError = true;
             } else {
                 if (!data.UseAPC) {
-                    handleModalToggle('Warning', 'The application has not been able to check the validity of your location through our service', palette.warning, undefined, 'information-circle-outline', palette.black);
+                    handleModalToggle('Warning', 'APC Check Skipped: Location authenticity not verified. Enable APC for fraud protection', palette.warning, undefined, 'information-circle-outline', palette.black);
                     setShouldNavigate(true);
                     console.log('Business validation success!!');
                 } else {  //APC Validation
@@ -283,6 +282,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
           console.log('LOC' + skipGeolocationCheck + " " + config.skipGeolocationCheck);
         }
       }, [config, skipGeolocationCheck]);
+      
     return (
         <AppContainer>
             <View style={[styles.parent]}>

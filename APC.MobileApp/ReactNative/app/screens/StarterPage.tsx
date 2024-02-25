@@ -24,6 +24,7 @@ import { useStep } from '../utils/StepContext';
 import { useApiClient } from '../api/ApiClientProvider';
 import CustomModal from '../components/CustomModal';
 import { AppConfiguration, ConnectionMode, readConfigurations } from '../utils/SettingsService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface StepProps {
   setProgress: (progress: number) => void;
@@ -43,7 +44,6 @@ const isSmallScreen = screenWidth < 200;
 const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const navigation = useNavigation();
   const apiClient = useApiClient();
-  const { setCurrentStep } = useStep();
   const {
     control,
     handleSubmit,
@@ -139,35 +139,42 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   };
 
   const autocompletePhoneNumber = async () => {
-    const devicePhoneNumber = await APCService.getPhoneNumber(apiClient, phoneNumber);
+    setLoading(true, "Validating your data...");
+    try {
+      const devicePhoneNumber = await APCService.getPhoneNumber(apiClient, phoneNumber);
+      await AsyncStorage.setItem('numberParam', phoneNumber);
 
-    let message, title, isValid, backgroundColor, icon, iconColor;
+      let message, title, isValid, backgroundColor, icon, iconColor;
 
-    if (!phoneNumber) {
-      message = "In order to validate your phone number, we need you to provide a valid phone number.";
-      title = "Phone number needed";
-      backgroundColor = palette.danger100;
-      icon = 'warning-outline'
-      iconColor = palette.danger200;
-      isValid = false;
-    } else if (devicePhoneNumber) {
-      message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
-      title = "Information message";
-      icon = 'information-circle-outline'
-      iconColor = palette.black;
-      backgroundColor = palette.accent200,
-        isValid = true;
-    } else {
-      message = "Sorry but in order to request a loan with this application your provided phone number must coincide with your phone line’s number that you are currently using with your phone";
-      title = "Business blocking rule";
-      backgroundColor = palette.danger100,
+      if (!phoneNumber) {
+        message = "In order to validate your phone number, we need you to provide a valid phone number.";
+        title = "Phone number needed";
+        backgroundColor = palette.danger100;
         icon = 'warning-outline'
-      iconColor = palette.danger200;
-      isValid = false;
+        iconColor = palette.danger200;
+        isValid = false;
+      } else if (devicePhoneNumber) {
+        message = "Congratulations, for anti-fraud reasons, the provided telephone number has been verified by your carrier that coincides with the phone line you are using";
+        title = "Information message";
+        icon = 'information-circle-outline'
+        iconColor = palette.black;
+        backgroundColor = palette.accent200,
+          isValid = true;
+      } else {
+        message = "Sorry but in order to request a loan with this application your provided phone number must coincide with your phone line’s number that you are currently using with your phone";
+        title = "Business blocking rule";
+        backgroundColor = palette.danger100,
+          icon = 'warning-outline'
+        iconColor = palette.danger200;
+        isValid = false;
+      }
+      handleModalToggle(title, message, backgroundColor, undefined, icon, iconColor);
+      setIsPhoneNumberValid(isValid);
+    } catch (error) {
+      console.log('Error' + error);
+    } finally {
+      setLoading(false);
     }
-    handleModalToggle(title, message, backgroundColor, undefined, icon, iconColor);
-    setIsPhoneNumberValid(isValid);
-
   };
 
 
