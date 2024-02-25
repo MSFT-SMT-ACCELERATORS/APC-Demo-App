@@ -26,8 +26,6 @@ namespace APC.ProxyServer.Controllers
         {
             if (request.Device.Ipv4Address != null)
             {
-                _logger.LogWarning($"Location triggered IP in request: {request.Device.Ipv4Address.Ipv4}, ip caller {Request.HttpContext.Connection.RemoteIpAddress}, port {Request.HttpContext.Connection.RemotePort}");
-
                 request.Device.Ipv4Address.Port = Request.HttpContext.Connection.RemotePort;
                 request.Device.Ipv4Address.Ipv4 = Request.HttpContext.Connection.RemoteIpAddress.ToString();
             }
@@ -38,7 +36,7 @@ namespace APC.ProxyServer.Controllers
             _logger.LogInformation($"Request model: {JsonSerializer.Serialize(request)}");
 
             return await HandleRequest(
-                useMock => _apcClient.DeviceLocationVerifyAsync(request, useMock),
+                () => _apcClient.DeviceLocationVerifyAsync(request),
                 "Error occurred while verifying device location.");
         }
 
@@ -50,7 +48,7 @@ namespace APC.ProxyServer.Controllers
             _logger.LogInformation($"Request model: {JsonSerializer.Serialize(request)}");
 
             return await HandleRequest(
-                useMock => _apcClient.DeviceNetworkRetrieveAsync(request, useMock),
+                () => _apcClient.DeviceNetworkRetrieveAsync(request),
                 "Error occurred while retrieving network.");
         }
 
@@ -61,7 +59,7 @@ namespace APC.ProxyServer.Controllers
         public async Task<IActionResult> NumberVerificationRetrieve(string apcCode)
         {
             return await HandleRequest(
-                useMock => _apcClient.NumberVerificationCallbackVerifyAsync(new NumberVerificationCallbackResult() { ApcCode = apcCode }, useMock),
+                () => _apcClient.NumberVerificationCallbackVerifyAsync(new NumberVerificationCallbackResult() { ApcCode = apcCode }),
                 "Error occurred while retrieving phone number.");
         }
 
@@ -75,7 +73,7 @@ namespace APC.ProxyServer.Controllers
             _logger.LogInformation($"Request model: {JsonSerializer.Serialize(request)}");
 
             return await HandleRequest(
-                useMock => _apcClient.NumberVerificationVerifyAsync(request, useMock),
+                () => _apcClient.NumberVerificationVerifyAsync(request),
                 "Error occurred while verifying phone number.");
         }
 
@@ -85,7 +83,7 @@ namespace APC.ProxyServer.Controllers
         public async Task<IActionResult> SimSwapRetrieve([FromBody] SimSwapRetrievalContent request)
         {
             return await HandleRequest(
-                useMock => _apcClient.SimSwapRetrieveAsync(request, useMock),
+                () => _apcClient.SimSwapRetrieveAsync(request),
                 "Error occurred while retrieving SIM swap information.");
         }
 
@@ -99,31 +97,19 @@ namespace APC.ProxyServer.Controllers
             request.MaxAgeHours = 20;
 
             return await HandleRequest(
-                useMock => _apcClient.SimSwapVerifyAsync(request, useMock),
+                () => _apcClient.SimSwapVerifyAsync(request),
                 "Error occurred while verifying SIM swap.");
         }
 
-        private void LogRequest(string message)
-        {
-
-        }
-
         private async Task<IActionResult> HandleRequest(
-            Func<bool, Task<HttpResponseMessage>> action,
+            Func<Task<HttpResponseMessage>> action,
             string errorMessage)
         {
             try
             {
-                var useMock = HttpContext.Request.Headers.TryGetValue("X-Use-Mock", out var useMockValue)
-                    ? string.Equals(useMockValue, "true", StringComparison.OrdinalIgnoreCase)
-                    : false;
-
-                _logger.LogInformation($"Request initiated with UseMock: {useMock}");
-
-                var responseMessage = await action(useMock);
+                var responseMessage = await action();
 
                 if (responseMessage.StatusCode == HttpStatusCode.Redirect)
-                    //return new OkObjectResult(responseMessage.Headers.Location.ToString());
                     return Redirect(responseMessage.Headers.Location?.ToString());
 
                 if (!responseMessage.IsSuccessStatusCode)
@@ -132,8 +118,6 @@ namespace APC.ProxyServer.Controllers
                     return StatusCode((int)responseMessage.StatusCode, errorContent);
                 }
                 var content = await responseMessage.Content.ReadAsStringAsync();
-
-                // _logger.LogInformation($"Content response: {content}");
 
                 return Content(content, "application/json");
             }

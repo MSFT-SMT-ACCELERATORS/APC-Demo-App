@@ -15,13 +15,11 @@ namespace APC.Client
         private readonly IConfidentialClientApplication _authApp;
         private readonly HttpClient _httpClient;
         private readonly APCClientSettings _settings;
-        private readonly IAPCMockService _mockService;
 
-        public APCClient(IHttpClientFactory httpClientFactory, IOptions<APCClientSettings> settings, IAPCMockService mockService)
+        public APCClient(IHttpClientFactory httpClientFactory, IOptions<APCClientSettings> settings)
         {
             _httpClient = httpClientFactory.CreateClient("NoRedirectClient");
             _settings = settings.Value;
-            _mockService = mockService;
 
             // Configure httpClient with APC API settings
             _httpClient.BaseAddress = new Uri(settings.Value.BaseUri);
@@ -41,31 +39,26 @@ namespace APC.Client
             return result.AccessToken;
         }
 
-        public async Task<HttpResponseMessage> DeviceLocationVerifyAsync(DeviceLocationVerificationContent request, bool useMock = false)
-            => await CallApcApiAsync(HttpMethod.Post, APCPaths.DeviceLocationVerify, request, useMock);
+        public async Task<HttpResponseMessage> DeviceLocationVerifyAsync(DeviceLocationVerificationContent request)
+            => await CallApcApiAsync(HttpMethod.Post, APCPaths.DeviceLocationVerify, request);
 
-        public async Task<HttpResponseMessage> DeviceNetworkRetrieveAsync(NetworkIdentifier request, bool useMock = false)
-            => await CallApcApiAsync(HttpMethod.Post, APCPaths.DeviceNetworkRetrieve, request, useMock);
+        public async Task<HttpResponseMessage> DeviceNetworkRetrieveAsync(NetworkIdentifier request)
+            => await CallApcApiAsync(HttpMethod.Post, APCPaths.DeviceNetworkRetrieve, request);
 
-        public async Task<HttpResponseMessage> SimSwapRetrieveAsync(SimSwapRetrievalContent request, bool useMock = false)
-            => await CallApcApiAsync(HttpMethod.Post, APCPaths.SimSwapRetrieve, request, useMock);
+        public async Task<HttpResponseMessage> SimSwapRetrieveAsync(SimSwapRetrievalContent request)
+            => await CallApcApiAsync(HttpMethod.Post, APCPaths.SimSwapRetrieve, request);
 
-        public async Task<HttpResponseMessage> SimSwapVerifyAsync(SimSwapVerificationContent request, bool useMock = false)
-            => await CallApcApiAsync(HttpMethod.Post, APCPaths.SimSwapVerify, request, useMock);
+        public async Task<HttpResponseMessage> SimSwapVerifyAsync(SimSwapVerificationContent request)
+            => await CallApcApiAsync(HttpMethod.Post, APCPaths.SimSwapVerify, request);
 
-        public async Task<HttpResponseMessage> NumberVerificationCallbackVerifyAsync(NumberVerificationCallbackResult request, bool useMock = false)
-            => await CallApcApiAsync(HttpMethod.Post, APCPaths.NumberVerificationVerify, request, useMock);
+        public async Task<HttpResponseMessage> NumberVerificationCallbackVerifyAsync(NumberVerificationCallbackResult request)
+            => await CallApcApiAsync(HttpMethod.Post, APCPaths.NumberVerificationVerify, request);
 
-        public async Task<HttpResponseMessage> NumberVerificationVerifyAsync(NumberVerificationContent request, bool useMock = false)
+        public async Task<HttpResponseMessage> NumberVerificationVerifyAsync(NumberVerificationContent request)
         {
             request.RedirectUri = _settings.NumberVerificationRedirectUri;
-            return await CallApcApiAsync(HttpMethod.Post, APCPaths.NumberVerificationVerify, request, useMock);
+            return await CallApcApiAsync(HttpMethod.Post, APCPaths.NumberVerificationVerify, request);
         }
-
-        private async Task<HttpResponseMessage> CallApcApiAsync(HttpMethod httpMethod, string endpoint, object? requestContent = null, bool useMock = false)
-            => (_settings.IsMockEnabled || useMock)
-            ? await CallApcMockAsync(endpoint) 
-            : await CallApcApiAsync(httpMethod, endpoint, requestContent);
 
         private async Task<HttpResponseMessage> CallApcApiAsync(HttpMethod httpMethod, string endpoint, object? requestContent = null)
         {
@@ -81,25 +74,8 @@ namespace APC.Client
             // Use HttpCompletionOption.ResponseHeadersRead for HTTP 302
             var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 
-            //if (response.StatusCode == HttpStatusCode.Redirect)
-            //    await CallApcApiAsync(HttpMethod.Get,  endpoint: response.Headers.Location.ToString(), requestContent:null, useMock: false);
-
             return response;
         }
 
-        private async Task<HttpResponseMessage> CallApcMockAsync(string endpoint) {
-
-                var mockResult = await _mockService.RetrieveMockResultAsync(endpoint);
-
-                var mockResponse = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = new StringContent(
-                        JsonSerializer.Serialize(
-                            mockResult,
-                            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }),
-                            Encoding.UTF8, "application/json")
-                };
-                return mockResponse;
-            }
     }
 }
