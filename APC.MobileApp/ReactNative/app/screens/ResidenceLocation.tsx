@@ -207,7 +207,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                 hasError = true;
             } else {
                 if (!data.UseAPC) {
-                    handleModalToggle('Warning', 'The application has not been able to check the validity of your location through our service', palette.warning, undefined, 'information-circle-outline', palette.black);
+                    handleModalToggle('Warning', 'APC Check Skipped: Location authenticity not verified. Enable APC for fraud protection', palette.warning, undefined, 'information-circle-outline', palette.black);
                     setShouldNavigate(true);
                     console.log('Business validation success!!');
                 } else {  //APC Validation
