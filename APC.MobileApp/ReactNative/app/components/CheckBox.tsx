@@ -38,7 +38,6 @@ const defaultStyles = StyleSheet.create({
   text: {
     color: palette.neutral,
     flex: 1,
-    textAlign: 'justify',
     alignSelf: 'center',
   },
 });

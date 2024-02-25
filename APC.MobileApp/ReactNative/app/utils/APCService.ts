@@ -14,29 +14,28 @@ export interface Position {
     location?: BingService.Location;
 }
 
-export const verificateAPCLocation = async (apiClient: APCApi, optionCoords: LocationObjectCoords) => {
+export const verificateAPCLocation = async (apiClient: APCApi, coords: LocationObjectCoords) => {
     const config = await readConfigurations();
 
     const ip = await ipify();
-    const coords = await getDeviceGPSLocation();
-    let accuracy = coords.coords.accuracy === null ? 2 : coords.coords.accuracy;   //Accuracy should be between 2-200 both included
-    accuracy = accuracy <= 1 ?  2 : accuracy;
-    accuracy = accuracy > 200 ?  200 : accuracy;
+    let accuracy = coords.accuracy === null ? 2 : coords.accuracy;   //Accuracy should be between 2-200 both included
+    accuracy = accuracy <= 1 ? 2 : accuracy;
+    accuracy = accuracy > 20 ? 20 : accuracy;
     if (config.connectionMode == ConnectionMode.Offline) {
         const fakeCoords = { coords: getLocationCoords(config.offlineLatitude, config.offlineLongitude) } as Position;
-        return matchesCoords(optionCoords, fakeCoords.coords, config.radiusKm);
+        return matchesCoords(coords, fakeCoords.coords, config.radiusKm);
     }
 
     const networkCode = await getNetworkCode(apiClient);
     const mockHeader = config.connectionMode == ConnectionMode.Mock ? { headers: { 'X-Use-Mock': true } } : undefined;
-    console.log(coords.coords.latitude + "--" + coords.coords.longitude + "--" + accuracy + " --" + networkCode);
+    console.log(coords.latitude + "--" + coords.longitude + "--" + accuracy + " --" + networkCode);
     const response = await apiClient.apiAPCDeviceLocationLocationverifyPost({
         networkIdentifier: {
             identifierType: "NetworkCode",
             identifier: networkCode
         },
-        latitude: coords.coords.latitude,
-        longitude: coords.coords.longitude,
+        latitude: coords.latitude,
+        longitude: coords.longitude,
         accuracy: accuracy,
         device: {
             ipv4Address: {
@@ -68,7 +67,7 @@ export const getPhoneNumber = async (apiClient: APCApi, phoneNumber: string): Pr
             identifierType: 'NetworkCode',
             identifier: networkCode
         },
-        phoneNumber: phoneNumber,
+        phoneNumber: '+' + phoneNumber,
         redirectUri: ''
     }, mockHeader);
 
@@ -110,8 +109,8 @@ export const checkSimChange = async (apiClient: APCApi, phoneNumber: string) => 
     const networkCode = await getNetworkCode(apiClient);
     const mockHeader = config.connectionMode == ConnectionMode.Mock ? { headers: { 'X-Use-Mock': true } } : undefined;
     const response = await apiClient.apiAPCSimSwapSimSwapverifyPost({
-        phoneNumber: phoneNumber,
-        maxAgeHours: 0,
+        phoneNumber:  '+' + phoneNumber,
+        maxAgeHours: 240,
         networkIdentifier: {
             identifierType: 'NetworkCode',
             identifier: networkCode
