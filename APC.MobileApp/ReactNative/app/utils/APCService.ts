@@ -144,7 +144,7 @@ export const getDeviceGPSLocation = async () => {
     location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
     console.log("Getting current position... OK");
 
-    const bingLocation = config.connectionMode != ConnectionMode.Offline ? await BingService.translateCoordsToLocation(location.coords) : undefined;
+    const bingLocation = await BingService.translateCoordsToLocation(location.coords);
 
     return { coords: location.coords, location: bingLocation } as Position;
 

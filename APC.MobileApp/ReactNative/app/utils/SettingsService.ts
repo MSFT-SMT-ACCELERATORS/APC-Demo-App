@@ -20,6 +20,7 @@ export type AppConfiguration = {
 };
 
 const CONFIG_KEY = 'app_configuration';
+export const  BING_MAPS_API_KEY = 'ApOlwQ1nNnrqWQ2jtz9Wyr27aAsnYsJpDeSr35Ej_-0_ntLEh0Ro0ZBXil0Rlnec';
 
 export const defaultConfig = {
   connectionMode: 'online',

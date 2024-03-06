@@ -1,39 +1,33 @@
 import * as React from 'react';
-import {
-    StyleSheet,
-    View,
-    ScrollView,
-    Pressable,
-} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import Colors from '../themes/Colors';
-import Button from '../components/Button';
-import palette from '../themes/Colors';
-import {
-    RadioButton,
-    Modal,
-} from 'react-native-paper';
-import StyledText from '../components/StyledText';
+import * as Location from 'expo-location';
+import { readConfigurations, AppConfiguration, ConnectionMode, } from '../utils/SettingsService';
 import { useEffect, useState } from 'react';
-import { Ionicons } from '@expo/vector-icons';
-import Icon from 'react-native-vector-icons/AntDesign';
-import AppContainer from '../components/AppContainer';
-import CheckboxWithText from '../components/CheckBox';
+import { useNavigation } from '@react-navigation/native';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
-import { LocationObjectCoords } from 'expo-location';
+
 import * as APCService from '../utils/APCService';
 import { useApiClient } from '../api/ApiClientProvider';
-import cities from '../utils/cities.json';
-import customStyles from '../themes/CustomStyles';
-import RNPickerSelect, { PickerStyle } from 'react-native-picker-select';
 import { Position } from '../utils/APCService';
-import {
-    readConfigurations,
-    AppConfiguration,
-    ConnectionMode,
-} from '../utils/SettingsService';
+
+import * as BingService from '../utils/BingService';
+
+import palette from '../themes/Colors';
+import customStyles from '../themes/CustomStyles';
+
+import cities from '../utils/cities.json';
+import countries from '../utils/countries.json'
+import Button from '../components/Button';
+import StyledText from '../components/StyledText';
+import StyledInputText from '../components/StyledInputText';
+import AppContainer from '../components/AppContainer';
+import CheckboxWithText from '../components/CheckBox';
+import RNPickerSelect, { PickerStyle } from 'react-native-picker-select';
 import CustomModal from '../components/CustomModal';
-import * as Location from 'expo-location';
+import { RadioButton, Modal, } from 'react-native-paper';
+import { StyleSheet, View, ScrollView, Pressable, FlatList, TouchableOpacity, } from 'react-native';
+
+import Icon from 'react-native-vector-icons/AntDesign';
+import { Ionicons } from '@expo/vector-icons';
 
 interface StepProps {
     setProgress: (progress: number) => void;
@@ -46,7 +40,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
 }) => {
     const navigation = useNavigation();
     const apiClient = useApiClient();
-    const [hackedGPS, setHackedGPS] = useState<LocationObjectCoords>();
+    const [hackedGPS, setHackedGPS] = useState<Location.LocationObjectCoords>();
     const [gpsPosition, setGPSPosition] = useState<Position>();
     const [config, setConfig] = useState<AppConfiguration>();
     const [skipGeolocationCheck, setSkipLocation] = useState<boolean>(true);
@@ -60,7 +54,16 @@ const ResidenceLocation: React.FC<StepProps> = ({
     const [modalIconColor, setColorIcon] = useState('');
     const [shouldNavigate, setShouldNavigate] = useState(false);
 
-    const [hasLocationPermission, setHasLocationPermission] = useState<boolean | null>(null);
+    const [hasLocationPermission, setHasLocationPermission] = useState<boolean | null>(true);
+    const [selectedCountry, setSelectedCountry] = useState<string>('');
+    const [stateQuery, setStateQuery] = useState<string>('');
+    const [stateSuggestions, setStateSuggestions] = useState<any>([]);
+    const [selectedState, setSelectedValue] = useState('');
+    const [cityQuery, setCityQuery] = useState<string>('');
+    const [citiesSuggestions, setCitySuggestions] = useState<string[]>([]);
+    const [selectedCity, setCityValue] = useState('');
+
+
 
     useEffect(() => {
         (async () => {
@@ -109,49 +112,55 @@ const ResidenceLocation: React.FC<StepProps> = ({
         },
     });
 
-    const handleCountryChange = (country: string) => {
+    const handleCountryChange = async (country: string) => {
         if (!country) return;
 
         setValue('Country', country);
-        const firstStateOption =
-            cities
-                .filter((item) => item.country === country)
-                .map((item) => item.state)[0] || '';
-        setValue('StateProvince', firstStateOption);
-        handleStateChange(firstStateOption);
+        setSelectedCountry(country);
     };
-    const handleStateChange = (state: string) => {
-        if (!state) return;
 
-        setValue('StateProvince', state);
-        const firstCityOption =
-            cities
-                .filter(
-                    (item) =>
-                        item.country == getValues('Country') &&
-                        item.state === state
-                )
-                .map((item) => item.city)[0] || '';
-        setValue('City', firstCityOption);
-        handleCityChange(firstCityOption);
+    const handleStateChange = async (query: string) => {
+        setStateQuery(query);
+        if (query.length >= 2) {
+            const suggestions = await BingService.getStateSuggestions(query, selectedCountry);
+            const uniqueSuggestions = Array.from(new Set(suggestions));
+            setStateSuggestions(uniqueSuggestions);
+        } else {
+            setStateSuggestions([]);
+        }
     };
-    const handleCityChange = (city: string) => {
-        if (!city) return;
 
-        setValue('City', city);
-        const selectedCity = cities.filter(
-            (d) =>
-                d.country == getValues('Country') &&
-                d.state == getValues('StateProvince') &&
-                d.city == city
-        )[0];
+    const handleSelectSuggestion = (suggestion: string) => {
+        setStateQuery(suggestion);
+        setStateSuggestions([]);
+        setSelectedValue(suggestion);
+    };
+
+
+    const handleCityChange = async (query: string) => {
+        setCityQuery(query);
+        if (query.length > 1) {
+            const suggestions = await BingService.getCitySuggestions(query, selectedCountry, selectedState);
+            const uniqueSuggestions = Array.from(new Set(suggestions));
+            setCitySuggestions(uniqueSuggestions);
+        } else {
+            setCitySuggestions([]);
+        }
+    };
+
+    const handleCitySuggestion = async (suggestion: string) => {
+        setCityQuery(suggestion);
+        setCitySuggestions([]);
+        setCityValue(suggestion);
+        const hackedLocation = await BingService.getCityCoordinates(selectedCity, selectedCountry);
         setHackedGPS(
             APCService.getLocationCoords(
-                selectedCity.latitude,
-                selectedCity.longitude
+                hackedLocation?.latitude,
+                hackedLocation?.longitude
             )
         );
     };
+
 
     const onFormValid = async (data: FieldValues) => {
         try {
@@ -160,30 +169,26 @@ const ResidenceLocation: React.FC<StepProps> = ({
             console.log('Submitted Data:', data);
             setLoading(true, 'Validating your data...');
 
-            const selectedCity = cities.filter(
-                (d) =>
-                    d.country == data.Country &&
-                    d.state == data.StateProvince &&
-                    d.city == data.City
-            )[0];
 
-            if (data.Country === 'Select a country' || !selectedCity) {
+            const selectedLocation = await BingService.getCityCoordinates(selectedCity, selectedCountry);
+            if (!selectedCity) {
                 console.log('Selection required');
-                handleModalToggle('Selection required', 'Please select a valid option from the "Select a country" dropdown to proceed', '#dadaed', undefined, 'information-circle-outline', palette.black);
+                handleModalToggle('Selection required', 'Select a valid option from the drop-down menus to continue', '#dadaed', undefined, 'information-circle-outline', palette.black);
                 setLoading(false);
 
                 return;
             }
 
             let coordsForm = APCService.getLocationCoords(
-                selectedCity.latitude,
-                selectedCity.longitude
+                selectedLocation?.latitude,
+                selectedLocation?.longitude
             );
+
             console.log('Get: device gps location');
             let coordsGPS = await APCService.getDeviceGPSLocation();
             console.log('Get: device gps location OK');
 
-            let coords: LocationObjectCoords;
+            let coords: Location.LocationObjectCoords;
             if (data.GPSOption == 'true') coords = coordsGPS.coords;
             else coords = coordsForm;
 
@@ -273,10 +278,10 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
     useEffect(() => {
         if (config) {
-          setSkipLocation(config.skipGeolocationCheck ?? false);
-          console.log('LOC' + skipGeolocationCheck + " " + config.skipGeolocationCheck);
+            setSkipLocation(config.skipGeolocationCheck ?? false);
+            console.log('LOC' + skipGeolocationCheck + " " + config.skipGeolocationCheck);
         }
-      }, [config, skipGeolocationCheck]);
+    }, [config, skipGeolocationCheck]);
     return (
         <AppContainer>
             <View style={[styles.parent]}>
@@ -304,47 +309,29 @@ const ResidenceLocation: React.FC<StepProps> = ({
                         style={[styles.separatorContainer, customStyles.mb4]}
                     ></View>
                     <View style={styles.bodyContent}>
-                        <Controller
-                            name="Country"
-                            control={control}
-                            defaultValue=""
-                            render={({ field }) => (
-                                <RNPickerSelect
-                                    style={pickerStyle}
-                                    darkTheme={true}
-                                    value={field.value || ''}
-
-                                    onValueChange={handleCountryChange}
-                                    useNativeAndroidPickerStyle={false}
-                                    Icon={() => {
-                                        return (
-                                            <Ionicons
-                                                name="chevron-down"
-                                                size={24}
-                                                color={palette.neutral}
-                                                style={styles.iconPicker}
-                                            />
-                                        );
-                                    }}
-                                    items={cities
-                                        .map((item) => item.country)
-                                        .filter(
-                                            (value, index, self) =>
-                                                self.indexOf(value) === index
-                                        )
-                                        .sort((a, b) =>
-                                            a.localeCompare(b, 'es', {
-                                                sensitivity: 'base',
-                                            })
-                                        )
-                                        .map((item) => {
-                                            return {
-                                                label: item,
-                                                value: item,
-                                            };
-                                        })}
-                                />
-                            )}
+                        <Controller name="Country" control={control} defaultValue="" render={({ field }) => (
+                            <RNPickerSelect style={pickerStyle} darkTheme={true}
+                                value={field.value || ''}
+                                onValueChange={handleCountryChange}
+                                useNativeAndroidPickerStyle={false}
+                                Icon={() => {
+                                    return (
+                                        <Ionicons
+                                            name="chevron-down"
+                                            size={24}
+                                            color={palette.neutral}
+                                            style={styles.iconPicker}
+                                        />
+                                    );
+                                }}
+                                items={countries.map((country) => {
+                                    return {
+                                        label: country.country,
+                                        value: country.country,
+                                    };
+                                })}
+                            />
+                        )}
                         />
                         {errors.Country && (
                             <StyledText
@@ -355,200 +342,74 @@ const ResidenceLocation: React.FC<StepProps> = ({
                             </StyledText>
                         )}
 
-                        <Controller
-                            name="StateProvince"
-                            control={control}
-                            defaultValue=""
-                            render={({ field }) => (
-                                <RNPickerSelect
-                                    style={pickerStyle}
-                                    darkTheme={true}
-                                    value={field.value || ''}
-                                    disabled={!getValues('Country')}
-                                    onValueChange={handleStateChange}
-                                    useNativeAndroidPickerStyle={false}
-                                    Icon={() => {
-                                        return (
-                                            <Ionicons
-                                                name="chevron-down"
-                                                size={24}
-                                                color={palette.neutral}
-                                                style={styles.iconPicker}
-                                            />
-                                        );
-                                    }}
-                                    items={cities
-                                        .filter(
-                                            (item) =>
-                                                item.country ===
-                                                getValues('Country')
-                                        )
-                                        .map((item) => item.state)
-                                        .filter(
-                                            (value, index, self) =>
-                                                self.indexOf(value) === index
-                                        )
-                                        .sort((a, b) =>
-                                            a.localeCompare(b, 'es', {
-                                                sensitivity: 'base',
-                                            })
-                                        )
-                                        .map((item) => {
-                                            return {
-                                                label: item,
-                                                value: item,
-                                            };
-                                        })}
-                                />
-                            )}
-                        />
-                        {errors.StateProvince && (
-                            <StyledText color="danger200">
-                                {errors.StateProvince.message}
-                            </StyledText>
+                        <Controller name='StateProvince' control={control} render={({ field }) => (
+                            <>
+                                <StyledInputText customStyle={['mb0']} labelText="State/Province" value={stateQuery} onChangeText={handleStateChange} placeholder="Select a State/Province..."/>
+                                {stateSuggestions.length > 0 && (
+                                    <FlatList style={styles.sectionContent} data={stateSuggestions}
+                                        renderItem={({ item }) => (
+                                            <TouchableOpacity onPress={() => handleSelectSuggestion(item)}>
+                                                <StyledText customStyle={['m4']}>{item}</StyledText>
+                                                <View style={[styles.separatorList]}></View>
+                                            </TouchableOpacity>
+                                        )}
+                                        keyExtractor={(item, index) => index.toString()}
+                                    />
+                                )}
+                            </>
                         )}
+                        />
+
 
                         <Controller
-                            name="City"
+                            name='City'
                             control={control}
-                            defaultValue=""
                             render={({ field }) => (
-                                <RNPickerSelect
-                                    style={pickerStyle}
-                                    darkTheme={true}
-                                    value={field.value || ''}
-                                    disabled={!getValues('StateProvince')}
-                                    onValueChange={handleCityChange}
-                                    useNativeAndroidPickerStyle={false}
-                                    Icon={() => {
-                                        return (
-                                            <Ionicons
-                                                name="chevron-down"
-                                                size={24}
-                                                color={palette.neutral}
-                                                style={styles.iconPicker}
-                                            />
-                                        );
-                                    }}
-                                    items={cities
-                                        .filter(
-                                            (item) =>
-                                                item.country ==
-                                                getValues('Country') &&
-                                                item.state ===
-                                                getValues('StateProvince')
-                                        )
-                                        .map((item) => item.city)
-                                        .filter(
-                                            (value, index, self) =>
-                                                self.indexOf(value) === index
-                                        )
-                                        .sort((a, b) =>
-                                            a.localeCompare(b, 'es', {
-                                                sensitivity: 'base',
-                                            })
-                                        )
-                                        .map((item) => {
-                                            return {
-                                                label: item,
-                                                value: item,
-                                            };
-                                        })}
-                                />
+                                <>
+                                    <StyledInputText customStyle={['mb0']} labelText="City" value={cityQuery} onChangeText={handleCityChange} placeholder="Select a City..." />
+                                    {citiesSuggestions.length > 0 && (
+                                        <FlatList style={styles.sectionContent} data={citiesSuggestions}
+                                            renderItem={({ item }) => (
+                                                <TouchableOpacity style={styles.itemList} onPress={() => handleCitySuggestion(item)}>
+                                                    <StyledText customStyle={['m4']}>{item}</StyledText>
+                                                    <View style={[styles.separatorList]}></View>
+                                                </TouchableOpacity>
+                                            )}
+                                            keyExtractor={(item, index) => index.toString()}
+                                        />
+                                    )}
+                                </>
                             )}
                         />
-                        {errors.City && (
-                            <StyledText color="danger200">
-                                {errors.City.message}
-                            </StyledText>
-                        )}
 
                         {!skipGeolocationCheck && hasLocationPermission && (
                             <View style={styles.btnGroup}>
-                                <StyledText style={styles.comparisonTitle}>
-                                    Internal comparison with:
-                                </StyledText>
-                                <Controller
-                                    control={control}
-                                    name="GPSOption"
-                                    rules={{
-                                        required: 'Please select an option',
-                                    }}
-                                    render={({
-                                        field: { onChange, value },
-                                    }) => (
-                                        <RadioButton.Group
-                                            onValueChange={onChange}
-                                            value={value}
-                                        >
+                                <StyledText style={styles.comparisonTitle}> Internal comparison with:</StyledText>
+                                <Controller control={control} name="GPSOption" rules={{ required: 'Please select an option', }}
+                                    render={({ field: { onChange, value }, }) => (
+                                        <RadioButton.Group onValueChange={onChange} value={value} >
                                             <View>
                                                 <View>
-                                                    <Pressable
-                                                        onPress={() =>
-                                                            onChange('true')
-                                                        }
-                                                    >
-                                                        <View
-                                                            style={styles.flex}
-                                                        >
-                                                            <RadioButton.Android
-                                                                value="true"
-                                                                color={
-                                                                    Colors.accent200
-                                                                }
-                                                            />
-                                                            <StyledText>
-                                                                Device GPS
-                                                            </StyledText>
+                                                    <Pressable onPress={() => onChange('true')}>
+                                                        <View style={styles.flex}>
+                                                            <RadioButton.Android value="true" color={palette.accent200} />
+                                                            <StyledText>Device GPS</StyledText>
                                                         </View>
-                                                        <View
-                                                            style={
-                                                                styles.optionSubtitleContainer
-                                                            }
-                                                        >
-                                                            {gpsPosition &&
-                                                                gpsPosition.location ? (
-                                                                <View
-                                                                    style={
-                                                                        styles.optionSubtitleBadge
-                                                                    }
-                                                                >
+                                                        <View style={styles.optionSubtitleContainer} >
+                                                            {gpsPosition && gpsPosition.location ? (
+                                                                <View style={styles.optionSubtitleBadge} >
                                                                     <StyledText>
-                                                                        {
-                                                                            gpsPosition
-                                                                                .location
-                                                                                .country
-                                                                        }{' '}
-                                                                        -{' '}
-                                                                        {
-                                                                            gpsPosition
-                                                                                .location
-                                                                                .state
-                                                                        }{' '}
-                                                                        -{' '}
-                                                                        {
-                                                                            gpsPosition
-                                                                                .location
-                                                                                .city
-                                                                        }
+                                                                        {gpsPosition.location.country}{' '}-{' '}
+                                                                        {gpsPosition.location.state}{' '}-{' '}
+                                                                        {gpsPosition.location.city}
                                                                     </StyledText>
                                                                 </View>
                                                             ) : null}
-                                                            {gpsPosition &&
-                                                                gpsPosition.coords ? (
-                                                                <View
-                                                                    style={
-                                                                        styles.optionSubtitleBadge
-                                                                    }
-                                                                >
+                                                            {gpsPosition && gpsPosition.coords ? (
+                                                                <View style={styles.optionSubtitleBadge} >
                                                                     <StyledText>
-                                                                        {gpsPosition.coords.latitude.toFixed(
-                                                                            4
-                                                                        )}
-                                                                        ,{' '}
-                                                                        {gpsPosition.coords.longitude.toFixed(
-                                                                            4
-                                                                        )}
+                                                                        {gpsPosition.coords.latitude.toFixed(4)} ,{' '}
+                                                                        {gpsPosition.coords.longitude.toFixed(4)}
                                                                     </StyledText>
                                                                 </View>
                                                             ) : null}
@@ -557,167 +418,42 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                                 </View>
                                             </View>
                                             <View>
-                                                <Pressable
-                                                    onPress={() =>
-                                                        onChange('hacked')
-                                                    }
-                                                >
+                                                <Pressable onPress={() => onChange('hacked')} >
                                                     <View style={styles.flex}>
-                                                        <RadioButton.Android
-                                                            value="hacked"
-                                                            color={
-                                                                Colors.accent200
-                                                            }
-                                                        />
-                                                        <StyledText>
-                                                            Hacked GPS
-                                                        </StyledText>
+                                                        <RadioButton.Android value="hacked" color={palette.accent200} />
+                                                        <StyledText> Hacked GPS </StyledText>
                                                     </View>
-                                                    {getValues('Country') &&
-                                                        getValues(
-                                                            'StateProvince'
-                                                        ) &&
-                                                        getValues('City') ? (
-                                                        <View
-                                                            style={
-                                                                styles.optionSubtitleContainer
-                                                            }
-                                                        >
-                                                            {config?.connectionMode !=
-                                                                ConnectionMode.Offline ? (
-                                                                <View
-                                                                    style={[
-                                                                        styles.optionSubtitleBadge,
-                                                                    ]}
-                                                                >
-                                                                    <StyledText>
-                                                                        {getValues(
-                                                                            'Country'
-                                                                        )}{' '}
-                                                                        -{' '}
-                                                                        {getValues(
-                                                                            'StateProvince'
-                                                                        )}{' '}
-                                                                        -{' '}
-                                                                        {getValues(
-                                                                            'City'
-                                                                        )}
-                                                                    </StyledText>
-                                                                </View>
-                                                            ) : null}
-                                                            <View
-                                                                style={
-                                                                    styles.optionSubtitleBadge
-                                                                }
-                                                            >
+                                                    {selectedCountry && selectedState && selectedCity ? (
+                                                        <View style={styles.optionSubtitleContainer} >
+
+                                                            <View style={[styles.optionSubtitleBadge,]} >
                                                                 <StyledText>
-                                                                    {
-                                                                        hackedGPS?.latitude
-                                                                    }
-                                                                    ,{' '}
-                                                                    {
-                                                                        hackedGPS?.longitude
-                                                                    }
+                                                                    {selectedCountry}{' '}-{' '}
+                                                                    {selectedState}{' '}-{' '}
+                                                                    {selectedCity}
+                                                                </StyledText>
+                                                            </View>
+                                                            <View style={styles.optionSubtitleBadge} >
+                                                                <StyledText>
+                                                                    {hackedGPS?.latitude},{' '}
+                                                                    {hackedGPS?.longitude}
                                                                 </StyledText>
                                                             </View>
                                                         </View>
                                                     ) : null}
                                                 </Pressable>
                                             </View>
-                                            <View
-                                                style={[
-                                                    styles.dangerSeparator,
-                                                    customStyles.my5,
-                                                ]}
-                                            ></View>
+
+                                            <View style={[styles.dangerSeparator, customStyles.my5,]}></View>
+
                                             <View>
-                                                <Controller
-                                                    control={control}
-                                                    name="UseAPC"
-                                                    render={({
-                                                        field: {
-                                                            onChange,
-                                                            value,
-                                                        },
-                                                    }) => (
-                                                        <Pressable
-                                                            onPress={() =>
-                                                                onChange(!value)
-                                                            }
-                                                        >
-                                                            <View
-                                                                style={
-                                                                    styles.flex
-                                                                }
-                                                            >
-                                                                <CheckboxWithText
-                                                                    label="Use Azure Programmable Connectivity backend"
-                                                                    checked={
-                                                                        value
-                                                                    }
-                                                                    onToggle={() =>
-                                                                        onChange(
-                                                                            !value
-                                                                        )
-                                                                    }
-                                                                />
+                                                <Controller control={control} name="UseAPC"
+                                                    render={({ field: { onChange, value, }, }) => (
+                                                        <Pressable onPress={() => onChange(!value)} >
+                                                            <View style={styles.flex} >
+                                                                <CheckboxWithText label="Use Azure Programmable Connectivity backend" checked={value}
+                                                                    onToggle={() => onChange(!value)} />
                                                             </View>
-                                                            {/* <View
-                                                                style={
-                                                                    styles.optionSubtitleContainer
-                                                                }
-                                                            >
-                                                                {apcPosition &&
-                                                                    apcPosition.location ? (
-                                                                    <View
-                                                                        style={
-                                                                            styles.optionSubtitleBadge
-                                                                        }
-                                                                    >
-                                                                        <StyledText>
-                                                                            {
-                                                                                apcPosition
-                                                                                    .location
-                                                                                    .country
-                                                                            }{' '}
-                                                                            -{' '}
-                                                                            {
-                                                                                apcPosition
-                                                                                    .location
-                                                                                    .state
-                                                                            }{' '}
-                                                                            -{' '}
-                                                                            {
-                                                                                apcPosition
-                                                                                    .location
-                                                                                    .city
-                                                                            }
-                                                                        </StyledText>
-                                                                    </View>
-                                                                ) : null}
-                                                                {apcPosition &&
-                                                                    apcPosition.coords ? (
-                                                                    <View
-                                                                        style={
-                                                                            styles.optionSubtitleBadge
-                                                                        }
-                                                                    >
-                                                                        <StyledText>
-                                                                            {
-                                                                                apcPosition
-                                                                                    .coords
-                                                                                    .latitude
-                                                                            }
-                                                                            ,{' '}
-                                                                            {
-                                                                                apcPosition
-                                                                                    .coords
-                                                                                    .longitude
-                                                                            }
-                                                                        </StyledText>
-                                                                    </View>
-                                                                ) : null}
-                                                            </View> */}
                                                         </Pressable>
                                                     )}
                                                 />
@@ -794,6 +530,18 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         gap: 25,
     },
+    sectionContent: {
+        flexDirection: 'column',
+        gap: 0,
+        padding: 20,
+        backgroundColor: '#252533',
+        // borderRadius: 10,
+        marginTop: -36,
+        marginHorizontal: 10,
+    },
+    itemList: {
+        //item List styles
+    },
     idContainer: {
         borderWidth: 2,
         borderRadius: 8,
@@ -824,6 +572,12 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         borderBottomWidth: 3,
         borderBlockColor: palette.secondary200,
+    },
+    separatorList: {
+        width: '100%',
+        // alignSelf: 'center',
+        borderBottomWidth: 3,
+        borderBlockColor: palette.primary100,
     },
     btnGroup: {
         borderWidth: 2,
@@ -861,7 +615,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     optionSubtitleBadge: {
-        backgroundColor: Colors.secondary200,
+        backgroundColor: palette.secondary200,
         paddingHorizontal: 5,
         marginRight: 5,
         borderRadius: 10,
@@ -891,28 +645,31 @@ const pickerStyle: PickerStyle = {
     inputWeb: {
         fontSize: 20,
         padding: 10,
+        margin: 12,
         backgroundColor: palette.transparent,
         color: palette.neutral,
         borderWidth: 0,
-        borderBottomWidth: 1,
+        borderBottomWidth: 2,
         borderBottomColor: palette.accent200,
     },
     inputIOS: {
         fontSize: 20,
         padding: 10,
+        margin: 12,
         backgroundColor: palette.transparent,
         color: palette.neutral,
         borderWidth: 0,
-        borderBottomWidth: 1,
+        borderBottomWidth: 2,
         borderColor: palette.accent200,
     },
     inputAndroid: {
         fontSize: 20,
         padding: 10,
+        margin: 12,
         backgroundColor: palette.transparent,
         color: palette.neutral,
         borderWidth: 0,
-        borderBottomWidth: 1,
+        borderBottomWidth: 2,
         borderColor: palette.accent200,
     },
 };

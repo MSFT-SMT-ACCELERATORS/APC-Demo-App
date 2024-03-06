@@ -6,6 +6,8 @@ import {
   ScrollView,
   Dimensions,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as APCService from '../utils/APCService';
@@ -185,7 +187,11 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   return (
     <AppContainer>
       <View style={[styles.parent]}>
-        <ScrollView style={[styles.contentContainer]}>
+      <KeyboardAvoidingView
+  behavior={Platform.OS === "ios" ? "padding" : "height"}
+  style={{ flex: 1 }}
+>
+        <ScrollView keyboardShouldPersistTaps="handled" style={[styles.contentContainer]}>
           <View style={[styles.title]}>
             <StyledText customStyle={['title2', 'extrabold']}>
               Let’s get started
@@ -421,7 +427,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
             />
           </View>
         </ScrollView>
-
+        </KeyboardAvoidingView>
         <View style={[styles.footer]}>
           <Button
             title="Next"
