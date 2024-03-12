@@ -55,6 +55,26 @@ export const translateCoordsToLocation = async (coords: LocationObjectCoords, ve
 }
 
 
+export const getCountrySuggestions = async (query: string): Promise<string[]> => {
+  const url = `http://dev.virtualearth.net/REST/v1/Autosuggest?query=${encodeURIComponent(query)}&key=${BING_MAPS_API_KEY}`;
+
+  try {
+    const response = await fetch(url);
+    const data: BingAutosuggestResponse = await response.json();
+    const countrySuggestions = data.resourceSets[0].resources[0].value
+      .filter((suggestion: BingSuggestion) => suggestion.address.countryRegion?.toLowerCase().includes(query.toLowerCase()))
+      .map((suggestion: BingSuggestion) => suggestion.address.countryRegion)
+      .filter((countryRegion): countryRegion is string => countryRegion != null);
+
+    // Podrías querer asegurarte de que los resultados son únicos si hay duplicados
+    return Array.from(new Set(countrySuggestions));
+  } catch (error) {
+    console.error('Error fetching country suggestions from Bing Maps:', error);
+    return [];
+  }
+};
+
+
 export const getStateSuggestions = async (query: string, country: string): Promise<string[]> => {
 
   const countryCode = countries.getAlpha2Code(country, 'en') || '';

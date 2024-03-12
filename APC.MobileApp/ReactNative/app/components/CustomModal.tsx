@@ -7,7 +7,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import palette from '../themes/Colors';
 
-interface ModalProps {
+interface CustomModalProps {
   visible: boolean;
   onClose: () => void;
   title: string;
@@ -20,7 +20,7 @@ interface ModalProps {
   backgroundColor?: string;
 }
 
-const CustomModal: React.FC<ModalProps> = ({
+const CustomModal: React.FC<CustomModalProps> = ({
   visible,
   onClose,
   title,

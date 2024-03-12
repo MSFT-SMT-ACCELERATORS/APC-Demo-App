@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { StyleSheet, Text, View, Image, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration } from '../utils/SettingsService'
+import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration } from '../Services/SettingsService'
 
 import Colors from '../themes/Colors';
 import Button from '../components/Button'
@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 import textStyles from '../themes/Texts';
 import Checkbox from '../components/CheckBox';
 import AppContainer from '../components/AppContainer';
-import * as APCService from '../utils/APCService'
+import * as APCService from '../Services/APCService'
 import { LocationObjectCoords } from 'expo-location';
 import { useApiClient } from '../api/ApiClientProvider';
 

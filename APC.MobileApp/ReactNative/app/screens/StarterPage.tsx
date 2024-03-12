@@ -1,31 +1,26 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import {
-  StyleSheet,
-  View,
-  ScrollView,
-  Dimensions,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
+import { StyleSheet, View, ScrollView, Dimensions, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
+import { Controller, FieldValues, useForm } from 'react-hook-form';
+import { AppConfiguration, readConfigurations } from '../Services/SettingsService';
+
 import { useNavigation } from '@react-navigation/native';
-import * as APCService from '../utils/APCService';
+import * as APCService from '../Services/APCService';
+import { useApiClient } from '../api/ApiClientProvider';
+
+import { useStep } from '../utils/StepContext';
+
+import palette from '../themes/Colors';
+import customStyles from '../themes/CustomStyles';
 
 import Button from '../components/Button';
 import StyledText from '../components/StyledText';
 import StyledInputText from '../components/StyledInputText';
-import palette from '../themes/Colors';
 import Slider from '../components/Slider';
 import AppContainer from '../components/AppContainer';
-import customStyles from '../themes/CustomStyles';
-import { Controller, FieldValues, useForm } from 'react-hook-form';
-import Icon from 'react-native-vector-icons/AntDesign';
 import { Modal } from 'react-native-paper';
-import { useStep } from '../utils/StepContext';
-import { useApiClient } from '../api/ApiClientProvider';
 import CustomModal from '../components/CustomModal';
-import { AppConfiguration, ConnectionMode, readConfigurations } from '../utils/SettingsService';
+import Icon from 'react-native-vector-icons/AntDesign';
 
 interface StepProps {
   setProgress: (progress: number) => void;
@@ -46,15 +41,12 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const navigation = useNavigation();
   const apiClient = useApiClient();
   const { setCurrentStep } = useStep();
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const { control, handleSubmit } = useForm();
+
   const [tooltipVisible, setTooltipVisible] = useState<boolean>(false);
   const [phoneNumber, setPhoneNumber] = useState<string>('');
-  const [isPhoneNumberValid, setIsPhoneNumberValid] =
-    useState<boolean>(false);
+  const [isPhoneNumberValid, setIsPhoneNumberValid] = useState<boolean>(false);
+  const [selectedPurpose, setSelectetPurposed] = useState<boolean>(false);
   const [config, setConfig] = useState<AppConfiguration>();
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
@@ -173,6 +165,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
         isValid = false;
       }
       handleModalToggle(title, message, backgroundColor, undefined, icon, iconColor);
+      Keyboard.dismiss();
       setIsPhoneNumberValid(isValid);
 
     } catch (error) {
@@ -187,246 +180,253 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   return (
     <AppContainer>
       <View style={[styles.parent]}>
-      <KeyboardAvoidingView
-  behavior={Platform.OS === "ios" ? "padding" : "height"}
-  style={{ flex: 1 }}
->
-        <ScrollView keyboardShouldPersistTaps="handled" style={[styles.contentContainer]}>
-          <View style={[styles.title]}>
-            <StyledText customStyle={['title2', 'extrabold']}>
-              Let’s get started
-            </StyledText>
-            <StyledText
-              style={{ textAlign: 'center' }}
-              customStyle={['title5', 'regular']}
-            >
-              Please complete the form below {'  '}
-              <Icon
-                name="infocirlceo"
-                size={20}
-                color={palette.accent200}
-                onPress={showTooltip}
-              />
-            </StyledText>
-          </View>
-
-          <View
-            style={[styles.separatorContainer, customStyles.mb4]}
-          ></View>
-          <View style={styles.bodyContent}>
-            <Controller
-              name="phonenumber"
-              control={control}
-              render={() => (
-                <View style={styles.phoneNumberField}>
-                  <StyledText style={styles.plusIcon}>+</StyledText>
-                  <StyledInputText
-                    style={styles.phoneInput}
-                    labelText="Phone number (Include country code)"
-                    placeholder="00 123 456 7890"
-                    value={phoneNumber}
-                    inputType="tel"
-                    onChangeText={(text) =>
-                      setPhoneNumber(text)
-                    }
-                  ></StyledInputText>
-                  <TouchableOpacity>
-                    <Button
-                      title=""
-                      size="short"
-                      style={
-                        styles.phoneVerificationCheck
-                      }
-                      showIcon={true}
-                      iconName={'check'}
-                      iconColor={palette.primary300}
-                      useGradient={true}
-                      onPress={autocompletePhoneNumber}
-                    />
-                  </TouchableOpacity>
-                </View>
-              )}
-            />
-            <StyledText customStyle={['standar']}>
-              I would like to formally request a loan for the
-              following amount:
-            </StyledText>
-
-            <Controller
-              name="amount"
-              control={control}
-              render={({ field }) => (
-                <Slider
-                  minValue={500}
-                  maxValue={10000}
-                  stepSize={100}
-                  formatter={currencyFormatter}
-                  onChange={field.onChange}
-                  value={field.value}
-                  style={{ padding: 10 }}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+        >
+          <ScrollView keyboardShouldPersistTaps="handled" style={[styles.contentContainer]}>
+            <View style={[styles.title]}>
+              <StyledText customStyle={['title2', 'extrabold']}>
+                Let’s get started
+              </StyledText>
+              <StyledText
+                style={{ textAlign: 'center' }}
+                customStyle={['title5', 'regular']}
+              >
+                Please complete the form below {'  '}
+                <Icon
+                  name="infocirlceo"
+                  size={20}
+                  color={palette.accent200}
+                  onPress={showTooltip}
                 />
-              )}
-            />
-            <StyledText customStyle={['standar']}>
-              Purpose:
-            </StyledText>
+              </StyledText>
+            </View>
 
-            <Controller
-              name="purpose"
-              control={control}
-              render={({ field }) => (
-                <View>
-                  <View style={styles.row}>
-                    <Button
-                      title="Debt consolidation"
-                      titleSize={customStyles.small}
-                      titleColor={buttonStyleVariant(
-                        'title',
-                        field.value ===
-                        ButtonNames.consolidation
-                      )}
-                      style={[
-                        customStyles.my3,
-                        customStyles.mr1,
-                        isSmallScreen
-                          ? styles.largeIconButton
-                          : styles.smallIconButton,
-                      ]}
-                      size="square"
-                      showIcon={true}
-                      outline={true}
-                      iconLib="MaterialIcons"
-                      iconName={'attach-money'}
-                      iconSize={50}
-                      iconColor={buttonStyleVariant(
-                        'icon',
-                        field.value ===
-                        ButtonNames.consolidation
-                      )}
-                      onPress={() =>
-                        field.onChange(
+            <View
+              style={[styles.separatorContainer, customStyles.mb4]}
+            ></View>
+            <View style={styles.bodyContent}>
+              <Controller
+                name="phonenumber"
+                control={control}
+                render={() => (
+                  <View style={styles.phoneNumberField}>
+                    <StyledText style={styles.plusIcon}>+</StyledText>
+                    <StyledInputText
+                      style={styles.phoneInput}
+                      labelText="Phone number (Include country code)"
+                      placeholder="00 123 456 7890"
+                      value={phoneNumber}
+                      inputType="tel"
+                      onChangeText={(text) =>
+                        setPhoneNumber(text)
+                      }
+                    ></StyledInputText>
+                    <TouchableOpacity>
+                      <Button
+                        title=""
+                        size="short"
+                        style={
+                          styles.phoneVerificationCheck
+                        }
+                        showIcon={true}
+                        iconName={'check'}
+                        iconColor={palette.primary300}
+                        useGradient={true}
+                        onPress={autocompletePhoneNumber}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                )}
+              />
+              <StyledText customStyle={['standar']}>
+                I would like to formally request a loan for the
+                following amount:
+              </StyledText>
+
+              <Controller
+                name="amount"
+                control={control}
+                render={({ field }) => (
+                  <Slider
+                    minValue={500}
+                    maxValue={10000}
+                    stepSize={100}
+                    formatter={currencyFormatter}
+                    onChange={field.onChange}
+                    value={field.value}
+                    style={{ padding: 10 }}
+                  />
+                )}
+              />
+              <StyledText customStyle={['standar']}>
+                Purpose:
+              </StyledText>
+
+              <Controller
+                name="purpose"
+                control={control}
+                render={({ field }) => (
+                  <View>
+                    <View style={styles.row}>
+                      <Button
+                        title="Debt consolidation"
+                        titleSize={customStyles.small}
+                        titleColor={buttonStyleVariant(
+                          'title',
+                          field.value ===
                           ButtonNames.consolidation
-                        )
-                      }
-                      isActive={
-                        field.value ===
-                        ButtonNames.consolidation
-                      }
-                    />
-                    <Button
-                      title="Monthly bills"
-                      titleSize={customStyles.small}
-                      titleColor={buttonStyleVariant(
-                        'title',
-                        field.value ===
-                        ButtonNames.bills
-                      )}
-                      style={[
-                        customStyles.my2,
-                        isSmallScreen
-                          ? styles.largeIconButton
-                          : styles.smallIconButton,
-                      ]}
-                      size="square"
-                      showIcon={true}
-                      outline={true}
-                      iconLib="Ionicons"
-                      iconName={'calendar-outline'}
-                      iconSize={50}
-                      iconColor={buttonStyleVariant(
-                        'icon',
-                        field.value ===
-                        ButtonNames.bills
-                      )}
-                      onPress={() =>
-                        field.onChange(
+                        )}
+                        style={[
+                          customStyles.my3,
+                          customStyles.mr1,
+                          isSmallScreen
+                            ? styles.largeIconButton
+                            : styles.smallIconButton,
+                        ]}
+                        size="square"
+                        showIcon={true}
+                        outline={true}
+                        iconLib="MaterialIcons"
+                        iconName={'attach-money'}
+                        iconSize={50}
+                        iconColor={buttonStyleVariant(
+                          'icon',
+                          field.value ===
+                          ButtonNames.consolidation
+                        )}
+                        onPress={() => {
+                          setSelectetPurposed(true);
+                          field.onChange(
+                            ButtonNames.consolidation
+                          )
+                        }}
+                        isActive={
+                          field.value ===
+                          ButtonNames.consolidation
+                        }
+                      />
+                      <Button
+                        title="Monthly bills"
+                        titleSize={customStyles.small}
+                        titleColor={buttonStyleVariant(
+                          'title',
+                          field.value ===
                           ButtonNames.bills
-                        )
-                      }
-                      isActive={
-                        field.value ===
-                        ButtonNames.bills
-                      }
-                    />
-                  </View>
-                  <View style={styles.row}>
-                    <Button
-                      title="Moving"
-                      titleSize={customStyles.small}
-                      titleColor={buttonStyleVariant(
-                        'title',
-                        field.value ===
-                        ButtonNames.moving
-                      )}
-                      style={[
-                        customStyles.my3,
-                        customStyles.mr1,
-                        isSmallScreen
-                          ? styles.largeIconButton
-                          : styles.smallIconButton,
-                      ]}
-                      size="square"
-                      showIcon={true}
-                      outline={true}
-                      iconLib="MaterialCommunity"
-                      iconName={'truck-check-outline'}
-                      iconSize={45}
-                      iconColor={buttonStyleVariant(
-                        'icon',
-                        field.value ===
-                        ButtonNames.moving
-                      )}
-                      onPress={() =>
-                        field.onChange(
+                        )}
+                        style={[
+                          customStyles.my2,
+                          isSmallScreen
+                            ? styles.largeIconButton
+                            : styles.smallIconButton,
+                        ]}
+                        size="square"
+                        showIcon={true}
+                        outline={true}
+                        iconLib="Ionicons"
+                        iconName={'calendar-outline'}
+                        iconSize={50}
+                        iconColor={buttonStyleVariant(
+                          'icon',
+                          field.value ===
+                          ButtonNames.bills
+                        )}
+                        onPress={() => {
+                          setSelectetPurposed(true);
+                          field.onChange(
+                            ButtonNames.bills
+                          )
+                        }
+                        }
+                        isActive={
+                          field.value ===
+                          ButtonNames.bills
+                        }
+                      />
+                    </View>
+                    <View style={styles.row}>
+                      <Button
+                        title="Moving"
+                        titleSize={customStyles.small}
+                        titleColor={buttonStyleVariant(
+                          'title',
+                          field.value ===
                           ButtonNames.moving
-                        )
-                      }
-                      isActive={
-                        field.value ===
-                        ButtonNames.moving
-                      }
-                    />
-                    <Button
-                      title="Others"
-                      titleSize={customStyles.small}
-                      titleColor={buttonStyleVariant(
-                        'title',
-                        field.value ===
-                        ButtonNames.others
-                      )}
-                      style={[
-                        customStyles.my3,
-                        isSmallScreen
-                          ? styles.largeIconButton
-                          : styles.smallIconButton,
-                      ]}
-                      size="square"
-                      showIcon={true}
-                      outline={true}
-                      iconLib="Ionicons"
-                      iconName={'wallet-outline'}
-                      iconSize={50}
-                      iconColor={buttonStyleVariant(
-                        'icon',
-                        field.value ===
-                        ButtonNames.others
-                      )}
-                      onPress={() =>
-                        field.onChange(
+                        )}
+                        style={[
+                          customStyles.my3,
+                          customStyles.mr1,
+                          isSmallScreen
+                            ? styles.largeIconButton
+                            : styles.smallIconButton,
+                        ]}
+                        size="square"
+                        showIcon={true}
+                        outline={true}
+                        iconLib="MaterialCommunity"
+                        iconName={'truck-check-outline'}
+                        iconSize={45}
+                        iconColor={buttonStyleVariant(
+                          'icon',
+                          field.value ===
+                          ButtonNames.moving
+                        )}
+                        onPress={() => {
+                          setSelectetPurposed(true);
+                          field.onChange(
+                            ButtonNames.moving
+                          )
+                        }
+                        }
+                        isActive={
+                          field.value ===
+                          ButtonNames.moving
+                        }
+                      />
+                      <Button
+                        title="Others"
+                        titleSize={customStyles.small}
+                        titleColor={buttonStyleVariant(
+                          'title',
+                          field.value ===
                           ButtonNames.others
-                        )
-                      }
-                      isActive={
-                        field.value ===
-                        ButtonNames.others
-                      }
-                    />
+                        )}
+                        style={[
+                          customStyles.my3,
+                          isSmallScreen
+                            ? styles.largeIconButton
+                            : styles.smallIconButton,
+                        ]}
+                        size="square"
+                        showIcon={true}
+                        outline={true}
+                        iconLib="Ionicons"
+                        iconName={'wallet-outline'}
+                        iconSize={50}
+                        iconColor={buttonStyleVariant(
+                          'icon',
+                          field.value ===
+                          ButtonNames.others
+                        )}
+                        onPress={() => {
+                          setSelectetPurposed(true);
+                          field.onChange(
+                            ButtonNames.others
+                          )
+                        }
+                        }
+                        isActive={
+                          field.value ===
+                          ButtonNames.others
+                        }
+                      />
+                    </View>
                   </View>
-                </View>
-              )}
-            />
-          </View>
-        </ScrollView>
+                )}
+              />
+            </View>
+          </ScrollView>
         </KeyboardAvoidingView>
         <View style={[styles.footer]}>
           <Button
@@ -435,7 +435,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
             size="long"
             useGradient={true}
             onPress={handleSubmit(onFormValid)}
-            disabled={!isPhoneNumberValid}
+            disabled={!isPhoneNumberValid || !selectedPurpose}
           />
         </View>
       </View>
@@ -494,7 +494,6 @@ const styles = StyleSheet.create({
     padding: 15,
     paddingTop: 0,
     marginBottom: 120,
-    // marginBottom:'33%'
   },
   bodyContent: {
     width: '100%',

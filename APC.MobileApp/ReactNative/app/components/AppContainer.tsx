@@ -1,6 +1,5 @@
 import React, { ReactNode } from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
-import Constants from 'expo-constants';
 import palette from "../themes/Colors";
 
 interface AppContainerProps {

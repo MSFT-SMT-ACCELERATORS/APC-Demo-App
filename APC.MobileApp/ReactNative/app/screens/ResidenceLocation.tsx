@@ -1,33 +1,29 @@
 import * as React from 'react';
 import * as Location from 'expo-location';
-import { readConfigurations, AppConfiguration, ConnectionMode, } from '../utils/SettingsService';
+import { readConfigurations, AppConfiguration, ConnectionMode, } from '../Services/SettingsService';
 import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
 
-import * as APCService from '../utils/APCService';
+import * as APCService from '../Services/APCService';
 import { useApiClient } from '../api/ApiClientProvider';
-import { Position } from '../utils/APCService';
+import { Position } from '../Services/APCService';
 
-import * as BingService from '../utils/BingService';
+import * as BingService from '../Services/BingService';
 
 import palette from '../themes/Colors';
 import customStyles from '../themes/CustomStyles';
 
-import cities from '../utils/cities.json';
-import countries from '../utils/countries.json'
 import Button from '../components/Button';
 import StyledText from '../components/StyledText';
 import StyledInputText from '../components/StyledInputText';
 import AppContainer from '../components/AppContainer';
 import CheckboxWithText from '../components/CheckBox';
-import RNPickerSelect, { PickerStyle } from 'react-native-picker-select';
 import CustomModal from '../components/CustomModal';
 import { RadioButton, Modal, } from 'react-native-paper';
-import { StyleSheet, View, ScrollView, Pressable, FlatList, TouchableOpacity, } from 'react-native';
+import { StyleSheet, View, ScrollView, Pressable, FlatList, TouchableOpacity, KeyboardAvoidingView, Platform, } from 'react-native';
 
 import Icon from 'react-native-vector-icons/AntDesign';
-import { Ionicons } from '@expo/vector-icons';
 
 interface StepProps {
     setProgress: (progress: number) => void;
@@ -55,10 +51,12 @@ const ResidenceLocation: React.FC<StepProps> = ({
     const [shouldNavigate, setShouldNavigate] = useState(false);
 
     const [hasLocationPermission, setHasLocationPermission] = useState<boolean | null>(true);
-    const [selectedCountry, setSelectedCountry] = useState<string>('');
+    const [countryQuery, setCountryQuery] = useState<string>('');
+    const [countrySuggestions, setCountrySuggestions] = useState<any>([]);
+    const [selectedCountry, setCountryValue] = useState('');
     const [stateQuery, setStateQuery] = useState<string>('');
     const [stateSuggestions, setStateSuggestions] = useState<any>([]);
-    const [selectedState, setSelectedValue] = useState('');
+    const [selectedState, setStateValue] = useState('');
     const [cityQuery, setCityQuery] = useState<string>('');
     const [citiesSuggestions, setCitySuggestions] = useState<string[]>([]);
     const [selectedCity, setCityValue] = useState('');
@@ -100,8 +98,6 @@ const ResidenceLocation: React.FC<StepProps> = ({
         control,
         handleSubmit,
         formState: { errors },
-        getValues,
-        setValue,
     } = useForm({
         defaultValues: {
             Country: '',
@@ -112,11 +108,21 @@ const ResidenceLocation: React.FC<StepProps> = ({
         },
     });
 
-    const handleCountryChange = async (country: string) => {
-        if (!country) return;
+    const handleCountryChange = async (query: string) => {
+        setCountryQuery(query);
+        if (query.length > 1) {
+            const suggestions = await BingService.getCountrySuggestions(query);
+            const uniqueSuggestions = Array.from(new Set(suggestions));
+            setCountrySuggestions(uniqueSuggestions);
+        } else {
+            setCountrySuggestions([]);
+        }
+    };
 
-        setValue('Country', country);
-        setSelectedCountry(country);
+    const handleCountrySuggestion = (suggestion: string) => {
+        setCountryQuery(suggestion);
+        setCountrySuggestions([]);
+        setCountryValue(suggestion);
     };
 
     const handleStateChange = async (query: string) => {
@@ -130,10 +136,10 @@ const ResidenceLocation: React.FC<StepProps> = ({
         }
     };
 
-    const handleSelectSuggestion = (suggestion: string) => {
+    const handleStateSuggestion = (suggestion: string) => {
         setStateQuery(suggestion);
         setStateSuggestions([]);
-        setSelectedValue(suggestion);
+        setStateValue(suggestion);
     };
 
 
@@ -268,12 +274,6 @@ const ResidenceLocation: React.FC<StepProps> = ({
         APCService.getDeviceGPSLocation()
             .then(setGPSPosition)
             .catch(console.error);
-
-        const firstCountry = cities
-            .map((item) => item.country)
-            .filter((value, index, self) => self.indexOf(value) === index)[0];
-
-        handleCountryChange(firstCountry);
     }, []);
 
     useEffect(() => {
@@ -285,92 +285,41 @@ const ResidenceLocation: React.FC<StepProps> = ({
     return (
         <AppContainer>
             <View style={[styles.parent]}>
-                <ScrollView style={[styles.contentContainer]}>
-                    <View style={[styles.title]}>
-                        <StyledText customStyle={['title2', 'extrabold']}>
-                            Residence location
-                        </StyledText>
-                        <StyledText
-                            style={{ textAlign: 'center' }}
-                            customStyle={['title5', 'regular']}
-                        >
-                            Please, select your country and state/province of
-                            residence{'  '}
-                            <Icon
-                                name="infocirlceo"
-                                size={20}
-                                color={palette.accent200}
-                                onPress={showTooltip}
-                            />
-                        </StyledText>
-                    </View>
-
-                    <View
-                        style={[styles.separatorContainer, customStyles.mb4]}
-                    ></View>
-                    <View style={styles.bodyContent}>
-                        <Controller name="Country" control={control} defaultValue="" render={({ field }) => (
-                            <RNPickerSelect style={pickerStyle} darkTheme={true}
-                                value={field.value || ''}
-                                onValueChange={handleCountryChange}
-                                useNativeAndroidPickerStyle={false}
-                                Icon={() => {
-                                    return (
-                                        <Ionicons
-                                            name="chevron-down"
-                                            size={24}
-                                            color={palette.neutral}
-                                            style={styles.iconPicker}
-                                        />
-                                    );
-                                }}
-                                items={countries.map((country) => {
-                                    return {
-                                        label: country.country,
-                                        value: country.country,
-                                    };
-                                })}
-                            />
-                        )}
-                        />
-                        {errors.Country && (
-                            <StyledText
-                                customStyle={['regular']}
-                                color="danger200"
-                            >
-                                {errors.Country.message}
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    style={{ flex: 1 }}
+                >
+                    <ScrollView style={[styles.contentContainer]}>
+                        <View style={[styles.title]}>
+                            <StyledText customStyle={['title2', 'extrabold']}>
+                                Residence location
                             </StyledText>
-                        )}
+                            <StyledText
+                                style={{ textAlign: 'center' }}
+                                customStyle={['title5', 'regular']}
+                            >
+                                Please, select your country and state/province of
+                                residence{'  '}
+                                <Icon
+                                    name="infocirlceo"
+                                    size={20}
+                                    color={palette.accent200}
+                                    onPress={showTooltip}
+                                />
+                            </StyledText>
+                        </View>
 
-                        <Controller name='StateProvince' control={control} render={({ field }) => (
-                            <>
-                                <StyledInputText customStyle={['mb0']} labelText="State/Province" value={stateQuery} onChangeText={handleStateChange} placeholder="Select a State/Province..."/>
-                                {stateSuggestions.length > 0 && (
-                                    <FlatList style={styles.sectionContent} data={stateSuggestions}
-                                        renderItem={({ item }) => (
-                                            <TouchableOpacity onPress={() => handleSelectSuggestion(item)}>
-                                                <StyledText customStyle={['m4']}>{item}</StyledText>
-                                                <View style={[styles.separatorList]}></View>
-                                            </TouchableOpacity>
-                                        )}
-                                        keyExtractor={(item, index) => index.toString()}
-                                    />
-                                )}
-                            </>
-                        )}
-                        />
-
-
-                        <Controller
-                            name='City'
-                            control={control}
-                            render={({ field }) => (
+                        <View
+                            style={[styles.separatorContainer, customStyles.mb4]}
+                        ></View>
+                        <View style={styles.bodyContent}>
+                            <Controller name='Country' control={control} render={({ field }) => (
                                 <>
-                                    <StyledInputText customStyle={['mb0']} labelText="City" value={cityQuery} onChangeText={handleCityChange} placeholder="Select a City..." />
-                                    {citiesSuggestions.length > 0 && (
-                                        <FlatList style={styles.sectionContent} data={citiesSuggestions}
+                                    <StyledInputText customStyle={['mb0']} labelText="Country" value={countryQuery} onChangeText={handleCountryChange} placeholder="Select a Country..." />
+                                    {countrySuggestions.length > 0 && (
+                                        <FlatList style={styles.sectionContent} data={countrySuggestions}
                                             renderItem={({ item }) => (
-                                                <TouchableOpacity style={styles.itemList} onPress={() => handleCitySuggestion(item)}>
+                                                <TouchableOpacity onPress={() => handleCountrySuggestion(item)}>
                                                     <StyledText customStyle={['m4']}>{item}</StyledText>
                                                     <View style={[styles.separatorList]}></View>
                                                 </TouchableOpacity>
@@ -380,101 +329,143 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                     )}
                                 </>
                             )}
-                        />
+                            />
 
-                        {!skipGeolocationCheck && hasLocationPermission && (
-                            <View style={styles.btnGroup}>
-                                <StyledText style={styles.comparisonTitle}> Internal comparison with:</StyledText>
-                                <Controller control={control} name="GPSOption" rules={{ required: 'Please select an option', }}
-                                    render={({ field: { onChange, value }, }) => (
-                                        <RadioButton.Group onValueChange={onChange} value={value} >
-                                            <View>
+
+                            <Controller name='StateProvince' control={control} render={({ field }) => (
+                                <>
+                                    <StyledInputText customStyle={['mb0']} labelText="State/Province" value={stateQuery} onChangeText={handleStateChange} placeholder="Select a State/Province..." />
+                                    {stateSuggestions.length > 0 && (
+                                        <FlatList style={styles.sectionContent} data={stateSuggestions}
+                                            renderItem={({ item }) => (
+                                                <TouchableOpacity onPress={() => handleStateSuggestion(item)}>
+                                                    <StyledText customStyle={['m4']}>{item}</StyledText>
+                                                    <View style={[styles.separatorList]}></View>
+                                                </TouchableOpacity>
+                                            )}
+                                            keyExtractor={(item, index) => index.toString()}
+                                        />
+                                    )}
+                                </>
+                            )}
+                            />
+
+
+                            <Controller
+                                name='City'
+                                control={control}
+                                render={({ field }) => (
+                                    <>
+                                        <StyledInputText customStyle={['mb0']} labelText="City" value={cityQuery} onChangeText={handleCityChange} placeholder="Select a City..." />
+                                        {citiesSuggestions.length > 0 && (
+                                            <FlatList style={styles.sectionContent} data={citiesSuggestions}
+                                                renderItem={({ item }) => (
+                                                    <TouchableOpacity style={styles.itemList} onPress={() => handleCitySuggestion(item)}>
+                                                        <StyledText customStyle={['m4']}>{item}</StyledText>
+                                                        <View style={[styles.separatorList]}></View>
+                                                    </TouchableOpacity>
+                                                )}
+                                                keyExtractor={(item, index) => index.toString()}
+                                            />
+                                        )}
+                                    </>
+                                )}
+                            />
+
+                            {!skipGeolocationCheck && hasLocationPermission && (
+                                <View style={styles.btnGroup}>
+                                    <StyledText style={styles.comparisonTitle}> Internal comparison with:</StyledText>
+                                    <Controller control={control} name="GPSOption" rules={{ required: 'Please select an option', }}
+                                        render={({ field: { onChange, value }, }) => (
+                                            <RadioButton.Group onValueChange={onChange} value={value} >
                                                 <View>
-                                                    <Pressable onPress={() => onChange('true')}>
-                                                        <View style={styles.flex}>
-                                                            <RadioButton.Android value="true" color={palette.accent200} />
-                                                            <StyledText>Device GPS</StyledText>
-                                                        </View>
-                                                        <View style={styles.optionSubtitleContainer} >
-                                                            {gpsPosition && gpsPosition.location ? (
-                                                                <View style={styles.optionSubtitleBadge} >
-                                                                    <StyledText>
-                                                                        {gpsPosition.location.country}{' '}-{' '}
-                                                                        {gpsPosition.location.state}{' '}-{' '}
-                                                                        {gpsPosition.location.city}
-                                                                    </StyledText>
-                                                                </View>
-                                                            ) : null}
-                                                            {gpsPosition && gpsPosition.coords ? (
-                                                                <View style={styles.optionSubtitleBadge} >
-                                                                    <StyledText>
-                                                                        {gpsPosition.coords.latitude.toFixed(4)} ,{' '}
-                                                                        {gpsPosition.coords.longitude.toFixed(4)}
-                                                                    </StyledText>
-                                                                </View>
-                                                            ) : null}
-                                                        </View>
-                                                    </Pressable>
-                                                </View>
-                                            </View>
-                                            <View>
-                                                <Pressable onPress={() => onChange('hacked')} >
-                                                    <View style={styles.flex}>
-                                                        <RadioButton.Android value="hacked" color={palette.accent200} />
-                                                        <StyledText> Hacked GPS </StyledText>
-                                                    </View>
-                                                    {selectedCountry && selectedState && selectedCity ? (
-                                                        <View style={styles.optionSubtitleContainer} >
-
-                                                            <View style={[styles.optionSubtitleBadge,]} >
-                                                                <StyledText>
-                                                                    {selectedCountry}{' '}-{' '}
-                                                                    {selectedState}{' '}-{' '}
-                                                                    {selectedCity}
-                                                                </StyledText>
+                                                    <View>
+                                                        <Pressable onPress={() => onChange('true')}>
+                                                            <View style={styles.flex}>
+                                                                <RadioButton.Android value="true" color={palette.accent200} />
+                                                                <StyledText>Device GPS</StyledText>
                                                             </View>
-                                                            <View style={styles.optionSubtitleBadge} >
-                                                                <StyledText>
-                                                                    {hackedGPS?.latitude},{' '}
-                                                                    {hackedGPS?.longitude}
-                                                                </StyledText>
-                                                            </View>
-                                                        </View>
-                                                    ) : null}
-                                                </Pressable>
-                                            </View>
-
-                                            <View style={[styles.dangerSeparator, customStyles.my5,]}></View>
-
-                                            <View>
-                                                <Controller control={control} name="UseAPC"
-                                                    render={({ field: { onChange, value, }, }) => (
-                                                        <Pressable onPress={() => onChange(!value)} >
-                                                            <View style={styles.flex} >
-                                                                <CheckboxWithText label="Use Azure Programmable Connectivity backend" checked={value}
-                                                                    onToggle={() => onChange(!value)} />
+                                                            <View style={styles.optionSubtitleContainer} >
+                                                                {gpsPosition && gpsPosition.location ? (
+                                                                    <View style={styles.optionSubtitleBadge} >
+                                                                        <StyledText>
+                                                                            {gpsPosition.location.country}{' '}-{' '}
+                                                                            {gpsPosition.location.state}{' '}-{' '}
+                                                                            {gpsPosition.location.city}
+                                                                        </StyledText>
+                                                                    </View>
+                                                                ) : null}
+                                                                {gpsPosition && gpsPosition.coords ? (
+                                                                    <View style={styles.optionSubtitleBadge} >
+                                                                        <StyledText>
+                                                                            {gpsPosition.coords.latitude.toFixed(4)} ,{' '}
+                                                                            {gpsPosition.coords.longitude.toFixed(4)}
+                                                                        </StyledText>
+                                                                    </View>
+                                                                ) : null}
                                                             </View>
                                                         </Pressable>
-                                                    )}
-                                                />
-                                            </View>
-                                        </RadioButton.Group>
-                                    )}
-                                />
-                            </View>
-                        )}
-                    </View>
-                </ScrollView>
+                                                    </View>
+                                                </View>
+                                                <View>
+                                                    <Pressable onPress={() => onChange('hacked')} >
+                                                        <View style={styles.flex}>
+                                                            <RadioButton.Android value="hacked" color={palette.accent200} />
+                                                            <StyledText> Hacked GPS </StyledText>
+                                                        </View>
+                                                        {selectedCountry && selectedState && selectedCity ? (
+                                                            <View style={styles.optionSubtitleContainer} >
 
-                <View style={[styles.footer]}>
-                    <Button
-                        title="Next"
-                        style={[styles.button]}
-                        size="long"
-                        useGradient={true}
-                        onPress={handleSubmit(onFormValid)}
-                    />
-                </View>
+                                                                <View style={[styles.optionSubtitleBadge,]} >
+                                                                    <StyledText>
+                                                                        {selectedCountry}{' '}-{' '}
+                                                                        {selectedState}{' '}-{' '}
+                                                                        {selectedCity}
+                                                                    </StyledText>
+                                                                </View>
+                                                                <View style={styles.optionSubtitleBadge} >
+                                                                    <StyledText>
+                                                                        {hackedGPS?.latitude},{' '}
+                                                                        {hackedGPS?.longitude}
+                                                                    </StyledText>
+                                                                </View>
+                                                            </View>
+                                                        ) : null}
+                                                    </Pressable>
+                                                </View>
+
+                                                <View style={[styles.dangerSeparator, customStyles.my5,]}></View>
+
+                                                <View>
+                                                    <Controller control={control} name="UseAPC"
+                                                        render={({ field: { onChange, value, }, }) => (
+                                                            <Pressable onPress={() => onChange(!value)} >
+                                                                <View style={styles.flex} >
+                                                                    <CheckboxWithText label="Use Azure Programmable Connectivity backend" checked={value}
+                                                                        onToggle={() => onChange(!value)} />
+                                                                </View>
+                                                            </Pressable>
+                                                        )}
+                                                    />
+                                                </View>
+                                            </RadioButton.Group>
+                                        )}
+                                    />
+                                </View>
+                            )}
+                        </View>
+                    </ScrollView>
+
+                    <View style={[styles.footer]}>
+                        <Button
+                            title="Next"
+                            style={[styles.button]}
+                            size="long"
+                            useGradient={true}
+                            onPress={handleSubmit(onFormValid)}
+                        />
+                    </View>
+                </KeyboardAvoidingView>
 
                 <Modal
                     visible={tooltipVisible}
@@ -535,7 +526,6 @@ const styles = StyleSheet.create({
         gap: 0,
         padding: 20,
         backgroundColor: '#252533',
-        // borderRadius: 10,
         marginTop: -36,
         marginHorizontal: 10,
     },
@@ -575,7 +565,6 @@ const styles = StyleSheet.create({
     },
     separatorList: {
         width: '100%',
-        // alignSelf: 'center',
         borderBottomWidth: 3,
         borderBlockColor: palette.primary100,
     },
@@ -640,38 +629,5 @@ const styles = StyleSheet.create({
         paddingTop: 12,
     },
 });
-
-const pickerStyle: PickerStyle = {
-    inputWeb: {
-        fontSize: 20,
-        padding: 10,
-        margin: 12,
-        backgroundColor: palette.transparent,
-        color: palette.neutral,
-        borderWidth: 0,
-        borderBottomWidth: 2,
-        borderBottomColor: palette.accent200,
-    },
-    inputIOS: {
-        fontSize: 20,
-        padding: 10,
-        margin: 12,
-        backgroundColor: palette.transparent,
-        color: palette.neutral,
-        borderWidth: 0,
-        borderBottomWidth: 2,
-        borderColor: palette.accent200,
-    },
-    inputAndroid: {
-        fontSize: 20,
-        padding: 10,
-        margin: 12,
-        backgroundColor: palette.transparent,
-        color: palette.neutral,
-        borderWidth: 0,
-        borderBottomWidth: 2,
-        borderColor: palette.accent200,
-    },
-};
 
 export default ResidenceLocation;

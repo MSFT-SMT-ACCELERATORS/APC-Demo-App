@@ -5,7 +5,7 @@ import axios from 'axios'
 import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration, ConnectionMode } from './SettingsService'
 import { useApiClient } from '../api/ApiClientProvider';
 import { APCApi, AuthApi, Configuration } from '../api/generated';
-import * as BingService from '../utils/BingService'
+import * as BingService from './BingService'
 import { LocationObjectCoords } from 'expo-location';
 
 

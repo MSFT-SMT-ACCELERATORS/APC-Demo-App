@@ -1,7 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useRef, useState, useEffect } from 'react';
-import { Text, View, StyleSheet, PanResponder, Animated, DimensionValue, StyleProp, ViewStyle } from 'react-native';
-import Colors from '../themes/Colors';
+import { View, StyleSheet, PanResponder, Animated, StyleProp, ViewStyle } from 'react-native';
 import StyledText from './StyledText';
 
 interface Props {
