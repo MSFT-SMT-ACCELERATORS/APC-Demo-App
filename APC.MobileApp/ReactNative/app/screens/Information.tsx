@@ -43,12 +43,12 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
 
   return (
     <AppContainer>
-      <View style={[styles.parent]}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={{ flex: 1 }}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-        >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 180 : 0}
+      >
+        <View style={[styles.parent]}>
           <ScrollView style={[styles.contentContainer]}>
 
             <View style={[styles.title]}>
@@ -140,8 +140,8 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
                 )} />
             </View>
           </ScrollView>
-        </KeyboardAvoidingView>
-      </View>
+        </View>
+      </KeyboardAvoidingView>
       <View style={[styles.footer]}>
         <Button
           title="Confirm request"
@@ -151,7 +151,7 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
           onPress={handleSubmit(onFormValid)}
         />
       </View>
-    </AppContainer>
+    </AppContainer >
   );
 }
 
@@ -171,7 +171,6 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     padding: 15,
-    marginBottom: 100
   },
   bodyContent: {
     width: ' 100%',
@@ -190,6 +189,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     width: '100%',
+    marginTop: 100,
     height: undefined
   },
   button: {

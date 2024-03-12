@@ -110,10 +110,17 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
     const handleCountryChange = async (query: string) => {
         setCountryQuery(query);
+        setCountryValue(query);
         if (query.length > 1) {
             const suggestions = await BingService.getCountrySuggestions(query);
             const uniqueSuggestions = Array.from(new Set(suggestions));
-            setCountrySuggestions(uniqueSuggestions);
+            const match = uniqueSuggestions.some(suggestion => suggestion.toLowerCase() === query.toLowerCase());
+
+            if (match) {
+                setCountrySuggestions([]);
+            } else {
+                setCountrySuggestions(uniqueSuggestions);
+            }
         } else {
             setCountrySuggestions([]);
         }
@@ -127,10 +134,18 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
     const handleStateChange = async (query: string) => {
         setStateQuery(query);
+        setStateValue(query);
         if (query.length >= 2) {
             const suggestions = await BingService.getStateSuggestions(query, selectedCountry);
             const uniqueSuggestions = Array.from(new Set(suggestions));
-            setStateSuggestions(uniqueSuggestions);
+            const match = uniqueSuggestions.some(suggestion => suggestion.toLowerCase() === query.toLowerCase());
+
+            if (match) {
+                setStateSuggestions([]);
+            } else {
+
+                setStateSuggestions(uniqueSuggestions);
+            }
         } else {
             setStateSuggestions([]);
         }
@@ -145,10 +160,17 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
     const handleCityChange = async (query: string) => {
         setCityQuery(query);
+        setCityValue(query);
         if (query.length > 1) {
             const suggestions = await BingService.getCitySuggestions(query, selectedCountry, selectedState);
             const uniqueSuggestions = Array.from(new Set(suggestions));
-            setCitySuggestions(uniqueSuggestions);
+            const match = uniqueSuggestions.some(suggestion => suggestion.toLowerCase() === query.toLowerCase());
+
+            if (match) {
+                setCitySuggestions([]);
+            } else {
+                setCitySuggestions(uniqueSuggestions);
+            }
         } else {
             setCitySuggestions([]);
         }
@@ -288,6 +310,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                 <KeyboardAvoidingView
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
                     style={{ flex: 1 }}
+                    keyboardVerticalOffset={Platform.OS === "ios" ? 180 : 0}
                 >
                     <ScrollView style={[styles.contentContainer]}>
                         <View style={[styles.title]}>
@@ -455,17 +478,17 @@ const ResidenceLocation: React.FC<StepProps> = ({
                             )}
                         </View>
                     </ScrollView>
-
-                    <View style={[styles.footer]}>
-                        <Button
-                            title="Next"
-                            style={[styles.button]}
-                            size="long"
-                            useGradient={true}
-                            onPress={handleSubmit(onFormValid)}
-                        />
-                    </View>
                 </KeyboardAvoidingView>
+
+                <View style={[styles.footer]}>
+                    <Button
+                        title="Next"
+                        style={[styles.button]}
+                        size="long"
+                        useGradient={true}
+                        onPress={handleSubmit(onFormValid)}
+                    />
+                </View>
 
                 <Modal
                     visible={tooltipVisible}
@@ -514,7 +537,7 @@ const styles = StyleSheet.create({
         width: '100%',
         padding: 15,
         paddingTop: 0,
-        marginBottom: 120,
+
     },
     bodyContent: {
         width: '100%',
@@ -543,6 +566,7 @@ const styles = StyleSheet.create({
     },
     footer: {
         width: '100%',
+        marginTop: 120,
         height: undefined,
     },
     button: {
