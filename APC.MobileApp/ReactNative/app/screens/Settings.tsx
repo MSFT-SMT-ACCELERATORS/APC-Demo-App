@@ -21,9 +21,12 @@ import {
     useForm,
 } from 'react-hook-form';
 import StyledText from '../components/StyledText';
-import { RadioButton } from 'react-native-paper';
+import { RadioButton, TextInput } from 'react-native-paper';
 import palette from '../themes/Colors';
 import CheckboxWithText from '../components/CheckBox';
+import { Logger } from '../utils/Logger';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Clipboard from 'expo-clipboard';
 
 interface SettingsProps {
     setLoading: (isLoading: boolean, text?: string) => void;
@@ -43,6 +46,11 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
         useState<boolean>(false);
     const [simSwap, setSimSwap] = useState<boolean>(false);
     const connectionMode = watch('connectionMode');
+    const [logContent, setLogContent] = useState<string | undefined | null>();
+
+    useEffect(() => {
+        AsyncStorage.getItem("log").then(setLogContent);
+    }, []);
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -82,7 +90,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
             residenceLocationRadius: Number(data.residenceLocationRadius)
         };
 
-        console.log(formattedData);
+        Logger.log(formattedData);
         storeConfigurations(formattedData);
         navigation.navigate('Welcome');
     };
@@ -94,6 +102,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                 <KeyboardAvoidingView
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
                     style={{ flex: 1 }}
+                    keyboardVerticalOffset={Platform.OS === "ios" ? 180 : 90}
                 >
                     <ScrollView style={styles.contentContainer}>
                         <View style={styles.bodyContent}>
@@ -332,19 +341,34 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                     )}
                                 </View>
                             ) : null}
-                        </View>
-                    </ScrollView>
 
-                    <View style={[styles.footer]}>
-                        <Button
-                            title="Save and close"
-                            style={[styles.button]}
-                            size="long"
-                            useGradient={true}
-                            onPress={handleSubmit(saveConfig)}
-                        />
-                    </View>
+
+
+                            <View style={styles.sectionContent}>
+                                <StyledText customStyle={['bold', 'title4']} color='accent200'>Logging</StyledText>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                    <Button title="Clear logs" onPress={() => { AsyncStorage.removeItem("log"); setLogContent(null) }} useGradient={true}></Button>
+                                    <Button title="Copy" disabled={!(logContent)} onPress={() => { Clipboard.setStringAsync(logContent ?? '') }} useGradient={true}></Button>
+                                </View>
+                                <TextInput multiline={true} editable={false}>
+                                    {logContent}
+                                </TextInput>
+                            </View>
+                        </View>
+
+
+                    </ScrollView>
                 </KeyboardAvoidingView>
+
+                <View style={[styles.footer]}>
+                    <Button
+                        title="Save and close"
+                        style={[styles.button]}
+                        size="long"
+                        useGradient={true}
+                        onPress={handleSubmit(saveConfig)}
+                    />
+                </View>
             </View>
         </AppContainer>
     );

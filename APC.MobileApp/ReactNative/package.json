@@ -36,7 +36,8 @@
     "react-native-vector-icons": "^10.0.3",
     "react-native-web": "~0.19.6",
     "react-navigation": "^5.0.0",
-    "url": "^0.11.3"
+    "url": "^0.11.3",
+    "expo-clipboard": "~4.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

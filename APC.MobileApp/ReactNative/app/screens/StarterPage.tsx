@@ -21,6 +21,7 @@ import AppContainer from '../components/AppContainer';
 import { Modal } from 'react-native-paper';
 import CustomModal from '../components/CustomModal';
 import Icon from 'react-native-vector-icons/AntDesign';
+import { Logger } from '../utils/Logger';
 
 interface StepProps {
   setProgress: (progress: number) => void;
@@ -69,25 +70,25 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
 
 
   const onFormValid = async (data: FieldValues) => {
-    console.log(data);
+    Logger.log(data);
     setLoading(true, "Validating your data...");
 
     try {
       // APC validation
       const response = await APCService.checkSimChange(apiClient, phoneNumber);
-      console.log("SIMSWAP: ", response);
+      Logger.log("SIMSWAP: ", response);
 
       if (response) {
-        console.log("SIM swap detected");
+        Logger.log("SIM swap detected");
         handleModalToggle("SIM swap detected", "A recent SIM change has been detected on this device, for security reasons you cannot continue with this local request");
 
       } else {
-        console.log("SIM swap not detected");
+        Logger.log("SIM swap not detected");
         handleModalToggle("SIM swap not detected", "For security reasons we checked that your phone line didn’t have any SIM swap recently. You can continue with this loan request.", palette.accent200, true, 'information-circle-outline', palette.black);
         setShouldNavigate(true);
       }
     } catch (error) {
-      console.log('Error' + error);
+      Logger.log('Error' + error);
     } finally {
       setLoading(false);
     }
@@ -169,7 +170,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
       setIsPhoneNumberValid(isValid);
 
     } catch (error) {
-      console.log('Error' + error);
+      Logger.log('Error' + error);
     } finally {
       setLoading(false);
     }

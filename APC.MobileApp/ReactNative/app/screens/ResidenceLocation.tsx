@@ -24,6 +24,7 @@ import { RadioButton, Modal, } from 'react-native-paper';
 import { StyleSheet, View, ScrollView, Pressable, FlatList, TouchableOpacity, KeyboardAvoidingView, Platform, } from 'react-native';
 
 import Icon from 'react-native-vector-icons/AntDesign';
+import { Logger } from '../utils/Logger';
 
 interface StepProps {
     setProgress: (progress: number) => void;
@@ -66,7 +67,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
     useEffect(() => {
         (async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
-            console.log('STATUS:' + status);
+            Logger.log('STATUS: ' + status);
             if (status !== 'granted') {
                 setHasLocationPermission(false);
                 return;
@@ -177,10 +178,11 @@ const ResidenceLocation: React.FC<StepProps> = ({
     };
 
     const handleCitySuggestion = async (suggestion: string) => {
+        setCityValue(suggestion);
         setCityQuery(suggestion);
         setCitySuggestions([]);
-        setCityValue(suggestion);
-        const hackedLocation = await BingService.getCityCoordinates(selectedCity, selectedCountry);
+        const hackedLocation = await BingService.getCityCoordinates(suggestion, selectedCountry);
+        Logger.log(`handleCitySuggestion:`, suggestion, JSON.stringify(hackedLocation));
         setHackedGPS(
             APCService.getLocationCoords(
                 hackedLocation?.latitude,
@@ -193,14 +195,14 @@ const ResidenceLocation: React.FC<StepProps> = ({
     const onFormValid = async (data: FieldValues) => {
         try {
             const networkCode = await APCService.getNetworkCode(apiClient);
-            console.log(`El código de red es: ${networkCode}`);
-            console.log('Submitted Data:', data);
+            Logger.log(`El código de red es: ${networkCode}`);
+            Logger.log('Submitted Data: ', data);
             setLoading(true, 'Validating your data...');
 
 
             const selectedLocation = await BingService.getCityCoordinates(selectedCity, selectedCountry);
             if (!selectedCity) {
-                console.log('Selection required');
+                Logger.log('Selection required');
                 handleModalToggle('Selection required', 'Select a valid option from the drop-down menus to continue', '#dadaed', undefined, 'information-circle-outline', palette.black);
                 setLoading(false);
 
@@ -212,9 +214,9 @@ const ResidenceLocation: React.FC<StepProps> = ({
                 selectedLocation?.longitude
             );
 
-            console.log('Get: device gps location');
+            Logger.log('Get: device gps location');
             let coordsGPS = await APCService.getDeviceGPSLocation();
-            console.log('Get: device gps location OK');
+            Logger.log('Get: device gps location OK');
 
             let coords: Location.LocationObjectCoords;
             if (data.GPSOption == 'true') coords = coordsGPS.coords;
@@ -224,7 +226,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
 
             // Business validation
-            console.log('validating business rule');
+            Logger.log('validating business rule');
             if (config?.skipGeolocationCheck || !hasLocationPermission) {
                 setShouldNavigate(true);
                 setLoading(false);
@@ -236,32 +238,33 @@ const ResidenceLocation: React.FC<StepProps> = ({
                     'Blocking business rule: Not allowed device location',
                     'For anti-fraud purposes, this application requires the user to be using the app in a location relatively close to the user’s residence location (i.e. same state). You are currently far away'
                 );
-                console.log('Business validation failed!!');
+                Logger.log('Business validation failed!!');
                 hasError = true;
             } else {
                 if (!data.UseAPC) {
                     handleModalToggle('Warning', 'APC Check Skipped: Location authenticity not verified. Enable APC for fraud protection', palette.warning, undefined, 'information-circle-outline', palette.black);
                     setShouldNavigate(true);
-                    console.log('Business validation success!!');
+                    Logger.log('Business validation success!!');
                 } else {  //APC Validation
-                    console.log('USING APC validating apc matches location');
+                    Logger.log('USING APC validating apc matches location');
                     const response = await APCService.verificateAPCLocation(apiClient, coords);
                     if (!response) {
                         handleModalToggle(
                             'Blocking anti-hacking rule: GPS coordinates hacking attempted',
                             'A possible hacking has been detected. The device GPS location does not match the device’s actual location provided by the network carrier. The application’s flow must stop'
                         );
-                        console.log('APC validation failed!!');
+                        Logger.log('APC validation failed!!');
                         hasError = true;
                     } else {
                         handleModalToggle('Information message', 'Congratulations, you have been verified in a location close to your residence location so you can continue with the loan request', palette.accent200, undefined, 'information-circle-outline', palette.black);
                         setShouldNavigate(true);
-                        console.log('APC validation success!!');
+                        Logger.log('APC validation success!!');
                     }
                 }
             }
 
         } catch (error) {
+            Logger.log(error);
             setSkipLocation(true);
             handleModalToggle('Warning', 'The application cannot check your location', palette.warning, undefined, 'information-circle-outline', palette.black);
             setShouldNavigate(true);
@@ -295,13 +298,13 @@ const ResidenceLocation: React.FC<StepProps> = ({
         readConfigurations().then(setConfig);
         APCService.getDeviceGPSLocation()
             .then(setGPSPosition)
-            .catch(console.error);
+            .catch(Logger.error);
     }, []);
 
     useEffect(() => {
         if (config) {
             setSkipLocation(config.skipGeolocationCheck ?? false);
-            console.log('LOC' + skipGeolocationCheck + " " + config.skipGeolocationCheck);
+            Logger.log('LOC' + skipGeolocationCheck + " " + config.skipGeolocationCheck);
         }
     }, [config, skipGeolocationCheck]);
     return (
@@ -340,9 +343,9 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                 <>
                                     <StyledInputText customStyle={['mb0']} labelText="Country" value={countryQuery} onChangeText={handleCountryChange} placeholder="Select a Country..." />
                                     {countrySuggestions.length > 0 && (
-                                        <FlatList style={styles.sectionContent} data={countrySuggestions}
+                                        <FlatList style={styles.sectionContent} data={countrySuggestions} scrollEnabled={false}
                                             renderItem={({ item }) => (
-                                                <TouchableOpacity onPress={() => handleCountrySuggestion(item)}>
+                                                <TouchableOpacity onPress={() => {field.onChange(item);handleCountrySuggestion(item)}}>
                                                     <StyledText customStyle={['m4']}>{item}</StyledText>
                                                     <View style={[styles.separatorList]}></View>
                                                 </TouchableOpacity>
@@ -359,9 +362,9 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                 <>
                                     <StyledInputText customStyle={['mb0']} labelText="State/Province" value={stateQuery} onChangeText={handleStateChange} placeholder="Select a State/Province..." />
                                     {stateSuggestions.length > 0 && (
-                                        <FlatList style={styles.sectionContent} data={stateSuggestions}
+                                        <FlatList style={styles.sectionContent} data={stateSuggestions} scrollEnabled={false}
                                             renderItem={({ item }) => (
-                                                <TouchableOpacity onPress={() => handleStateSuggestion(item)}>
+                                                <TouchableOpacity onPress={() => {field.onChange(item);handleStateSuggestion(item)}}>
                                                     <StyledText customStyle={['m4']}>{item}</StyledText>
                                                     <View style={[styles.separatorList]}></View>
                                                 </TouchableOpacity>
@@ -381,9 +384,9 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                     <>
                                         <StyledInputText customStyle={['mb0']} labelText="City" value={cityQuery} onChangeText={handleCityChange} placeholder="Select a City..." />
                                         {citiesSuggestions.length > 0 && (
-                                            <FlatList style={styles.sectionContent} data={citiesSuggestions}
+                                            <FlatList style={styles.sectionContent} data={citiesSuggestions} scrollEnabled={false}
                                                 renderItem={({ item }) => (
-                                                    <TouchableOpacity style={styles.itemList} onPress={() => handleCitySuggestion(item)}>
+                                                    <TouchableOpacity style={styles.itemList} onPress={() => {field.onChange(item);handleCitySuggestion(item)}}>
                                                         <StyledText customStyle={['m4']}>{item}</StyledText>
                                                         <View style={[styles.separatorList]}></View>
                                                     </TouchableOpacity>

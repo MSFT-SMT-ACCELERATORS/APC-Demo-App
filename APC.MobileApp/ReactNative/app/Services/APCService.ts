@@ -7,6 +7,7 @@ import { useApiClient } from '../api/ApiClientProvider';
 import { APCApi, AuthApi, Configuration } from '../api/generated';
 import * as BingService from './BingService'
 import { LocationObjectCoords } from 'expo-location';
+import { Logger } from '../utils/Logger';
 
 
 export interface Position {
@@ -28,7 +29,7 @@ export const verificateAPCLocation = async (apiClient: APCApi, coords: LocationO
 
     const networkCode = await getNetworkCode(apiClient);
     const mockHeader = config.connectionMode == ConnectionMode.Mock ? { headers: { 'X-Use-Mock': true } } : undefined;
-    console.log(coords.latitude + "--" + coords.longitude + "--" + accuracy + " --" + networkCode);
+    Logger.log(coords.latitude + "--" + coords.longitude + "--" + accuracy + " --" + networkCode);
     const response = await apiClient.apiAPCDeviceLocationLocationverifyPost({
         networkIdentifier: {
             identifierType: "NetworkCode",
@@ -45,9 +46,9 @@ export const verificateAPCLocation = async (apiClient: APCApi, coords: LocationO
         }
     }, mockHeader);
 
-    console.log("Completed response LOCATION:", JSON.stringify(response, null, 2));
+    Logger.log("Completed response LOCATION:", JSON.stringify(response, null, 2));
 
-    console.log("VALIDACION: " + response.data.verificationResult);
+    Logger.log("VALIDACION: " + response.data.verificationResult);
 
     return response.data.verificationResult;
 }
@@ -55,7 +56,7 @@ export const verificateAPCLocation = async (apiClient: APCApi, coords: LocationO
 export const getPhoneNumber = async (apiClient: APCApi, phoneNumber: string): Promise<boolean> => {
     const config = await readConfigurations();
 
-    console.log(phoneNumber);
+    Logger.log(phoneNumber);
     const mockHeader = config.connectionMode == ConnectionMode.Mock ? { headers: { 'X-Use-Mock': true } } : undefined;
     if (config.connectionMode == ConnectionMode.Offline) {
         return config.autovalidatePhoneNumber;
@@ -71,7 +72,7 @@ export const getPhoneNumber = async (apiClient: APCApi, phoneNumber: string): Pr
         redirectUri: ''
     }, mockHeader);
 
-    console.log("Completed response phoneNumber:", JSON.stringify(response, null, 2));
+    Logger.log("Completed response phoneNumber:", JSON.stringify(response, null, 2));
 
     return response.data.verificationResult ?? false;
 }
@@ -93,9 +94,9 @@ export const getNetworkCode = async (apiClient: APCApi): Promise<string> => {
         identifierType: 'IPv4',
         identifier: ip
     });
-    // console.log("Respuesta completa:", JSON.stringify(response, null, 2));
+    // Logger.log("Respuesta completa:", JSON.stringify(response, null, 2));
 
-    console.log("CODE: " + response.data.networkCode);
+    Logger.log("CODE: " + response.data.networkCode);
     return response.data.networkCode ?? 'Empty';
 }
 
@@ -117,7 +118,7 @@ export const checkSimChange = async (apiClient: APCApi, phoneNumber: string) => 
         }
     }, mockHeader)
 
-    console.log("Completed response simswap:", JSON.stringify(response, null, 2));
+    Logger.log("Completed response simswap:", JSON.stringify(response, null, 2));
 
     return response.data.verificationResult;
 }
@@ -126,23 +127,23 @@ export const checkSimChange = async (apiClient: APCApi, phoneNumber: string) => 
 
 export const getDeviceGPSLocation = async () => {
     async function getLocationPermission() {
-        console.log("Requesting gps permission...");
+        Logger.log("Requesting gps permission...");
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
-            console.error('Permission to access location was denied');
+            Logger.error('Permission to access location was denied');
             return;
         }
-        console.log("Requesting gps permission... OK");
+        Logger.log("Requesting gps permission... OK");
     }
 
     const config = await readConfigurations();
     await getLocationPermission();
 
     let location: Location.LocationObject;
-    console.log("Getting current position...");
+    Logger.log("Getting current position...");
 
     location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-    console.log("Getting current position... OK");
+    Logger.log("Getting current position... OK");
 
     const bingLocation = await BingService.translateCoordsToLocation(location.coords);
 
@@ -152,25 +153,25 @@ export const getDeviceGPSLocation = async () => {
 
 // export const getDeviceGPSLocation = async () => {
 //     async function getLocationPermission() {
-//         console.log("Requesting gps permission...");
+//         Logger.log("Requesting gps permission...");
 //         const { status } = await Location.requestForegroundPermissionsAsync();
 //         if (status !== 'granted') {
-//             console.error('Permission to access location was denied');
+//             Logger.error('Permission to access location was denied');
 //             return;
 //         }
-//         console.log("Requesting gps permission... OK");
+//         Logger.log("Requesting gps permission... OK");
 //     }
 
 //     const config = await readConfigurations();
 //     await getLocationPermission();
 
 //     let location: Location.LocationObject;
-//     console.log("Getting current position...");
+//     Logger.log("Getting current position...");
 
 //     location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
 //     let coords = location.coords;
 //     coords = getLocationCoords(41.3851, 2.1734, 0);
-//     console.log("Getting current position... OK");
+//     Logger.log("Getting current position... OK");
 
 //     const bingLocation = config.connectionMode != ConnectionMode.Offline ? await BingService.translateCoordsToLocation(coords) : undefined;
 
@@ -220,7 +221,7 @@ export const getIPAddress = async () => {
             const ip = await Network.getIpAddressAsync();
             return ip;
         } catch (error) {
-            console.error("Error obtaining IP address on mobile device", error);
+            Logger.error("Error obtaining IP address on mobile device", error);
         }
     }
 }
@@ -232,7 +233,7 @@ export const ipify = async () => {
 
         return data.ip;
     } catch (error) {
-        console.error("Error obtaining IP address on the web", error);
+        Logger.error("Error obtaining IP address on the web", error);
         return "-";
     }
 }

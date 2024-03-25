@@ -11,6 +11,7 @@ import customStyles from '../themes/CustomStyles';
 import AppContainer from '../components/AppContainer';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
 import { useStep } from '../utils/StepContext';
+import { Logger } from '../utils/Logger';
 
 interface StepProps {
   setProgress: (progress: number) => void;
@@ -36,7 +37,7 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   }, [setCurrentStep]);
 
   const onFormValid = async (data: FieldValues) => {
-    console.log(data);
+    Logger.log(data);
     setProgress(100);
     navigation.navigate('Success');
   }
