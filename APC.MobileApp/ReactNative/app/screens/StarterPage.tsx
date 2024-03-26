@@ -88,6 +88,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
         setShouldNavigate(true);
       }
     } catch (error) {
+      handleModalToggle('Warning', 'The application cannot check if your phone line had any SIM swap recently.', palette.warning, undefined, 'information-circle-outline', palette.black);
       Logger.log('Error' + error);
     } finally {
       setLoading(false);
@@ -171,6 +172,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
 
     } catch (error) {
       Logger.log('Error' + error);
+      handleModalToggle('Warning', 'The application cannot validate your phone number.', palette.warning, undefined, 'information-circle-outline', palette.black);
     } finally {
       setLoading(false);
     }
