@@ -186,6 +186,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 165 : 165}
         >
           <ScrollView keyboardShouldPersistTaps="handled" style={[styles.contentContainer]}>
             <View style={[styles.title]}>

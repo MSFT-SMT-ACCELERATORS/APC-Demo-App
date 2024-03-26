@@ -314,7 +314,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                 <KeyboardAvoidingView
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
                     style={{ flex: 1 }}
-                    keyboardVerticalOffset={Platform.OS === "ios" ? 165 : 0}
+                    keyboardVerticalOffset={Platform.OS === "ios" ? 165 : 165}
                 >
                     <ScrollView style={[styles.contentContainer]}>
                         <View style={[styles.title]}>
