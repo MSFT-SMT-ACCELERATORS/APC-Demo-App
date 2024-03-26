@@ -481,17 +481,16 @@ const ResidenceLocation: React.FC<StepProps> = ({
                             )}
                         </View>
                     </ScrollView>
+                    <View style={[styles.footer]}>
+                        <Button
+                            title="Next"
+                            style={[styles.button]}
+                            size="long"
+                            useGradient={true}
+                            onPress={handleSubmit(onFormValid)}
+                        />
+                    </View>
                 </KeyboardAvoidingView>
-
-                <View style={[styles.footer]}>
-                    <Button
-                        title="Next"
-                        style={[styles.button]}
-                        size="long"
-                        useGradient={true}
-                        onPress={handleSubmit(onFormValid)}
-                    />
-                </View>
 
                 <Modal
                     visible={tooltipVisible}

@@ -141,17 +141,18 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
                 )} />
             </View>
           </ScrollView>
+          <View style={[styles.footer]}>
+            <Button
+              title="Confirm request"
+              style={[styles.button]}
+              size='long'
+              useGradient={true}
+              onPress={handleSubmit(onFormValid)}
+            />
+          </View>
         </View>
       </KeyboardAvoidingView>
-      <View style={[styles.footer]}>
-        <Button
-          title="Confirm request"
-          style={[styles.button]}
-          size='long'
-          useGradient={true}
-          onPress={handleSubmit(onFormValid)}
-        />
-      </View>
+
     </AppContainer >
   );
 }
