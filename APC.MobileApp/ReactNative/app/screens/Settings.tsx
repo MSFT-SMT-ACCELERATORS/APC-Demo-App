@@ -102,7 +102,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                 <KeyboardAvoidingView
                     behavior={Platform.OS === "ios" ? "height" : "height"}
                     style={{ flex: 1 }}
-                    keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 90}
+                    keyboardVerticalOffset={Platform.OS === "ios" ? 98 : 90}
                 >
                     <ScrollView style={styles.contentContainer}>
                         <View style={styles.bodyContent}>

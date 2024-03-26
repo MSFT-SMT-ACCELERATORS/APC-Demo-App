@@ -47,7 +47,7 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 180 : 0}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 165 : 0}
       >
         <View style={[styles.parent]}>
           <ScrollView style={[styles.contentContainer]}>
