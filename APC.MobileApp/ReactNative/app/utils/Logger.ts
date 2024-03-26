@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { USE_STORAGE_LOGGING } from '../Services/SettingsService'
 
 let isLogging = false;
 const logQueue: string[] = [];
@@ -34,10 +35,13 @@ const formatArgs = (args: any[]): string => {
 };
 
 const enqueueLog = (prefix: string, ...args: any[]) => {
+    if (!USE_STORAGE_LOGGING)
+        return;
+
     const formattedArgs = formatArgs(args);
     const logEntry = `[${prefix}] ${formattedArgs}`;
-    logQueue.push(logEntry); // Agrega el log a la cola
-    processQueue(); // Intenta procesar la cola
+    logQueue.push(logEntry);
+    processQueue();
 };
 
 export const Logger = {

@@ -10,6 +10,7 @@ import {
     AppConfiguration,
     defaultConfig,
     ConnectionMode,
+    USE_STORAGE_LOGGING
 } from '../Services/SettingsService';
 
 import AppContainer from '../components/AppContainer';
@@ -48,9 +49,11 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
     const connectionMode = watch('connectionMode');
     const [logContent, setLogContent] = useState<string | undefined | null>();
 
-    useEffect(() => {
-        AsyncStorage.getItem("log").then(setLogContent);
-    }, []);
+    if(USE_STORAGE_LOGGING) {
+        useEffect(() => {
+            AsyncStorage.getItem("log").then(setLogContent);
+        }, []);
+    }
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -346,18 +349,18 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                 </View>
                             ) : null}
 
-
-
-                            <View style={styles.sectionContent}>
-                                <StyledText customStyle={['bold', 'title4']} color='accent200'>Logging</StyledText>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Button title="Clear logs" onPress={() => { AsyncStorage.removeItem("log"); setLogContent(null) }} useGradient={true}></Button>
-                                    <Button title="Copy" disabled={!(logContent)} onPress={() => { Clipboard.setStringAsync(logContent ?? '') }} useGradient={true}></Button>
-                                </View>
-                                <TextInput multiline={true} editable={false}>
-                                    {logContent}
-                                </TextInput>
-                            </View>
+                            { USE_STORAGE_LOGGING ?
+                                <View style={styles.sectionContent}>
+                                    <StyledText customStyle={['bold', 'title4']} color='accent200'>Logging</StyledText>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                        <Button title="Clear logs" onPress={() => { AsyncStorage.removeItem("log"); setLogContent(null) }} useGradient={true}></Button>
+                                        <Button title="Copy" disabled={!(logContent)} onPress={() => { Clipboard.setStringAsync(logContent ?? '') }} useGradient={true}></Button>
+                                    </View>
+                                    <TextInput multiline={true} editable={false}>
+                                        {logContent}
+                                    </TextInput>
+                                </View> 
+                            : null }
                         </View>
                     </ScrollView>
                     <View style={[styles.footer]}>
