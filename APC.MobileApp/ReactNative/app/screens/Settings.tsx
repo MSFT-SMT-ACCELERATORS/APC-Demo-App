@@ -100,9 +100,9 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
         <AppContainer>
             <View style={[styles.parent]}>
                 <KeyboardAvoidingView
-                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    behavior={Platform.OS === "ios" ? "height" : "height"}
                     style={{ flex: 1 }}
-                    keyboardVerticalOffset={Platform.OS === "ios" ? 180 : 90}
+                    keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 90}
                 >
                     <ScrollView style={styles.contentContainer}>
                         <View style={styles.bodyContent}>
@@ -355,20 +355,17 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                 </TextInput>
                             </View>
                         </View>
-
-
                     </ScrollView>
+                    <View style={[styles.footer]}>
+                        <Button
+                            title="Save and close"
+                            style={[styles.button]}
+                            size="long"
+                            useGradient={true}
+                            onPress={handleSubmit(saveConfig)}
+                        />
+                    </View>
                 </KeyboardAvoidingView>
-
-                <View style={[styles.footer]}>
-                    <Button
-                        title="Save and close"
-                        style={[styles.button]}
-                        size="long"
-                        useGradient={true}
-                        onPress={handleSubmit(saveConfig)}
-                    />
-                </View>
             </View>
         </AppContainer>
     );
