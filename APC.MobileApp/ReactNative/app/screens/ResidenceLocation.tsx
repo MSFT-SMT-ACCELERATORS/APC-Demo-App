@@ -111,6 +111,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
     const handleCountryChange = async (query: string) => {
         setCountryQuery(query);
+        setCountryValue('');
 
         setStateQuery('');
         setStateSuggestions([]);
@@ -125,14 +126,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
         if (query.length > 1) {
             const suggestions = await BingService.getCountrySuggestions(query);
             const uniqueSuggestions = Array.from(new Set(suggestions));
-            const match = uniqueSuggestions.some(suggestion => suggestion.toLowerCase() === query.toLowerCase());
-
-            if (match) {
-                setCountryValue(query);
-                setCountrySuggestions([]);
-            } else {
-                setCountrySuggestions(uniqueSuggestions);
-            }
+            setCountrySuggestions(uniqueSuggestions);
         } else {
             setCountrySuggestions([]);
         }
@@ -145,8 +139,9 @@ const ResidenceLocation: React.FC<StepProps> = ({
     };
 
     const handleStateChange = async (query: string) => {
-        setStateQuery(query);
-        
+        setStateQuery(query);        
+        setStateValue('');
+
         setCityQuery('');
         setCitySuggestions([]);
         setCityValue('');
@@ -156,14 +151,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
         if (query.length >= 2) {
             const suggestions = await BingService.getStateSuggestions(query, selectedCountry);
             const uniqueSuggestions = Array.from(new Set(suggestions));
-            const match = uniqueSuggestions.some(suggestion => suggestion.toLowerCase() === query.toLowerCase());
-
-            if (match) {
-                handleStateSuggestion(query);
-            } else {
-
-                setStateSuggestions(uniqueSuggestions);
-            }
+            setStateSuggestions(uniqueSuggestions);
         } else {
             setStateSuggestions([]);
         }
@@ -184,13 +172,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
         if (query.length > 1) {
             const suggestions = await BingService.getCitySuggestions(query, selectedCountry, selectedState);
             const uniqueSuggestions = Array.from(new Set(suggestions));
-            const match = uniqueSuggestions.some(suggestion => suggestion.toLowerCase() === query.toLowerCase());
-
-            if (match) {
-                handleCitySuggestion(query);
-            } else {
-                setCitySuggestions(uniqueSuggestions);
-            }
+            setCitySuggestions(uniqueSuggestions);
         } else {
             setCitySuggestions([]);
         }
@@ -379,7 +361,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
                             <Controller name='StateProvince' control={control} render={({ field }) => (
                                 <>
-                                    <StyledInputText customStyle={['mb0']} labelText="State/Province" value={stateQuery} onChangeText={handleStateChange} placeholder="Select a State/Province..." />
+                                    <StyledInputText customStyle={['mb0']} labelText="State/Province" value={stateQuery} onChangeText={handleStateChange} placeholder="Select a State/Province..." editable={selectedCountry != ''}/>
                                     {stateSuggestions.length > 0 && (
                                         <FlatList style={styles.sectionContent} data={stateSuggestions} scrollEnabled={false}
                                             renderItem={({ item }) => (
@@ -401,7 +383,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                 control={control}
                                 render={({ field }) => (
                                     <>
-                                        <StyledInputText customStyle={['mb0']} labelText="City" value={cityQuery} onChangeText={handleCityChange} placeholder="Select a City..." />
+                                        <StyledInputText customStyle={['mb0']} labelText="City" value={cityQuery} onChangeText={handleCityChange} placeholder="Select a City..."  editable={selectedState != ''}/>
                                         {citiesSuggestions.length > 0 && (
                                             <FlatList style={styles.sectionContent} data={citiesSuggestions} scrollEnabled={false}
                                                 renderItem={({ item }) => (
