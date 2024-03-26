@@ -125,6 +125,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                     render={({ field }) => (
                                         <StyledInputText
                                             labelText="Radius Km (allowed gps deviation)"
+                                            inputType='decimal'
                                             value={field.value?.toString() || ''}
                                             onChangeText={field.onChange}
                                         />
@@ -152,6 +153,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                     render={({ field }) => (
                                         <StyledInputText
                                             labelText="Radius Km (allowed deviation for residence location)"
+                                            inputType='decimal'
                                             value={field.value?.toString() || ''}
                                             onChangeText={field.onChange}
                                         />
@@ -291,6 +293,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                         render={({ field }) => (
                                             <StyledInputText
                                                 labelText="Simulated APC Latitude"
+                                                inputType='decimal'
                                                 value={
                                                     field.value?.toString() || ''
                                                 }
@@ -324,6 +327,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                         render={({ field }) => (
                                             <StyledInputText
                                                 labelText="Simulated APC Longitude"
+                                                inputType='decimal'
                                                 value={
                                                     field.value?.toString() || ''
                                                 }

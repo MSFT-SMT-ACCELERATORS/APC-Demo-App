@@ -106,7 +106,7 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
                 name='zipcode'
                 control={control}
                 render={({ field }) => (
-                  <StyledInputText labelText="Zip code" placeholder="Zip code" onChangeText={field.onChange}></StyledInputText>
+                  <StyledInputText labelText="Zip code" placeholder="Zip code" onChangeText={field.onChange} inputType='numeric'></StyledInputText>
                 )} />
               <View style={[styles.idContainer]}>
                 <StyledText>Identity verification</StyledText>
