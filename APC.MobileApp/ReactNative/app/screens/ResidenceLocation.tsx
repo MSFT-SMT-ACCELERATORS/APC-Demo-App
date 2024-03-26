@@ -111,13 +111,24 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
     const handleCountryChange = async (query: string) => {
         setCountryQuery(query);
-        setCountryValue(query);
+
+        setStateQuery('');
+        setStateSuggestions([]);
+        setStateValue('');
+
+        setCityQuery('');
+        setCitySuggestions([]);
+        setCityValue('');
+        
+        setHackedGPS(undefined);
+        
         if (query.length > 1) {
             const suggestions = await BingService.getCountrySuggestions(query);
             const uniqueSuggestions = Array.from(new Set(suggestions));
             const match = uniqueSuggestions.some(suggestion => suggestion.toLowerCase() === query.toLowerCase());
 
             if (match) {
+                setCountryValue(query);
                 setCountrySuggestions([]);
             } else {
                 setCountrySuggestions(uniqueSuggestions);
@@ -135,14 +146,20 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
     const handleStateChange = async (query: string) => {
         setStateQuery(query);
-        setStateValue(query);
+        
+        setCityQuery('');
+        setCitySuggestions([]);
+        setCityValue('');
+
+        setHackedGPS(undefined);
+
         if (query.length >= 2) {
             const suggestions = await BingService.getStateSuggestions(query, selectedCountry);
             const uniqueSuggestions = Array.from(new Set(suggestions));
             const match = uniqueSuggestions.some(suggestion => suggestion.toLowerCase() === query.toLowerCase());
 
             if (match) {
-                setStateSuggestions([]);
+                handleStateSuggestion(query);
             } else {
 
                 setStateSuggestions(uniqueSuggestions);
@@ -161,14 +178,16 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
     const handleCityChange = async (query: string) => {
         setCityQuery(query);
-        setCityValue(query);
+        setCityValue('');
+        setHackedGPS(undefined);
+
         if (query.length > 1) {
             const suggestions = await BingService.getCitySuggestions(query, selectedCountry, selectedState);
             const uniqueSuggestions = Array.from(new Set(suggestions));
             const match = uniqueSuggestions.some(suggestion => suggestion.toLowerCase() === query.toLowerCase());
 
             if (match) {
-                setCitySuggestions([]);
+                handleCitySuggestion(query);
             } else {
                 setCitySuggestions(uniqueSuggestions);
             }
