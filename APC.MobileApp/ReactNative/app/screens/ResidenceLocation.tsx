@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Location from 'expo-location';
 import { readConfigurations, AppConfiguration, ConnectionMode, } from '../Services/SettingsService';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
 
@@ -21,7 +21,7 @@ import AppContainer from '../components/AppContainer';
 import CheckboxWithText from '../components/CheckBox';
 import CustomModal from '../components/CustomModal';
 import { RadioButton, Modal, } from 'react-native-paper';
-import { StyleSheet, View, ScrollView, Pressable, FlatList, TouchableOpacity, KeyboardAvoidingView, Platform, } from 'react-native';
+import { StyleSheet, View, ScrollView, Pressable, FlatList, TouchableOpacity, KeyboardAvoidingView, Platform, NativeSyntheticEvent, TextInputFocusEventData, findNodeHandle, UIManager, TextInput, } from 'react-native';
 
 import Icon from 'react-native-vector-icons/AntDesign';
 import { Logger } from '../utils/Logger';
@@ -35,7 +35,11 @@ const ResidenceLocation: React.FC<StepProps> = ({
     setProgress,
     setLoading,
 }) => {
-    const navigation = useNavigation();
+    const navigation = useNavigation();    
+    const scrollRef = useRef<ScrollView>(null);
+    const countryRef = useRef<TextInput>(null);
+    const stateRef = useRef<TextInput>(null);
+    const cityRef = useRef<TextInput>(null);
     const apiClient = useApiClient();
     const [hackedGPS, setHackedGPS] = useState<Location.LocationObjectCoords>();
     const [gpsPosition, setGPSPosition] = useState<Position>();
@@ -308,6 +312,20 @@ const ResidenceLocation: React.FC<StepProps> = ({
             Logger.log('LOC' + skipGeolocationCheck + " " + config.skipGeolocationCheck);
         }
     }, [config, skipGeolocationCheck]);
+
+    const handleFocus = (inputRef: React.RefObject<TextInput>) => (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+        const scrollViewNode = findNodeHandle(scrollRef.current);
+    
+        if (inputRef.current && scrollViewNode) {
+            inputRef.current.measureLayout(
+                scrollViewNode, 
+                (x, y, width, height) => {
+                    scrollRef.current?.scrollTo({ y: y-40, animated: true });
+                }
+            );
+          }
+    }
+
     return (
         <AppContainer>
             <View style={[styles.parent]}>
@@ -316,7 +334,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                     style={{ flex: 1 }}
                     keyboardVerticalOffset={Platform.OS === "ios" ? 165 : 165}
                 >
-                    <ScrollView style={[styles.contentContainer]}>
+                    <ScrollView style={[styles.contentContainer]} ref={scrollRef}>
                         <View style={[styles.title]}>
                             <StyledText customStyle={['title2', 'extrabold']}>
                                 Residence location
@@ -336,13 +354,13 @@ const ResidenceLocation: React.FC<StepProps> = ({
                             </StyledText>
                         </View>
 
-                        <View
-                            style={[styles.separatorContainer, customStyles.mb4]}
-                        ></View>
+                        <View style={[styles.separatorContainer, customStyles.mb4]}>
+                        </View>
+
                         <View style={styles.bodyContent}>
                             <Controller name='Country' control={control} render={({ field }) => (
                                 <>
-                                    <StyledInputText customStyle={['mb0']} labelText="Country" value={countryQuery} onChangeText={handleCountryChange} placeholder="Select a Country..." />
+                                    <StyledInputText customStyle={['mb0']} labelText="Country" value={countryQuery} onChangeText={handleCountryChange} placeholder="Select a Country..." ref={countryRef} onFocus={handleFocus(countryRef)}/>
                                     {countrySuggestions.length > 0 && (
                                         <FlatList style={styles.sectionContent} data={countrySuggestions} scrollEnabled={false}
                                             renderItem={({ item }) => (
@@ -361,7 +379,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
                             <Controller name='StateProvince' control={control} render={({ field }) => (
                                 <>
-                                    <StyledInputText customStyle={['mb0']} labelText="State/Province" value={stateQuery} onChangeText={handleStateChange} placeholder="Select a State/Province..." editable={selectedCountry != ''}/>
+                                    <StyledInputText customStyle={['mb0']} labelText="State/Province" value={stateQuery} onChangeText={handleStateChange} placeholder="Select a State/Province..." editable={selectedCountry != ''} ref={stateRef} onFocus={handleFocus(stateRef)}/>
                                     {stateSuggestions.length > 0 && (
                                         <FlatList style={styles.sectionContent} data={stateSuggestions} scrollEnabled={false}
                                             renderItem={({ item }) => (
@@ -383,7 +401,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                 control={control}
                                 render={({ field }) => (
                                     <>
-                                        <StyledInputText customStyle={['mb0']} labelText="City" value={cityQuery} onChangeText={handleCityChange} placeholder="Select a City..."  editable={selectedState != ''}/>
+                                        <StyledInputText customStyle={['mb0']} labelText="City" value={cityQuery} onChangeText={handleCityChange} placeholder="Select a City..."  editable={selectedState != ''} ref={cityRef} onFocus={handleFocus(cityRef)}/>
                                         {citiesSuggestions.length > 0 && (
                                             <FlatList style={styles.sectionContent} data={citiesSuggestions} scrollEnabled={false}
                                                 renderItem={({ item }) => (
