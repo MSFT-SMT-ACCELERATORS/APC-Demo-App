@@ -21,7 +21,7 @@ import AppContainer from '../components/AppContainer';
 import CheckboxWithText from '../components/CheckBox';
 import CustomModal from '../components/CustomModal';
 import { RadioButton, Modal, } from 'react-native-paper';
-import { StyleSheet, View, ScrollView, Pressable, FlatList, TouchableOpacity, KeyboardAvoidingView, Platform, NativeSyntheticEvent, TextInputFocusEventData, findNodeHandle, UIManager, TextInput, } from 'react-native';
+import { StyleSheet, View, ScrollView, Pressable, FlatList, TouchableOpacity, KeyboardAvoidingView, Platform, NativeSyntheticEvent, TextInputFocusEventData, findNodeHandle, UIManager, TextInput, Keyboard, } from 'react-native';
 
 import Icon from 'react-native-vector-icons/AntDesign';
 import { Logger } from '../utils/Logger';
@@ -42,6 +42,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
     const countryRef = useRef<TextInput>(null);
     const stateRef = useRef<TextInput>(null);
     const cityRef = useRef<TextInput>(null);
+    const [focusedInputRef, setFocusedInputRef] = useState<React.RefObject<TextInput> | null>(null);
     const apiClient = useApiClient();
     const [hackedGPS, setHackedGPS] = useState<Location.LocationObjectCoords>();
     const [gpsPosition, setGPSPosition] = useState<Position>();
@@ -67,8 +68,6 @@ const ResidenceLocation: React.FC<StepProps> = ({
     const [cityQuery, setCityQuery] = useState<string>('');
     const [citiesSuggestions, setCitySuggestions] = useState<string[]>([]);
     const [selectedCity, setCityValue] = useState('');
-
-
 
     useEffect(() => {
         (async () => {
@@ -141,6 +140,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
         setCountryQuery(suggestion);
         setCountrySuggestions([]);
         setCountryValue(suggestion);
+        Keyboard.dismiss();
     };
 
     const handleStateChange = async (query: string) => {
@@ -166,6 +166,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
         setStateQuery(suggestion);
         setStateSuggestions([]);
         setStateValue(suggestion);
+        Keyboard.dismiss();
     };
 
 
@@ -187,6 +188,8 @@ const ResidenceLocation: React.FC<StepProps> = ({
         setCityValue(suggestion);
         setCityQuery(suggestion);
         setCitySuggestions([]);
+        Keyboard.dismiss();
+
         const hackedLocation = await BingService.getCityCoordinates(suggestion, selectedCountry);
         Logger.log(`handleCitySuggestion:`, suggestion, JSON.stringify(hackedLocation));
         setHackedGPS(
@@ -315,18 +318,28 @@ const ResidenceLocation: React.FC<StepProps> = ({
         }
     }, [config, skipGeolocationCheck]);
 
-    const handleFocus = (inputRef: React.RefObject<TextInput>) => (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-        const scrollViewNode = findNodeHandle(scrollRef.current);
-    
-        if (inputRef.current && scrollViewNode) {
-            inputRef.current.measureLayout(
-                scrollViewNode, 
-                (x, y, width, height) => {
-                    scrollRef.current?.scrollTo({ y: y-40, animated: true });
-                }
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+          if (focusedInputRef && focusedInputRef.current) {
+            const scrollViewNode = findNodeHandle(scrollRef.current);
+            focusedInputRef.current.measureLayout(
+              scrollViewNode!,
+              (x, y, width, height) => {
+                scrollRef.current?.scrollTo({ y: y-40, animated: true });
+              },
+              () => Logger.error("Failed to measure layout."),
             );
           }
-    }
+        });
+    
+        return () => {
+          keyboardDidShowListener.remove();
+        };
+      }, [focusedInputRef]);
+
+    const handleFocus = (inputRef: React.RefObject<TextInput>) => (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+        setFocusedInputRef(inputRef);
+    };
 
     return (
         <AppContainer>
@@ -336,7 +349,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                     style={{ flex: 1 }}
                     keyboardVerticalOffset={Platform.OS === "ios" ? 165 : 165}
                 >
-                    <ScrollView style={[styles.contentContainer]} ref={scrollRef}>
+                    <ScrollView style={[styles.contentContainer]} ref={scrollRef} keyboardShouldPersistTaps="handled">
                         <View style={[styles.title]}>
                             <StyledText customStyle={['title2', 'extrabold']}>
                                 Residence location
@@ -362,9 +375,9 @@ const ResidenceLocation: React.FC<StepProps> = ({
                         <View style={styles.bodyContent}>
                             <Controller name='Country' control={control} render={({ field }) => (
                                 <>
-                                    <StyledInputText customStyle={['mb0']} labelText="Country" value={countryQuery} onChangeText={handleCountryChange} placeholder="Select a Country..." ref={countryRef} onFocus={handleFocus(countryRef)}/>
+                                    <StyledInputText customStyle={['mb0']} labelText="Country" value={countryQuery} onChangeText={handleCountryChange} placeholder="Select a Country..." ref={countryRef} onFocus={handleFocus(countryRef)} />
                                     {countrySuggestions.length > 0 && (
-                                        <FlatList style={styles.sectionContent} data={countrySuggestions} scrollEnabled={false}
+                                        <FlatList style={styles.sectionContent} data={countrySuggestions} scrollEnabled={false} keyboardShouldPersistTaps="handled"
                                             renderItem={({ item }) => (
                                                 <TouchableOpacity onPress={() => {field.onChange(item);handleCountrySuggestion(item)}}>
                                                     <StyledText customStyle={['m4']}>{item}</StyledText>
@@ -383,7 +396,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                 <>
                                     <StyledInputText customStyle={['mb0']} labelText="State/Province" value={stateQuery} onChangeText={handleStateChange} placeholder="Select a State/Province..." editable={selectedCountry != ''} ref={stateRef} onFocus={handleFocus(stateRef)}/>
                                     {stateSuggestions.length > 0 && (
-                                        <FlatList style={styles.sectionContent} data={stateSuggestions} scrollEnabled={false}
+                                        <FlatList style={styles.sectionContent} data={stateSuggestions} scrollEnabled={false} keyboardShouldPersistTaps="handled"
                                             renderItem={({ item }) => (
                                                 <TouchableOpacity onPress={() => {field.onChange(item);handleStateSuggestion(item)}}>
                                                     <StyledText customStyle={['m4']}>{item}</StyledText>
@@ -405,7 +418,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                     <>
                                         <StyledInputText customStyle={['mb0']} labelText="City" value={cityQuery} onChangeText={handleCityChange} placeholder="Select a City..."  editable={selectedState != ''} ref={cityRef} onFocus={handleFocus(cityRef)}/>
                                         {citiesSuggestions.length > 0 && (
-                                            <FlatList style={styles.sectionContent} data={citiesSuggestions} scrollEnabled={false}
+                                            <FlatList style={styles.sectionContent} data={citiesSuggestions} scrollEnabled={false} keyboardShouldPersistTaps="handled"
                                                 renderItem={({ item }) => (
                                                     <TouchableOpacity style={styles.itemList} onPress={() => {field.onChange(item);handleCitySuggestion(item)}}>
                                                         <StyledText customStyle={['m4']}>{item}</StyledText>
