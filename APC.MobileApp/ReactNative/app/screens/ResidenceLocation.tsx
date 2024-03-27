@@ -25,6 +25,7 @@ import { StyleSheet, View, ScrollView, Pressable, FlatList, TouchableOpacity, Ke
 
 import Icon from 'react-native-vector-icons/AntDesign';
 import { Logger } from '../utils/Logger';
+import { useStep } from '../utils/StepContext';
 
 interface StepProps {
     setProgress: (progress: number) => void;
@@ -36,6 +37,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
     setLoading,
 }) => {
     const navigation = useNavigation();    
+    const { setCurrentStep } = useStep();
     const scrollRef = useRef<ScrollView>(null);
     const countryRef = useRef<TextInput>(null);
     const stateRef = useRef<TextInput>(null);
@@ -80,7 +82,6 @@ const ResidenceLocation: React.FC<StepProps> = ({
             setHasLocationPermission(true);
         })();
     }, []);
-
 
     const handleModalToggle = (
         title: string,
@@ -208,7 +209,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
             const selectedLocation = await BingService.getCityCoordinates(selectedCity, selectedCountry);
             if (!selectedCity) {
                 Logger.log('Selection required');
-                handleModalToggle('Selection required', 'Select a valid option from the drop-down menus to continue', '#dadaed', undefined, 'information-circle-outline', palette.black);
+                handleModalToggle('Selection required', 'Select a valid location to continue', '#dadaed', undefined, 'information-circle-outline', palette.black);
                 setLoading(false);
 
                 return;
@@ -292,6 +293,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
+            setCurrentStep(1);
             setLoading(false);
             setProgress(25);
         });
