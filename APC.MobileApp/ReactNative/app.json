@@ -2,7 +2,7 @@
   "expo": {
     "name": "Microsoft APC Demo",
     "slug": "MicrosoftAPCDemo",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "orientation": "portrait",
     "icon": "./assets/icons/icon.png",
     "userInterfaceStyle": "light",
@@ -17,10 +17,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.turingchallenge.MicrosoftAPCDemo",
-      "buildNumber": "14"
+      "buildNumber": "16"
     },
     "android": {
-      "versionCode": 14,
+      "versionCode": 16,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/adaptive-icon.png",
         "backgroundColor": "#ffffff"
