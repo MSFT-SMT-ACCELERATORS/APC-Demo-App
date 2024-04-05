@@ -4,7 +4,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import btnStyles from '../themes/BtnStyles';
 import StyledText from './StyledText';
 import palette from '../themes/Colors';
-import customStyles from '../themes/CustomStyles';
 import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -107,7 +106,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
    buttonPressed: {
-    // Estilos del botón cuando está presionado
     backgroundColor: palette.accent200,
     color: 'red',
   },

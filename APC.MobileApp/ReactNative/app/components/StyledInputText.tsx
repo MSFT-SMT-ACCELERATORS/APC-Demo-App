@@ -11,7 +11,7 @@ interface InputTextProps extends TextInputProps {
     colors?: keyof typeof palette;
     labelText?: string;
     placeholder?: string;
-    inputType?: 'text' | 'numeric' | 'tel';
+    inputType?: 'text' | 'numeric' | 'decimal' | 'tel';
     isSensitiveData?: boolean;
 }
 
