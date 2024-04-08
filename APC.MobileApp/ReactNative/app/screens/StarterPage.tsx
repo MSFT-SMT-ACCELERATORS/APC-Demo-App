@@ -98,7 +98,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   useEffect(() => {
     if (!modalVisible && shouldNavigate) {
       setTimeout(() => {
-        navigation.navigate('Information');
+        navigation.navigate('ResidenceLocation');
         setShouldNavigate(false);
       }, 100);
     }
@@ -107,15 +107,15 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       setLoading(false);
-      setProgress(50);
+      setProgress(25);
     });
 
     return unsubscribe;
   }, [navigation]);
 
-  useEffect(() => {
-    setCurrentStep(2);
-  }, [setCurrentStep]);
+  // useEffect(() => {
+  //   setCurrentStep(2);
+  // }, [setCurrentStep]);
 
   useEffect(() => {
     readConfigurations().then(setConfig);
@@ -167,13 +167,13 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
         isValid = false;
       }
       handleModalToggle(title, message, backgroundColor, undefined, icon, iconColor);
-      Keyboard.dismiss();
       setIsPhoneNumberValid(isValid);
-
+      
     } catch (error) {
       Logger.log('Error' + error);
       handleModalToggle('Warning', 'The application cannot validate your phone number.', palette.warning, undefined, 'information-circle-outline', palette.black);
     } finally {
+      Keyboard.dismiss();
       setLoading(false);
     }
 
