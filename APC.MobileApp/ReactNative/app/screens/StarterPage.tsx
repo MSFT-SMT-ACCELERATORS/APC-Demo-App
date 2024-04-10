@@ -107,7 +107,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       setLoading(false);
-      setProgress(25);
+      setProgress(33.3);
     });
 
     return unsubscribe;

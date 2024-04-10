@@ -311,15 +311,14 @@ const ResidenceLocation: React.FC<StepProps> = ({
     }, [modalVisible, shouldNavigate, navigation]);
 
     useEffect(() => {
-        setCurrentStep(1);
+        setCurrentStep(2);
       }, [setCurrentStep]);
 
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            setCurrentStep(1);
             setLoading(false);
-            setProgress(50);
+            setProgress(66.6);
         });
 
         return unsubscribe;
