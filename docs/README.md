@@ -1,4 +1,3 @@
-
 # APC-Demo-App
 Mobile App with Cloud Service Demo consuming Azure Programmable Connectivity APIs with Telcos network APIs under the covers
 
@@ -61,7 +60,7 @@ To set up and run the project locally, follow these steps:
 5. **Open in a Web Browser**
    - Once the Metro Bundler is running in your terminal, press `W` to open the app in your web browser. Use responsive mode when opening the developer console with F12.
 
-![Dev Responsive](img/desktop.png)
+![Dev Responsive](docs/img/desktop.png)
 
 ### Mobile Testing
 
@@ -75,8 +74,8 @@ To test the app on a mobile device, follow these additional steps:
    - Select the option to scan the QR code.
    - Scan the QR code that appears in your terminal after you've run `npm start` from the React Native app directory.
 
-![QR Code](img/QR.png)
-![Scan QR](img/scan.png)
+![QR Code](docs/img/QR.png)
+![Scan QR](docs/img/scan.png)
 
 
 This will open the app on your mobile device, allowing you to test its features in a mobile environment.
