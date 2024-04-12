@@ -45,6 +45,7 @@ Welcome to the Azure Programmable Connectivity Hands-On Lab. In this lab, we wil
     - [React Service Calling APC](#react-service-calling-apc)
     - [APC Proxy SDK Usage](#apc-proxy-sdk-usage)
     - [Dependency Injection for SDK + HttpClient](#dependency-injection-for-sdk--httpclient)
+    - [Handling Consent permission for Locaction Number Verification](#handling-consent-permission-for-locaction-verification)
     - [Handling Redirections for Number Verification](#handling-redirections-for-number-verification)
   - [Exercise: Deploying and Testing a Demo Banking Application](#exercise-deploying-and-testing-a-demo-banking-application)
     - [Prerequisites](#prerequisites-1)
@@ -85,6 +86,8 @@ Here is an overview diagram depicting the interaction between these components:
 
 ### APC Planned Operator APIs
 
+TODO: current supported, comment on planned APIS
+
 APC enables direct access to a range of operator APIs, designed to streamline complex telecom functionalities into developer-friendly services. Below is a table summarizing the planned operator APIs:
 
 | API                 | Description                                                                                   |
@@ -92,11 +95,13 @@ APC enables direct access to a range of operator APIs, designed to streamline co
 | SIM Swap Detection  | Allows detection of SIM card changes, crucial for fraud prevention in security-sensitive operations. |
 | Number Verification | Verifies the authenticity of mobile numbers, enhancing trust and reducing spam.                |
 | Location Services   | Provides network-based location data, ideal for location-sensitive applications.              |
-| Quality of Service (QoS) | Ensures prioritized network traffic for essential services, maintaining performance standards. |
-| Billing and Charging | Facilitates direct carrier billing capabilities, enabling seamless transactions.              |
+
 
 Each API offers a unique set of functionalities, aligning with modern application needs and user expectations, propelling APC to the forefront of cloud-telecom integrations.
 
+
+TODO Planned  Quality of Service (QoS) | Ensures prioritized network traffic for essential services, maintaining performance standards.Billing and Charging | Facilitates direct carrier billing capabilities, enabling seamless transactions.  
+            |
 ### Additional information
 
 For a deeper understanding of Azure Programmable Connectivity (APC), including its potential impact and further details on its capabilities, refer to the following resources:
@@ -120,14 +125,15 @@ For a deeper understanding of Azure Programmable Connectivity (APC), including i
     - [Install the APC SDK](#install-the-apc-sdk)
     - [Instantiate an Authenticated Client](#instantiate-an-authenticated-client)
     - [Make APC Requests](#make-apc-requests)
-      - [APC Call #1: Retrieve Network Information](#apc-call-1-retrieve-network-information)
-      - [APC Call #2: Sim Swap Retrieve/Verify](#apc-call-2-sim-swap-retrieveverify)
+      - [APC SDK Call #1: Retrieve Network Information](#apc-call-1-retrieve-network-information)
+      - [APC SDK Call #2: Device Location](#apc-call-2-device-location)
+      - [APC SDK Call #3: Sim Swap Retrieve/Verify](#apc-call-3-sim-swap-retrieveverify)
+      - [APC SDK Call #3: Number verification](#apc-call-4-number-verification)
   - [Use Network APIs with APC REST APIs](#use-network-apis-with-apc-rest-apis)
 - (optional) [Part 1 Annex: Make APC Requests](#use-network-apis-with-the-apc-sdk-client)
     - [APC Call #1: Retrieve Network Information](#apc-call-1-retrieve-network-information)
     - [APC Call #2: Sim Swap Retrieve/Verify](#apc-call-2-sim-swap-retrieveverify)
 ---
-
 
 ### Prerequisites
 
@@ -252,7 +258,30 @@ Response<NetworkRetrievalResult> response = deviceNetworkApcClient.Retrieve(ApcG
 ![alt text](image-3.png)
 
 
-##### APC Call #2: Sim Swap retrieve/verify
+##### APC Call #2: Device Location
+
+Device location verification can fail if the operator line owner has not given location verification permission for this application. More on this and how to approach it in code [here](#handling-consent-permission-for-locaction-verification)
+
+1. Add code to access the subclient for sim-swap from the base client created earlier `apcClient`:
+```csharp
+var deviceLocationClient = apcClient.GetDeviceLocationClient();
+```
+2. Create the location-verify request content using the SDK class `DeviceLocationVerificationContent`. PhoneNumber `phone-number` with your actual number associated with the cellular network you are using:
+```csharp
+var deviceLocationVerificationContent = new DeviceLocationVerificationContent(new NetworkIdentifier("NetworkCode", "Telefonica_Brazil"), 80.0, 85.1, 50, new LocationDevice
+{
+    PhoneNumber = "+8000000000000",
+});
+```
+3. Retrieve the device-network response:
+```csharp
+Response<DeviceLocationVerificationResult> result = deviceLocationClient.Verify(apcGatewayId, deviceLocationVerificationContent);
+Console.WriteLine(result.Value.VerificationResult);
+```
+![alt text](image-15.png)
+
+
+##### APC Call #3: Sim Swap retrieve/verify
 
 To make the first operator network API call, once you have the client configured and retrieved the network information:
 
@@ -274,6 +303,51 @@ Response<SimSwapVerificationResult> response = client.Verify(ApcGatewayId, conte
 Console.WriteLine($"Verification result: {response.Value.VerificationResult}");
 ```
 ![alt text](image-5.png)
+
+##### APC Call #4: Number verification
+
+Number verification involves 2 steps. In the first request, you receive a redirect URL that must be followed, in order to get teh ApcCode. Then in the second request, the ApcCode gets sent in.
+
+For the fist call:
+
+1. Add code to access the subclient for sim-swap from the base client created earlier `apcClient`:
+```csharp
+NumberVerification numberVerificationClient = apcClient.GetNumberVerificationClient();
+
+```
+2. Create the number verification request content using the SDK class `NumberVerificationWithoutCodeContent`. PhoneNumber `phone-number` with your actual number associated with the cellular network you are using:
+```csharp
+NumberVerificationWithoutCodeContent numberVerificationWithoutCodeContent = new NumberVerificationWithoutCodeContent(
+    new NetworkIdentifier("NetworkCode", "Telefonica_Spain"),
+    new Uri("http://your-redirect-url.com")){ PhoneNumber = "<phoneNumber>", };
+
+```
+3. Retrieve the apcCode from the response:
+```csharp
+var response = await numberVerificationClient.VerifyWithoutCodeAsync(apcGatewayId, numberVerificationWithoutCodeContent);
+
+var locationUrl = response.GetRawResponse().Headers.TryGetValue("location", out var location) ? location : "not found";
+
+Console.WriteLine($"location redirect URL: {locationUrl}");
+```
+![alt text](image-16.png)
+
+For the second call
+
+1. Retrieve the code by following the previous `locationUrl`:
+```csharp
+var apcCode = "aad"; // WIP follow locationUrl
+```
+2. Create the number verification request content using the SDK class `NumberVerificationWithCodeContent`. Use the `apcCode` retrieved:
+```csharp
+NumberVerificationWithCodeContent numberVerificationWithCodeContent = new NumberVerificationWithCodeContent(apcCode);
+```
+3. Retrieve the verification result with the code `NumberVerificationWithCodeContent`. Use the `apcCode` retrieved:
+```csharp
+Response<NumberVerificationResult> numberVerificationResponse = await numberVerificationClient.VerifyWithCodeAsync(apcGatewayId, numberVerificationWithCodeContent);
+Console.WriteLine(numberVerificationResponse.Value.VerificationResult);
+```
+![alt text](image-17.png)
 
 ### Use Network APIs with APC REST APIs
 
@@ -337,40 +411,167 @@ Here's an example for the request payload to perform a SIM Swap verify:
 
 You can also use the .NET HttpClient to make authenticated calls to APC. Here's a basic example of how you can implement this in a .NET 8 console application:
 
+##### APC Call #1: Retrieve Network Information
+1. Create a Console App project in Net8.0 in your preferred IDE.
+2. Add code for your Azure EntraId client credentials and APC Gateway Id
+```csharp
+// Endpoint and Gateway ID for your APC.
+string baseUrl = "https://eastus.prod.apcgatewayapi.azure.com";
+string apcGatewayId = "/subscriptions/65e6256a-defe-45dd-9137-caf300f71460/resourceGroups/APC-TEST/providers/Microsoft.programmableconnectivity/gateways/apc-turing-prv-01";
+//"/subscriptions/your-subscription-id/resourceGroups/your-resource-group/providers/Microsoft.programmableconnectivity/gateways/your-gateway-name";
+
+// Azure AD application's details for OAuth.
+string clientId = "your-application-client-id";
+string clientSecret = "your-application-client-secret";
+string tenantId = "your-tenant-id";
+```
+3. Retrieve a token for your HttpClient by installing the nuget package Azure.Identity and adding the following code:
+```csharp
+// Authentication with Azure AD to obtain Bearer Token.
+var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+var token = await credential.GetTokenAsync(new Azure.Core.TokenRequestContext(new[] { "https://management.azure.com/.default" }));
+string accessToken = token.Token;
+```
+
+4. Add the required headers to call APC using a REST client:
+```csharp
+// Prepare the HttpClient with the Bearer token and common headers.
+using var httpClient = new HttpClient();
+httpClient.BaseAddress = new Uri(baseUrl);
+httpClient.DefaultRequestHeaders.Add("apc-gateway-id", apcGatewayId);
+httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+```
+
+Now you are ready to start calling APC API:
+![alt text](image-18.png)
+
+##### APC Call #1: Retrieve Network Information
+To make most of the APC calls, you'll need the network information of the device. Request this information from APC:
+
+1. WIP:
+```csharp
+string networkApiUrl = $"{baseUrl}/device-network/network:retrieve";
+var networkIdentifier = new
+    {
+        identifierType = "IPv4",
+        identifier = "your-ip" // phone?
+    };
+var networkContent = new StringContent(JsonSerializer.Serialize(networkIdentifier), Encoding.UTF8, "application/json");
+```
+
+2. Retrieve the device-network response:
+```csharp
+HttpResponseMessage networkResponse = await httpClient.PostAsync(networkApiUrl, networkContent);
+var networkResult = await JsonSerializer.DeserializeAsync<NetworkRetrievalResult>(await networkResponse.Content.ReadAsStreamAsync(), new JsonSerializerOptions{PropertyNameCaseInsensitive = true});
+Console.WriteLine($"Network retrieval result: {networkResult}");
+```
+![alt text](image-19.png)
+
+WIP location
+![alt text](image-20.png)
+
+WIP simswap
+![alt text](image-21.png)
 ```C#
-using System;
-using System.Net.Http;
+
+
 using System.Net.Http.Headers;
 using System.Text.Json;
+using System.Text;
+using System;
 using System.Threading.Tasks;
+using Azure.Identity;
+using Azure.Core;
 
-namespace ApcHttpClientDemo
-{
-    class Program
+// See https://aka.ms/new-console-template for more information
+// Simple console application to demonstrate API calls to Azure Programmable Connectivity using HTTP REST.
+Console.WriteLine("Hello, APC HOL!");
+
+// Endpoint and Gateway ID for your APC.
+string baseUrl = "https://eastus.prod.apcgatewayapi.azure.com";
+string apcGatewayId = "/subscriptions/65e6256a-defe-45dd-9137-caf300f71460/resourceGroups/APC-TEST/providers/Microsoft.programmableconnectivity/gateways/apc-turing-prv-01";
+//"/subscriptions/your-subscription-id/resourceGroups/your-resource-group/providers/Microsoft.programmableconnectivity/gateways/your-gateway-name";
+
+// Azure AD application's details for OAuth.
+string clientId = "c4c2624b-6b54-4ab5-89c5-05af87b842d3"; //"your-application-client-id";
+string clientSecret = "Xkw8Q~XJh3KTGDt4XofSpGfBX.2QlRlxoGnBObWl"; //"your-application-client-secret";
+string tenantId = "9b20b70c-e57f-4604-960a-5b779327ee3a"; // "your-tenant-id";
+
+// Authentication with Azure AD to obtain Bearer Token.
+var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+var token = await credential.GetTokenAsync(new Azure.Core.TokenRequestContext(new[] { "https://management.azure.com/.default" }));
+string accessToken = token.Token;
+
+// Prepare the HttpClient with the Bearer token and common headers.
+using var httpClient = new HttpClient();
+httpClient.BaseAddress = new Uri(baseUrl);
+httpClient.DefaultRequestHeaders.Add("apc-gateway-id", apcGatewayId);
+httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+httpClient.DefaultRequestHeaders.Add("x-ms-client-request-id", Guid.NewGuid().ToString()); // Maybe remove this and mention it in part 2?
+
+// Example: Retrieve network information using a direct HTTP call.
+string networkApiUrl = $"{baseUrl}/device-network/network:retrieve";
+var networkIdentifier = new
     {
-        static async Task Main(string[] args)
-        {
-            var httpClient = new HttpClient();
-            var requestUrl = "https://<apc-gateway-url>/sim-swap/check";
-            
-            var requestContent = new StringContent(
-                JsonSerializer.Serialize(new
-                {
-                    phoneNumber = "+1234567890",
-                    networkIdentifier = new { identifierType = "NetworkCode", identifier = "network-code-here" }
-                }), System.Text.Encoding.UTF8, "application/json");
+        identifierType = "IPv4",
+        identifier = "176.83.74.44" // TODO not hardcode (this one returns Telefonica_Spain)
+    };
+var networkContent = new StringContent(JsonSerializer.Serialize(networkIdentifier), Encoding.UTF8, "application/json");
 
-            httpClient.DefaultRequestHeaders.Authorization = 
-                new AuthenticationHeaderValue("Bearer", "<Your-Access-Token>");
+HttpResponseMessage networkResponse = await httpClient.PostAsync(networkApiUrl, networkContent);
+var networkResult = await JsonSerializer.DeserializeAsync<NetworkRetrievalResult>(await networkResponse.Content.ReadAsStreamAsync(), new JsonSerializerOptions{PropertyNameCaseInsensitive = true});
+Console.WriteLine($"Network retrieval result: {networkResult}");
 
-            var response = await httpClient.PostAsync(requestUrl, requestContent);
-            var responseContent = await response.Content.ReadAsStringAsync();
-            
-            Console.WriteLine($"Response Status: {response.StatusCode}");
-            Console.WriteLine($"Response Body: {responseContent}");
-        }
-    }
+// Example: Sim Swap verification using a direct HTTP call.
+string simSwapApiUrl = $"{baseUrl}/sim-swap/sim-swap:verify";
+var simSwapContent = new
+{
+    phoneNumber = "+34618125036",
+    maxAgeHours = 240,
+    networkCode = networkResult.networkCode
+};
+var simSwapRequestContent = new StringContent(JsonSerializer.Serialize(simSwapContent), Encoding.UTF8, "application/json");
+
+HttpResponseMessage simSwapResponse = await httpClient.PostAsync(simSwapApiUrl, simSwapRequestContent);
+var simSwapResult = await JsonSerializer.DeserializeAsync<SimSwapVerificationResult>(await simSwapResponse.Content.ReadAsStreamAsync(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+Console.WriteLine($"Sim swap verification result: {simSwapResult.VerificationResult}");
+
+// Example: Verify device location using a direct HTTP call.
+string locationApiUrl = $"{baseUrl}/device-location/location:verify";
+var locationContent = new
+{
+    networkIdentifier = new { networkCode = networkResult.networkCode },
+    latitude = 40.7128,
+    longitude = -74.0060,
+    accuracy = 10,
+    locationDevice = new { phoneNumber = "+34618125036" }
+};
+var locationRequestContent = new StringContent(JsonSerializer.Serialize(locationContent), Encoding.UTF8, "application/json");
+
+HttpResponseMessage locationResponse = await httpClient.PostAsync(locationApiUrl, locationRequestContent);
+var locationResult = await JsonSerializer.DeserializeAsync<DeviceLocationVerificationResult>(await locationResponse.Content.ReadAsStreamAsync(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+Console.WriteLine($"Device location verification result: {locationResult.VerificationResult}");
+
+// Add additional API calls as needed.
+
+// Number verification
+// Use HttpCompletionOption.ResponseHeadersRead for stopping autoredirection on HTTP 302
+//var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+
+// Response model classes
+public class NetworkRetrievalResult
+{
+    public required string networkCode { get; set; }
 }
+public class SimSwapVerificationResult
+{
+    public bool VerificationResult { get; set; }
+}
+public class DeviceLocationVerificationResult
+{
+    public bool VerificationResult { get; set; }
+}
+
 ```
 
 Find in the annex additional REST calls with implementation details using the HttpClient approach.
@@ -456,6 +657,9 @@ Our backend leverages the APC Proxy SDK to make API calls. Since its a demo app 
 
 #### Dependency Injection for SDK + HttpClient
 The backend service is designed with dependency injection (DI) to utilize the APC SDK for handling complex logic and HttpClient for direct REST calls where needed.
+
+#### Handling Consent permission for Locaction Verification
+For number verification, the banking app redirects users to a consent page if required by the operator. This ensures compliance with privacy regulations and operator terms.
 
 #### Handling Redirections for Number Verification
 For number verification, the banking app redirects users to a consent page if required by the operator. This ensures compliance with privacy regulations and operator terms.
