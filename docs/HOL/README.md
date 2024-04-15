@@ -373,11 +373,11 @@ This section covers how to interact with Azure Programmable Connectivity (APC) u
 
 To make authenticated requests to APC using REST HTTP calls, follow the process aided by the postman collection referenced in this guide.
 
-* Make sure the collection has the authentication token properly configured
-* Navigate to the desired APC request, for instance `sim-swap:verify`
-* Create the content for your request by replacing the payload examples given in postman with your information
-* Send the request
-* Access the result
+- Make sure the collection has the authentication token properly configured. If this is not done prior to making a request or the token has expired (1 hour lifetime) the requests will return **HTTP 401 Unauthorized** results.
+- Navigate to the desired APC request, for instance `sim-swap:verify`
+- Create the content for your request by replacing the payload examples given in postman with your information
+- Send the request
+- Access the result
 
 ##### Setup: Configure Postman for Authenticated Requests to APC
 
@@ -385,15 +385,24 @@ To make authenticated requests to the APC API, you need to set up Postman with t
 
 1. Open Postman, click import and drag the collection linked in this repo [Link to APC Postman collection](apc-postman.json)
 
-![alt text](image-6.png)
+![Import collection](image-6.png)
 
-2. Double click the collection name that appeared on the collection side menu and go to the tab `Authorization`
+2. Double click the collection name that appeared on the collection side menu and go to the tab `Variables`. From there, update the `auth-secret`, `auth-clientId`, `auth-secret` and also the `app-gateway-id` values. 
 
-![alt text](image-7.png)
+![Collection auth var](image-30.png)
+![Collection APC Gateway id var](image-33.png)
 
-3. Scroll down to `Configure New Token` section and replace the values for `client id` and `client secret`. TODO add tenantId
+3. Click save or press `Ctrl+S` and go to the tab `Authorization`
 
-![alt text](image-8.png)
+![Collection auth tab](image-7.png)
+
+4. Scroll down to `Configure New Token` advanced section and click the values for `Generate New Access Token`
+
+![Collection Get new token](image-32.png)
+
+5. Once succeeded, select `Use Token`. This token will be valid for 1 hour. You can skip to the Generate New Token step every time it expires.
+
+![alt text](image-31.png)
 
 ##### Postman APC SimSwap Verify Request
 
