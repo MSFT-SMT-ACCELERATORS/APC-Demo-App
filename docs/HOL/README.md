@@ -124,12 +124,17 @@ For a deeper understanding of Azure Programmable Connectivity (APC), including i
     - [Create a Console Application](#create-a-console-application)
     - [Install the APC SDK](#install-the-apc-sdk)
     - [Instantiate an Authenticated Client](#instantiate-an-authenticated-client)
-    - [Make APC Requests](#make-apc-requests)
+    - [SDK APC Requests](#make-apc-requests)
       - [APC SDK Call #1: Retrieve Network Information](#apc-call-1-retrieve-network-information)
       - [APC SDK Call #2: Device Location](#apc-call-2-device-location)
       - [APC SDK Call #3: Sim Swap Retrieve/Verify](#apc-call-3-sim-swap-retrieveverify)
       - [APC SDK Call #3: Number verification](#apc-call-4-number-verification)
   - [Use Network APIs with APC REST APIs](#use-network-apis-with-apc-rest-apis)
+    - [Postman APC requests](#a-make-apc-requests-with-postman)
+      - [Postman APC SimSwap Verify Request](#postman-apc-simswap-verify-request)
+      - [Postman APC Number Verification Request](#postman-apc-number-verification-request)
+    - [.NET HttpClient APC requests](#b-make-apc-requests-with-net-httpclient)
+      - [HttpClient APC Retrieve Network Information Request](#http-apc-call-1-retrieve-network-information)
 - (optional) [Part 1 Annex: Make APC Requests](#use-network-apis-with-the-apc-sdk-client)
     - [APC Call #1: Retrieve Network Information](#apc-call-1-retrieve-network-information)
     - [APC Call #2: Sim Swap Retrieve/Verify](#apc-call-2-sim-swap-retrieveverify)
@@ -353,7 +358,15 @@ Console.WriteLine(numberVerificationResponse.Value.VerificationResult);
 
 This section covers how to interact with Azure Programmable Connectivity (APC) using REST HTTP calls. You'll learn to set up Postman for making authenticated requests, and how to construct these requests using .NET HttpClient in a console application.
 
-#### A. Make APC requests with Postman (SIM Swap)
+#### A. Make APC requests with Postman
+
+To make authenticated requests to APC using REST HTTP calls, follow the process aided by the postman collection referenced in this guide.
+
+* Make sure the collection has the authentication token properly configured
+* Navigate to the desired APC request, for instance `sim-swap:verify`
+* Create the content for your request by replacing the payload examples given in postman with your information
+* Send the request
+* Access the result
 
 ##### Setup: Configure Postman for Authenticated Requests to APC
 
@@ -371,22 +384,13 @@ To make authenticated requests to the APC API, you need to set up Postman with t
 
 ![alt text](image-8.png)
 
-##### APC Requests
+##### Postman APC SimSwap Verify Request
 
-To make authenticated requests to APC using REST HTTP calls, follow the process aided by the postman collection referenced in this guide.
-
-* Make sure the collection has the authentication token properly configured
-* Navigate to the desired APC request, for instance `sim-swap:verify`
-* Create the content for your request by replacing the payload examples given in postman with your information
-* Send the request
-* Access the result
-
-###### APC SimSwap Verify requests
-4. Click `Ctrl + S` to save and navigate to `sim-swap:verify` request
+1. Navigate to `sim-swap:verify` request
 
 ![alt text](image-9.png)
 
-5. Adjust the request payload in the `Body` tab
+2. Adjust the request payload in the `Body` tab
 
 Here's an example for the request payload to perform a SIM Swap verify:
 
@@ -403,15 +407,61 @@ Here's an example for the request payload to perform a SIM Swap verify:
 
 ![alt text](image-10.png)
 
-6. Click `Send` and view the response
+3. Click `Send` and view the response
 
 ![alt text](image-11.png)
 
-#### B. Run APC REST APIs with .NET HttpClient
+
+##### Postman APC Number Verification Request
+
+1. Navigate to `number-verification > number:verify` request
+2. Adjust the request payload in the `Body` tab with your data.
+  ```json
+  {
+    "networkIdentifier": {
+      "identifierType": "NetworkCode",
+      "identifier": "your-network-code"
+    },
+    "phoneNumber": "your-phone-inc-countrycode",
+    "redirectUri": "your-service-auth-callback"
+  }
+  ```
+![alt text](image-22.png)
+
+3. Go to the settings tab and make sure the setting `Automatically follow redirects` is set to OFF. Following this step, you will procceed to manually follow **three** 302 redirect calls.
+
+![alt text](image-23.png)
+
+4. Click Send and once it completes the result should be a HTTP `302` response with a Location header containing the next call in the number verification flow. Copy the url value for the `Location` header. 
+
+![alt text](image-24.png)
+
+5. **1/3 302 request**: Create a new request in a new tab and paste the url value from the step before. Make sure the `Automatically follow redirects` setting is OFF. Send the GET request and copy the next `Location` header value from the new 302 response.
+
+![alt text](image-26.png)
+
+5. **2/3 302 request**: Create a new request in a new tab and paste the url value from the step before. Make sure the `Automatically follow redirects` setting is OFF. Send the GET request and copy the next `Location` header value from the new 302 response.
+
+![alt text](image-27.png)
+
+5. **3/3 302 request**: Create a new request in a new tab and paste the url value from the step before. Make sure the `Automatically follow redirects` setting is OFF. Send the GET request and copy the query param named `apcCode` in the `Location` header value from the new 302 response.
+
+![alt text](image-28.png)
+
+6. Go back to and modify the original `number-verification > number:verify` request's payload with the following content, then click Send to retrieve the number verification result.
+
+```json
+{
+    "apcCode": "your-apc-code-retrieved-in-step-5"
+}
+```
+![alt text](image-29.png)
+
+#### B. Make APC requests with .NET HttpClient
 
 You can also use the .NET HttpClient to make authenticated calls to APC. Here's a basic example of how you can implement this in a .NET 8 console application:
 
-##### APC Call #1: Retrieve Network Information
+##### Set up a .NET httpClient for APC
 1. Create a Console App project in Net8.0 in your preferred IDE.
 2. Add code for your Azure EntraId client credentials and APC Gateway Id
 ```csharp
@@ -445,7 +495,7 @@ httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("
 Now you are ready to start calling APC API:
 ![alt text](image-18.png)
 
-##### APC Call #1: Retrieve Network Information
+##### Http APC Call #1: Retrieve Network Information
 To make most of the APC calls, you'll need the network information of the device. Request this information from APC:
 
 1. WIP:
@@ -526,7 +576,7 @@ Console.WriteLine($"Network retrieval result: {networkResult}");
 string simSwapApiUrl = $"{baseUrl}/sim-swap/sim-swap:verify";
 var simSwapContent = new
 {
-    phoneNumber = "+34618125036",
+    phoneNumber = "+34600000000",
     maxAgeHours = 240,
     networkCode = networkResult.networkCode
 };
@@ -544,7 +594,7 @@ var locationContent = new
     latitude = 40.7128,
     longitude = -74.0060,
     accuracy = 10,
-    locationDevice = new { phoneNumber = "+34618125036" }
+    locationDevice = new { phoneNumber = "+34600000000" }
 };
 var locationRequestContent = new StringContent(JsonSerializer.Serialize(locationContent), Encoding.UTF8, "application/json");
 
