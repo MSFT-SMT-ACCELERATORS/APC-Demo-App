@@ -39,6 +39,14 @@ Welcome to the Azure Programmable Connectivity Hands-On Lab. In this lab, we wil
       - [APC Call #1: Retrieve Network Information](#apc-call-1-retrieve-network-information)
       - [APC Call #2: Sim Swap Retrieve/Verify](#apc-call-2-sim-swap-retrieveverify)
   - [Use Network APIs with APC REST APIs](#use-network-apis-with-apc-rest-apis)
+    - [Postman APC requests](#a-make-apc-requests-with-postman)
+      - [Postman APC SimSwap Verify Request](#postman-apc-simswap-verify-request)
+      - [Postman APC Number Verification Request](#postman-apc-number-verification-request)
+    - [.NET HttpClient APC requests](#b-make-apc-requests-with-net-httpclient)
+      - [HttpClient APC Retrieve Network Information Request](#http-apc-call-1-retrieve-network-information)
+      - [HttpClient APC Verify Device Location Request](#http-apc-call-2-verify-device-location)
+      - [HttpClient APC Verify Sim Swap Request](#http-apc-call-3-verify-sim-swap)
+      - [HttpClient APC Number Verification Request](#http-apc-call-4-number-verification)
 - **Part 2:**[ Advanced Use Case - Integrating APC into a Banking App](#part-2-advanced-use-case---integrating-apc-into-a-banking-app)
   - [Architecture](#architecture)
   - [Advanced Integration Details](#advanced-integration-details)
@@ -135,6 +143,9 @@ For a deeper understanding of Azure Programmable Connectivity (APC), including i
       - [Postman APC Number Verification Request](#postman-apc-number-verification-request)
     - [.NET HttpClient APC requests](#b-make-apc-requests-with-net-httpclient)
       - [HttpClient APC Retrieve Network Information Request](#http-apc-call-1-retrieve-network-information)
+      - [HttpClient APC Verify Device Location Request](#http-apc-call-2-verify-device-location)
+      - [HttpClient APC Verify Sim Swap Request](#http-apc-call-3-verify-sim-swap)
+      - [HttpClient APC Number Verification Request](#http-apc-call-4-number-verification)
 - (optional) [Part 1 Annex: Make APC Requests](#use-network-apis-with-the-apc-sdk-client)
     - [APC Call #1: Retrieve Network Information](#apc-call-1-retrieve-network-information)
     - [APC Call #2: Sim Swap Retrieve/Verify](#apc-call-2-sim-swap-retrieveverify)
@@ -498,7 +509,7 @@ Now you are ready to start calling APC API:
 ##### Http APC Call #1: Retrieve Network Information
 To make most of the APC calls, you'll need the network information of the device. Request this information from APC:
 
-1. WIP:
+1. Prepare the network retrieve request content:
 ```csharp
 string networkApiUrl = $"{baseUrl}/device-network/network:retrieve";
 var networkIdentifier = new
@@ -517,13 +528,53 @@ Console.WriteLine($"Network retrieval result: {networkResult}");
 ```
 ![alt text](image-19.png)
 
-WIP location
+##### Http APC Call #2: Verify device location
+1. Prepare the device location verify content:
+```csharp
+string locationApiUrl = $"{baseUrl}/device-location/location:verify";
+var locationContent = new
+{
+    networkIdentifier = new { networkCode = networkResult.networkCode },
+    latitude = 40.7128,
+    longitude = -74.0060,
+    accuracy = 10,
+    locationDevice = new { phoneNumber = "your-phone-with-country-code" }
+};
+var locationRequestContent = new StringContent(JsonSerializer.Serialize(locationContent), Encoding.UTF8, "application/json");
+```
+
+2. Retrieve the device location verify response:
+```csharp
+HttpResponseMessage locationResponse = await httpClient.PostAsync(locationApiUrl, locationRequestContent);
+var locationResult = await JsonSerializer.DeserializeAsync<DeviceLocationVerificationResult>(await locationResponse.Content.ReadAsStreamAsync(),
+    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+Console.WriteLine($"Device location verification result: {locationResult.VerificationResult}");
+```
 ![alt text](image-20.png)
 
-WIP simswap
-![alt text](image-21.png)
-```C#
+##### Http APC Call #3: Verify Sim Swap
+1. Prepare the verify sim swap content:
+```csharp
+string simSwapApiUrl = $"{baseUrl}/sim-swap/sim-swap:verify";
+var simSwapContent = new
+{
+    phoneNumber = "your-phone-with-country-code",
+    maxAgeHours = 240,
+    networkCode = networkResult.networkCode
+};
+var simSwapRequestContent = new StringContent(JsonSerializer.Serialize(simSwapContent), Encoding.UTF8, "application/json");
+```
 
+2. Retrieve the verify sim swap response:
+```csharp
+HttpResponseMessage simSwapResponse = await httpClient.PostAsync(simSwapApiUrl, simSwapRequestContent);
+var simSwapResult = await JsonSerializer.DeserializeAsync<SimSwapVerificationResult>(await simSwapResponse.Content.ReadAsStreamAsync(),
+    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+Console.WriteLine($"Sim swap verification result: {simSwapResult.VerificationResult}");
+```
+![alt text](image-21.png)
+
+##### Http APC Call #4: Number verification
 
 using System.Net.Http.Headers;
 using System.Text.Json;
