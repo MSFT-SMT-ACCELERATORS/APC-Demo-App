@@ -73,6 +73,31 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
         return unsubscribe;
     }, [navigation]);
 
+    const handleInputChange = (text: string, setValue: (value: string) => void) => {
+        let newText = text.replace(/[^0-9\-.,]/g, '');
+    
+        newText = newText.startsWith('-') ? '-' + newText.slice(1).replace(/-/g, '') : newText.replace(/-/g, '');
+    
+        newText = newText.replace(/^[.,]+/, ''); 
+        let decimalPointFound = false;
+        let commaFound = false;
+        newText = newText.split('').filter(char => {
+            if (char === '.' && !decimalPointFound) {
+                decimalPointFound = true;
+                return true;
+            } else if (char === ',' && !commaFound) {
+                commaFound = true;
+                return true;
+            }
+            return char !== '.' && char !== ',';
+        }).join('');
+    
+        setValue(newText);
+    };
+    
+    
+    
+    
     const saveConfig: SubmitHandler<AppConfiguration> = async (data) => {
         let updatedAutovalidatePhoneNumber = autovalidatePhoneNumber;
         let updatedSimSwap = simSwap;
@@ -296,11 +321,11 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                         render={({ field }) => (
                                             <StyledInputText
                                                 labelText="Simulated APC Latitude"
-                                                inputType='decimal'
+                                                inputType='text'
                                                 value={
                                                     field.value?.toString() || ''
                                                 }
-                                                onChangeText={field.onChange}
+                                                onChangeText={(text) => handleInputChange(text, field.onChange)}
                                             />
                                         )}
                                     />
@@ -330,11 +355,11 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                         render={({ field }) => (
                                             <StyledInputText
                                                 labelText="Simulated APC Longitude"
-                                                inputType='decimal'
+                                                inputType='text'
                                                 value={
                                                     field.value?.toString() || ''
                                                 }
-                                                onChangeText={field.onChange}
+                                                onChangeText={(text) => handleInputChange(text, field.onChange)}
                                             />
                                         )}
                                     />
