@@ -47,7 +47,7 @@ Welcome to the Azure Programmable Connectivity Hands-On Lab. In this lab, we wil
       - [HttpClient APC Verify Device Location Request](#http-apc-call-2-verify-device-location)
       - [HttpClient APC Verify Sim Swap Request](#http-apc-call-3-verify-sim-swap)
       - [HttpClient APC Number Verification Request](#http-apc-call-4-number-verification)
-- **Part 2:**[ Advanced Use Case - Integrating APC into a Banking App](#part-2-advanced-use-case---integrating-apc-into-a-banking-app)
+- **Part 2:**[ Advanced Use Case - Integrating APC into a Banking App](#part-2
   - [Architecture](#architecture)
   - [Advanced Integration Details](#advanced-integration-details)
     - [React Service Calling APC](#react-service-calling-apc)
@@ -192,20 +192,24 @@ Once your gateway is created, you'll need to configure it:
 
 To authenticate and access the APC Gateway, create a Microsoft Entra application:
 
-1. Follow the instructions to [register an application with Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal) and create a service principal.
+1. Follow the instructions to [register an application with Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal), create a service principal and record the clientId and secret.
     1. Sign in to the [Microsoft Entra admin center](https://entra.microsoft.com) as at least a [Cloud Application Administrator](~/identity/role-based-access-control/permissions-reference.md#cloud-application-administrator). 
     1. Browse to **Identity** > **Applications** > **App registrations** then select **New registration**.
     1. Name the application, for example "example-app". 
     1. Select a supported account type, which determines who can use the application. 
-    1. Under **Redirect URI**, select **Web** for the type of application you want to create. Enter the URI where the access token is sent to.
+    1. Under **Redirect URI**, select **Service** for the type of application you want to create.
     1. Select **Register**.
+
+    ![App Registration](image-35.png)
+
+2. Create and record the application client ID and client secret or certificate for future use.
     1. Browse to **Identity** > **Applications** > **App registrations**, then select your application.
     1. Select **Certificates & secrets**.
     1. Select **Client secrets**, and then Select **New client secret**.
     1. Provide a description of the secret, and a duration.
     1. Select **Add**.
 
-2. Record the application client ID and client secret or certificate for future use.
+![Record Client Secret](image-34.png)
 
 3. Assign the necessary role to your application using Azure CLI:
 
@@ -459,7 +463,7 @@ Here's an example for the request payload to perform a SIM Swap verify:
   ```
 ![alt text](image-22.png)
 
-3. Go to the settings tab and make sure the setting `Automatically follow redirects` is set to OFF. Following this step, you will procceed to manually follow **three** 302 redirect calls.
+3. Go to the settings tab and make sure the setting `Automatically follow redirects` is set to OFF. Following this step, you will procceed to manually follow **three** 302 redirect calls. In a normal scenario these would befollowed automatically, refer to [Part 2: TODO LINk](#part-2-advanced-use-case---integrating-apc-into-a-banking-app) for real-word number verification example. 
 
 ![alt text](image-23.png)
 
@@ -596,6 +600,88 @@ Console.WriteLine($"Sim swap verification result: {simSwapResult.VerificationRes
 
 ##### Http APC Call #4: Number verification
 
+
+Number verification involves 2 APC requests along with some HTTP 302 redirections that in a normal scenario would befollowed automatically, refer to [Part 2: TODO LINk](#part-2-advanced-use-case---integrating-apc-into-a-banking-app) for real-word number verification example. 
+
+**APC Requests for number verification:**
+
+- Retrieve APC auth code flow: you receive some HTTP 302 redirect responses from and to operator authentication servers that should be followed to retrieve the APC Code.
+- Verify the retrieved APC auth code.
+
+
+1. Since the first call returns HTTP 302 redirect responses, set up the HttpClient you instanciated earlier to not automatically follow redirects.
+    1. Create a `HttpClientHandler` with `AllowAutoRedirect` property set to false
+
+        ```csharp
+        var handler = new HttpClientHandler
+        {
+            AllowAutoRedirect = false
+        };
+        ```
+    2. Add the handler as a parameter in the httpCleint constructor call.
+
+        ```csharp
+        using var httpClient = new HttpClient(handler);
+        ```
+
+2. Now that you disabled automatic redirection, make the first APC request and follow redirections  manually, as this is a demo exercise and not the intended setup.
+    1. Prepare the number verification apc code retrieval request. The request content property `redirectUri` can be any Uri as it won't be followed in this case, however in real-word scenarios, this should a service of yours capable of making or propagating APC requests. ead more about real-word scenarios in [Part 2: TODO LINk](#part-2-advanced-use-case---integrating-apc-into-a-banking-app)
+        ```csharp
+        // Number verification
+        // First Number Verification Request
+        string numberVerificationInitUrl = $"{baseUrl}/number-verification/number:verify";
+        var numberVerificationInitContent = new
+        {
+            networkIdentifier = new { identifierType = "NetworkCode", identifier = networkResult.networkCode },
+            phoneNumber = "+34618125036",
+            redirectUri = "https://localhost:7127/api/APC/number-verification/apcauthcallback"
+        };
+        var initRequestContent = new StringContent(JsonSerializer.Serialize(numberVerificationInitContent), Encoding.UTF8, "application/json");
+        ```
+        ![alt text](image-36.png)
+
+    2. **First APC Request:** Make the HTTP Request. The result should be a HTTP `302` response with a Location header containing the next call in the number verification flow. This location won't be followed automatically since we configured the HttpClient when instanciating it.
+    
+        ```csharp
+        // Send the initial request and handle redirects to capture apcCode
+        HttpResponseMessage initialNumberVerificationResponse = await httpClient.PostAsync(numberVerificationInitUrl, initRequestContent);
+        ```
+
+    3. Make a new HTTP GET to the url value from the `Location` header on the previous response. Send the GET request and copy the next `Location` header value from the new 302 response.
+        ```csharp
+        // Following redirects manually
+        string firstRedirectUri = initialNumberVerificationResponse.Headers.Location?.ToString();
+        HttpResponseMessage firstRedirectResponse = await httpClient.GetAsync(firstRedirectUri);
+        ```
+        ![Initial request with first redirection](image-37.png)
+
+    4. Add the remaining manual redirects .
+        ```csharp
+        // Following redirects manually
+        string firstRedirectUri = initialNumberVerificationResponse.Headers.Location?.ToString();
+        HttpResponseMessage firstRedirectResponse = await httpClient.GetAsync(firstRedirectUri);
+        ```
+        ![Initial request with first redirection](image-37.png)
+
+For the second call
+
+1. Retrieve the code by following the previous `locationUrl`:
+```csharp
+var apcCode = "aad"; // WIP follow locationUrl
+```
+2. Create the number verification request content using the SDK class `NumberVerificationWithCodeContent`. Use the `apcCode` retrieved:
+```csharp
+NumberVerificationWithCodeContent numberVerificationWithCodeContent = new NumberVerificationWithCodeContent(apcCode);
+```
+3. Retrieve the verification result with the code `NumberVerificationWithCodeContent`. Use the `apcCode` retrieved:
+```csharp
+Response<NumberVerificationResult> numberVerificationResponse = await numberVerificationClient.VerifyWithCodeAsync(apcGatewayId, numberVerificationWithCodeContent);
+Console.WriteLine(numberVerificationResponse.Value.VerificationResult);
+```
+![alt text](image-17.png)
+
+##### Complete HttpClient REST APC Example
+```csharp
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text;
@@ -614,9 +700,9 @@ string apcGatewayId = "/subscriptions/65e6256a-defe-45dd-9137-caf300f71460/resou
 //"/subscriptions/your-subscription-id/resourceGroups/your-resource-group/providers/Microsoft.programmableconnectivity/gateways/your-gateway-name";
 
 // Azure AD application's details for OAuth.
-string clientId = "c4c2624b-6b54-4ab5-89c5-05af87b842d3"; //"your-application-client-id";
-string clientSecret = "Xkw8Q~XJh3KTGDt4XofSpGfBX.2QlRlxoGnBObWl"; //"your-application-client-secret";
-string tenantId = "9b20b70c-e57f-4604-960a-5b779327ee3a"; // "your-tenant-id";
+string clientId = "your-application-client-id";
+string clientSecret = "your-application-client-secret";
+string tenantId = "your-tenant-id";
 
 // Authentication with Azure AD to obtain Bearer Token.
 var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
@@ -692,7 +778,6 @@ public class DeviceLocationVerificationResult
 {
     public bool VerificationResult { get; set; }
 }
-
 ```
 
 Find in the annex additional REST calls with implementation details using the HttpClient approach.
