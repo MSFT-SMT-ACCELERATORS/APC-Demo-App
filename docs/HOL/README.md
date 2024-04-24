@@ -193,6 +193,17 @@ Once your gateway is created, you'll need to configure it:
 To authenticate and access the APC Gateway, create a Microsoft Entra application:
 
 1. Follow the instructions to [register an application with Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal) and create a service principal.
+    1. Sign in to the [Microsoft Entra admin center](https://entra.microsoft.com) as at least a [Cloud Application Administrator](~/identity/role-based-access-control/permissions-reference.md#cloud-application-administrator). 
+    1. Browse to **Identity** > **Applications** > **App registrations** then select **New registration**.
+    1. Name the application, for example "example-app". 
+    1. Select a supported account type, which determines who can use the application. 
+    1. Under **Redirect URI**, select **Web** for the type of application you want to create. Enter the URI where the access token is sent to.
+    1. Select **Register**.
+    1. Browse to **Identity** > **Applications** > **App registrations**, then select your application.
+    1. Select **Certificates & secrets**.
+    1. Select **Client secrets**, and then Select **New client secret**.
+    1. Provide a description of the secret, and a duration.
+    1. Select **Add**.
 
 2. Record the application client ID and client secret or certificate for future use.
 
@@ -402,7 +413,7 @@ To make authenticated requests to the APC API, you need to set up Postman with t
 
 5. Once succeeded, select `Use Token`. This token will be valid for 1 hour. You can skip to the Generate New Token step every time it expires.
 
-![alt text](image-31.png)
+![Collection use token](image-31.png)
 
 ##### Postman APC SimSwap Verify Request
 
