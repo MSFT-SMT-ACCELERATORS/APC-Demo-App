@@ -28,6 +28,12 @@ interface StepProps {
   setLoading: (isLoading: boolean) => void;
 }
 
+export enum ConnectionMode {
+  Online = "online",
+  Offline = "offline",
+  Mock = "mock"
+}
+
 enum ButtonNames {
   consolidation,
   bills,
@@ -68,10 +74,15 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
     setColorIcon(iconColor);
   };
 
+  const sleep = (milliseconds: number): Promise<void> => {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+  };
 
   const onFormValid = async (data: FieldValues) => {
     Logger.log(data);
     setLoading(true, "Validating your data...");
+
+    const currentConfig = await readConfigurations();
 
     try {
       // APC validation
@@ -168,7 +179,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
       }
       handleModalToggle(title, message, backgroundColor, undefined, icon, iconColor);
       setIsPhoneNumberValid(isValid);
-      
+
     } catch (error) {
       Logger.log('Error' + error);
       handleModalToggle('Warning', 'The application cannot validate your phone number.', palette.warning, undefined, 'information-circle-outline', palette.black);
