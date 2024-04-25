@@ -27,6 +27,8 @@ export const verificateAPCLocation = async (apiClient: APCApi, coords: LocationO
     accuracy = accuracy <= 1 ? 2 : accuracy;
     accuracy = accuracy > 20 ? 20 : accuracy;
     if (config.connectionMode == ConnectionMode.Offline) {
+        let time = 2000;
+        await sleep(time);
         const fakeCoords = { coords: getLocationCoords(config.offlineLatitude, config.offlineLongitude) } as Position;
         return matchesCoords(coords, fakeCoords.coords, config.radiusKm);
     }
