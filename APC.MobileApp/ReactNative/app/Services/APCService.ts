@@ -15,6 +15,10 @@ export interface Position {
     location?: BingService.Location;
 }
 
+const sleep = (milliseconds: number): Promise<void> => {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+};
+
 export const verificateAPCLocation = async (apiClient: APCApi, coords: LocationObjectCoords) => {
     const config = await readConfigurations();
 
@@ -59,6 +63,8 @@ export const getPhoneNumber = async (apiClient: APCApi, phoneNumber: string): Pr
     Logger.log(phoneNumber);
     const mockHeader = config.connectionMode == ConnectionMode.Mock ? { headers: { 'X-Use-Mock': true } } : undefined;
     if (config.connectionMode == ConnectionMode.Offline) {
+        let time = 2000;
+        await sleep(time);
         return config.autovalidatePhoneNumber;
     }
 
@@ -104,6 +110,8 @@ export const checkSimChange = async (apiClient: APCApi, phoneNumber: string) => 
     const config = await readConfigurations();
 
     if (config.connectionMode == ConnectionMode.Offline) {
+        let time =2000;
+        await sleep(time);
         return config.offlineLastSimChange;
     }
 

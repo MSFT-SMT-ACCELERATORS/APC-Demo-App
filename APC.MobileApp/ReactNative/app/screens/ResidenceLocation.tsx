@@ -71,7 +71,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
     useEffect(() => {
         (async () => {
-            const currentConfig = await readConfigurations(); // Solo si necesitas cargarlo aquí.
+            const currentConfig = await readConfigurations(); 
             setConfig(currentConfig);
 
             if (currentConfig?.skipGeolocationCheck) {
@@ -90,12 +90,12 @@ const ResidenceLocation: React.FC<StepProps> = ({
             setHasLocationPermission(true);
 
             APCService.getDeviceGPSLocation()
-            .then(setGPSPosition)
-            .catch(Logger.error);
+                .then(setGPSPosition)
+                .catch(Logger.error);
 
         })();
     }, []);
-    
+
 
     const handleModalToggle = (
         title: string,
@@ -127,6 +127,11 @@ const ResidenceLocation: React.FC<StepProps> = ({
             GPSOption: 'true',
         },
     });
+
+    const sleep = (milliseconds: number): Promise<void> => {
+        return new Promise(resolve => setTimeout(resolve, milliseconds));
+    };
+
 
     const handleCountryChange = async (query: string) => {
         setCountryQuery(query);
@@ -267,6 +272,10 @@ const ResidenceLocation: React.FC<StepProps> = ({
                 hasError = true;
             } else {
                 if (!data.UseAPC) {
+                    setLoading(true);
+                    let time = 2000;
+                    await sleep(time);
+                    setLoading(false);
                     handleModalToggle('Warning', 'APC Check Skipped: Location authenticity not verified. Enable APC for fraud protection', palette.warning, undefined, 'information-circle-outline', palette.black);
                     setShouldNavigate(true);
                     Logger.log('Business validation success!!');
@@ -312,7 +321,7 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
     useEffect(() => {
         setCurrentStep(2);
-      }, [setCurrentStep]);
+    }, [setCurrentStep]);
 
 
     useEffect(() => {
