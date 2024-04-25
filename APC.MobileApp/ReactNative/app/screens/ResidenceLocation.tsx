@@ -128,11 +128,6 @@ const ResidenceLocation: React.FC<StepProps> = ({
         },
     });
 
-    const sleep = (milliseconds: number): Promise<void> => {
-        return new Promise(resolve => setTimeout(resolve, milliseconds));
-    };
-
-
     const handleCountryChange = async (query: string) => {
         setCountryQuery(query);
         setCountryValue('');
@@ -272,10 +267,6 @@ const ResidenceLocation: React.FC<StepProps> = ({
                 hasError = true;
             } else {
                 if (!data.UseAPC) {
-                    setLoading(true);
-                    let time = 2000;
-                    await sleep(time);
-                    setLoading(false);
                     handleModalToggle('Warning', 'APC Check Skipped: Location authenticity not verified. Enable APC for fraud protection', palette.warning, undefined, 'information-circle-outline', palette.black);
                     setShouldNavigate(true);
                     Logger.log('Business validation success!!');
