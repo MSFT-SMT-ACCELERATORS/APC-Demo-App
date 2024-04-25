@@ -73,7 +73,7 @@ Welcome to the Azure Programmable Connectivity Hands-On Lab. In this lab, we wil
 
 ### Overview of APC
 
-Azure Programmable Connectivity (APC) is a transformative Azure service connecting cloud applications to mobile operator networks APIs. It offers a streamlined method to access an array of operator network services, simplifying the use of telecommunications capabilities like SIM swap detection and location-based services through easy-to-implement APIs
+Azure Programmable Connectivity (APC) is an Azure service that connects cloud applications to mobile operator networks APIs. It offers a streamlined method to access an array of operator network services, simplifying the use of telecommunications capabilities like SIM swap detection and location-based services through easy-to-implement APIs
 
 ![APC Diagram](imgs/apc-diagram.jpg)
 
@@ -94,9 +94,7 @@ Here is an overview diagram depicting the interaction between these components:
 
 ### APC Planned Operator APIs
 
-TODO: current supported, comment on planned APIS
-
-APC enables direct access to a range of operator APIs, designed to streamline complex telecom functionalities into developer-friendly services. Below is a table summarizing the planned operator APIs:
+APC enables direct access to a range of operator APIs, designed to streamline complex telecom functionalities into developer-friendly services. Below is a table summarizing the currently supported operator APIs:
 
 | API                 | Description                                                                                   |
 |---------------------|-----------------------------------------------------------------------------------------------|
@@ -105,11 +103,14 @@ APC enables direct access to a range of operator APIs, designed to streamline co
 | Location Services   | Provides network-based location data, ideal for location-sensitive applications.              |
 
 
-Each API offers a unique set of functionalities, aligning with modern application needs and user expectations, propelling APC to the forefront of cloud-telecom integrations.
+These are the announced, but not already available Operator APIs. (TODO reword this)
+
+| API                 | Description                                                                                   |
+|---------------------|-----------------------------------------------------------------------------------------------|
+| Quality of Service (QoS)  | Ensures prioritized network traffic for essential services, maintaining performance standards. |
+| Billing and Charging | Facilitates direct carrier billing capabilities, enabling seamless transactions.                |
 
 
-TODO Planned  Quality of Service (QoS) | Ensures prioritized network traffic for essential services, maintaining performance standards.Billing and Charging | Facilitates direct carrier billing capabilities, enabling seamless transactions.  
-            |
 ### Additional information
 
 For a deeper understanding of Azure Programmable Connectivity (APC), including its potential impact and further details on its capabilities, refer to the following resources:
@@ -164,7 +165,7 @@ Before starting your journey with Azure Programmable Connectivity (APC), make su
 #### Create APC Gateway Instance
 
 * Follow the [guide](https://learn.microsoft.com/azure/programmable-connectivity/azure-programmable-connectivity-create-gateway) to create a gateway, or have one already.
-* Note down your endpoint and `apc-gateway-id`, which is retrieved by following the guide linked.
+* Once you are done creating the gateway, note down your endpoint and `apc-gateway-id` or resoruce id, which is explained in this section.
 
 Deploying an APC Gateway in Azure is a straightforward process that involves the following steps:
 
@@ -188,16 +189,22 @@ Once your gateway is created, you'll need to configure it:
 
 3. Agree to the operators' terms and conditions to finalize the setup.
 
+#### Retrieve APC Gateway information
+
+1. Navigtate to your APC Gateway resource in the Azure portal and copy the `resource Id` and the `endpoint` value:
+
+![APC Gateway resource](image-38.png)
+
 #### Set up authentication
 
 To authenticate and access the APC Gateway, create a Microsoft Entra application:
 
 1. Follow the instructions to [register an application with Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal), create a service principal and record the clientId and secret.
-    1. Sign in to the [Microsoft Entra admin center](https://entra.microsoft.com) as at least a [Cloud Application Administrator](~/identity/role-based-access-control/permissions-reference.md#cloud-application-administrator). 
+    1. Sign in to the [Microsoft Entra admin center](https://entra.microsoft.com) as at least a **Cloud Application Administrator**. 
     1. Browse to **Identity** > **Applications** > **App registrations** then select **New registration**.
     1. Name the application, for example "example-app". 
     1. Select a supported account type, which determines who can use the application. 
-    1. Under **Redirect URI**, select **Service** for the type of application you want to create.
+    1. Under **Redirect URI**, select **Web** for the type of application you want to create. Don't type any return URL.
     1. Select **Register**.
 
     ![App Registration](image-35.png)
@@ -211,7 +218,7 @@ To authenticate and access the APC Gateway, create a Microsoft Entra application
 
 ![Record Client Secret](image-34.png)
 
-3. Assign the necessary role to your application using Azure CLI:
+3. Assign the necessary role to your application using Azure CLI. Log in using az login first:
 
 ```sh
 az role assignment create --role 609c0c20-e0a0-4a71-b99f-e7e755ac493d
