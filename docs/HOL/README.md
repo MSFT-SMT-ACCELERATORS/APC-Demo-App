@@ -81,16 +81,17 @@ Azure Programmable Connectivity (APC) is an Azure service that connects cloud ap
 
  Here’s a high-level view of the typical architecture:
 
-- **Application Clients**: These can range from Single Page Applications (SPAs) to mobile apps or any other client-side applications. They are the consumer-facing end of the system, interacting with the application service to perform various tasks like SIM swap checks or retrieving location data.
+- **Application Clients**: (Client App Innstance in diagram) These can range from Single Page Applications (SPAs) to mobile apps or any other client-side applications. They are the consumer-facing end of the system, interacting with the application service to perform various tasks like SIM swap checks or retrieving location data.
 
-- **Application Service**: This is the backend that your application clients communicate with. It is responsible for processing client requests, handling business logic, and making authenticated calls to the APC Gateway. This service can be hosted on cloud platforms like Azure or on-premises.
+- **Application Service**: (Application Backend in diagram) This is the backend that your application clients communicate with. It is responsible for processing client requests, handling business logic, and making authenticated calls to the APC Gateway. This service can be hosted on cloud platforms like Azure or on-premises.
 
 - **APC Gateway**: Hosted on Azure, the APC Gateway is an intermediary that securely connects to multiple operator networks. It translates the requests from the application service into the specific protocols, authentication and data formats that telecom operators require.
 
 - **Operator Network APIs**: These are the services and APIs provided by telecom operators, which offer functionality such as number verification, SIM swap detection, and user location services. APC abstracts the complexities of these operator-specific APIs, presenting a unified and standardized interface for the application service to interact with.
 
 Here is an overview diagram depicting the interaction between these components:
-![APC Simple diagram](image-12.png)
+
+![APC Simple diagram](image-39.png)
 
 ### APC Planned Operator APIs
 
@@ -98,17 +99,16 @@ APC enables direct access to a range of operator APIs, designed to streamline co
 
 | API                 | Description                                                                                   |
 |---------------------|-----------------------------------------------------------------------------------------------|
-| SIM Swap Detection  | Allows detection of SIM card changes, crucial for fraud prevention in security-sensitive operations. |
-| Number Verification | Verifies the authenticity of mobile numbers, enhancing trust and reducing spam.                |
-| Location Services   | Provides network-based location data, ideal for location-sensitive applications.              |
+c  | Provides network-based location data, ideal for location-sensitive applications.              |
 
+Find in the annex detailed information about eachc Operator API.
 
-These are the announced, but not already available Operator APIs. (TODO reword this)
+**Bellow are the planned Operator APIs coming to APC:**
 
 | API                 | Description                                                                                   |
 |---------------------|-----------------------------------------------------------------------------------------------|
-| Quality of Service (QoS)  | Ensures prioritized network traffic for essential services, maintaining performance standards. |
-| Billing and Charging | Facilitates direct carrier billing capabilities, enabling seamless transactions.                |
+| Quality on Demand (QoD)  | Ensures prioritized network traffic for essential services, maintaining performance standards. |
+| Billing | Facilitates direct carrier billing capabilities, enabling seamless transactions.                |
 
 
 ### Additional information
@@ -135,21 +135,19 @@ For a deeper understanding of Azure Programmable Connectivity (APC), including i
     - [Instantiate an Authenticated Client](#instantiate-an-authenticated-client)
     - [SDK APC Requests](#make-apc-requests)
       - [APC SDK Call #1: Retrieve Network Information](#apc-call-1-retrieve-network-information)
-      - [APC SDK Call #2: Device Location](#apc-call-2-device-location)
       - [APC SDK Call #3: Sim Swap Retrieve/Verify](#apc-call-3-sim-swap-retrieveverify)
-      - [APC SDK Call #3: Number verification](#apc-call-4-number-verification)
   - [Use Network APIs with APC REST APIs](#use-network-apis-with-apc-rest-apis)
     - [Postman APC requests](#a-make-apc-requests-with-postman)
       - [Postman APC SimSwap Verify Request](#postman-apc-simswap-verify-request)
       - [Postman APC Number Verification Request](#postman-apc-number-verification-request)
     - [.NET HttpClient APC requests](#b-make-apc-requests-with-net-httpclient)
       - [HttpClient APC Retrieve Network Information Request](#http-apc-call-1-retrieve-network-information)
-      - [HttpClient APC Verify Device Location Request](#http-apc-call-2-verify-device-location)
       - [HttpClient APC Verify Sim Swap Request](#http-apc-call-3-verify-sim-swap)
-      - [HttpClient APC Number Verification Request](#http-apc-call-4-number-verification)
 - (optional) [Part 1 Annex: Make APC Requests](#use-network-apis-with-the-apc-sdk-client)
-    - [APC Call #1: Retrieve Network Information](#apc-call-1-retrieve-network-information)
-    - [APC Call #2: Sim Swap Retrieve/Verify](#apc-call-2-sim-swap-retrieveverify)
+    - [HttpClient APC Verify Device Location Request](#http-apc-call-2-verify-device-location)
+    - [HttpClient APC Number Verification Request](#http-apc-call-4-number-verification)
+    - [APC SDK Call #2: Device Location](#apc-call-2-device-location)
+    - [APC SDK Call #3: Number verification](#apc-call-4-number-verification)
 ---
 
 ### Prerequisites
@@ -165,7 +163,7 @@ Before starting your journey with Azure Programmable Connectivity (APC), make su
 #### Create APC Gateway Instance
 
 * Follow the [guide](https://learn.microsoft.com/azure/programmable-connectivity/azure-programmable-connectivity-create-gateway) to create a gateway, or have one already.
-* Once you are done creating the gateway, note down your endpoint and `apc-gateway-id` or resoruce id, which is explained in this section.
+* Once you are done creating the gateway, note down the APC Gateway resoruce id endpoint, as explained in this section.
 
 Deploying an APC Gateway in Azure is a straightforward process that involves the following steps:
 
@@ -189,25 +187,25 @@ Once your gateway is created, you'll need to configure it:
 
 3. Agree to the operators' terms and conditions to finalize the setup.
 
-#### Retrieve APC Gateway information
+Now, note down relevant resource information for later steps:
 
-1. Navigtate to your APC Gateway resource in the Azure portal and copy the `resource Id` and the `endpoint` value:
+1. Navigate to your APC Gateway resource in the Azure portal and copy the `resource Id` and the `endpoint` value:
 
 ![APC Gateway resource](image-38.png)
 
 #### Set up authentication
 
-To authenticate and access the APC Gateway, create a Microsoft Entra application:
+To authenticate and access the APC Gateway, create a Microsoft Entra application in the same directory or tenant.
 
 1. Follow the instructions to [register an application with Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal), create a service principal and record the clientId and secret.
     1. Sign in to the [Microsoft Entra admin center](https://entra.microsoft.com) as at least a **Cloud Application Administrator**. 
     1. Browse to **Identity** > **Applications** > **App registrations** then select **New registration**.
-    1. Name the application, for example "example-app". 
-    1. Select a supported account type, which determines who can use the application. 
-    1. Under **Redirect URI**, select **Web** for the type of application you want to create. Don't type any return URL.
+    1. Name the application, for example "apc-hol-exercise". 
+    1. Select a supported account type, which determines who can use the application. For the exercises in this lab it won´t matter since we are using a client credentials flow with Client Id and secret.
+    1. Don´t specify any return URI as it´s not needed for these HOL exercises.
     1. Select **Register**.
 
-    ![App Registration](image-35.png)
+    ![App Registration](image-40.png)
 
 2. Create and record the application client ID and client secret or certificate for future use.
     1. Browse to **Identity** > **Applications** > **App registrations**, then select your application.
@@ -218,7 +216,7 @@ To authenticate and access the APC Gateway, create a Microsoft Entra application
 
 ![Record Client Secret](image-34.png)
 
-3. Assign the necessary role to your application using Azure CLI. Log in using az login first:
+3. Assign the necessary role to interact with the APC Gateway to your application by running the following Azure CLI command. Replace or assign values to `$SUB_ID` with your subscription id, `RG_NAME` with resource group name where the APC Gateway resource is and `$GATEWAY_NAME` for and the APC Gateway resource name. Log in using `az login` if you have to:
 
 ```sh
 az role assignment create --role 609c0c20-e0a0-4a71-b99f-e7e755ac493d
@@ -242,14 +240,14 @@ To start using the Azure Programmable Connectivity (APC) SDK, you'll need to cre
 
 With your project created, the next step is to install the APC SDK:
 
-1. Use the NuGet Package Manager to search for `Azure.Communication.ProgrammableConnectivity`.
+1. Use the NuGet Package Manager and search for `Azure.Communication.ProgrammableConnectivity`.
 2. Install the latest stable version of the SDK to your project.
 
-![APC SDK nugget install](image.png)
+![APC SDK nugget install](image-41.png) TODO Repalce with actual Nuget
 
 or use dotnet CLI to install the NuGet Package from the project folder path:
 
-```dotnetcli
+```sh
 dotnet add package Azure.Communication.ProgrammableConnectivity --prerelease
 ```
 
@@ -257,17 +255,40 @@ dotnet add package Azure.Communication.ProgrammableConnectivity --prerelease
 
 The client library uses [`Azure.Identity`](https://learn.microsoft.com/dotnet/api/azure.identity?view=azure-dotnet) credentials to authenticate with APC. 
 
-1. Install Azure.Identity nugget package.
-![Azure.Identity nugget install](image.png)
-2. Obtain client credential by implementing this authentication logic in your application using the noted clientId and clientSecret from the authentication section in prerequisites.
+1. Install Azure.Identity nugget package with the Nuget Package Manager or with the following command:
+
+```sh
+dotnet add package Azure.Identity
+```
+
+![Azure.Identity nugget install](image-41.png)
+
+2. In Program.cs, create values for the recorded APC Gateway information and Entra client credentials from earlier steps.
+
+```csharp
+// Setup your APC endpoint and gateway resource id here
+var apcEndpoint = "https://eastus.prod.apcgatewayapi.azure.com";
+var apcGatewayId = "/subscriptions/$your-subscription-id/resourceGroups/$your-resource-group/providers/Microsoft.programmableconnectivity/gateways/$your-gateway-name";
+
+// Your Azure Entra application's details
+var clientId = "your-application-client-id";
+var clientSecret = "your-application-client-secret";
+var tenantId = "your-tenant-id";
+```
+
+3. Obtain client credential by implementing this authentication logic in your application using the noted clientId and clientSecret from the authentication section in prerequisites.
+
 ```csharp
 TokenCredential credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
 ```
+
 3. Instanciate the SDK client using:
+
 ```csharp
 ProgrammableConnectivityClient apcClient = new ProgrammableConnectivityClient(apcEndpoint, credential);
 ```
-![alt text](image-1.png)
+
+![Console app APC SDK setup with auth](image-1.png)
 
 #### Make APC requests
 
@@ -278,52 +299,69 @@ For each call that you make to APC with the SDK, you will follow the same patter
 * Call the client with the content you've created
 * Access the result
 
-Find additional requests in the annex, these are optional extra examples:
-
-- [Annex: Additional APC SDK requests using .NET SDK](#additional-apc-sdk-examples-using-net-sdk)
-  - [Location APC SDK request](#apc-sdk-device-location)
-  - [Number Verification APC SDK request](#apc-sdk-number-verification)
-
 ##### APC SDK: Retrieve Network Information
-To make most of the APC calls, you'll need the network information of the device. Request this information from APC:
+
+To make APC operator API calls, you'll need the network identifier for the cellular network device address you are calling from. More informtion on this APC Call: [Device Netwrok](#device-network).
+
 
 1. Access the subclient for the device network from the base client created earlier `apcClient`:
+
 ```csharp
+// Retrieve network information
 var deviceNetworkApcClient = apcClient.GetDeviceNetworkClient();
 ```
-2. Create the device-network request content using the SDK class `Networkidentifier`. Replace `phone-number` with your actual number associated with the cellular network you are using:
+
+2. Create the device-network request content using the SDK class `Networkidentifier`. Use `phone-number` to retrieve your public ip. APC will identify which is operator network is managing it:
+
 ```csharp
-var networkIdentifier = new NetworkIdentifier("phone-number"); // TODO do IPv4
+// TODO get actual IP and test
+var networkIdentifier = new NetworkIdentifier("IPv4", "176.83.74.44");
 ```
+
 3. Retrieve the device-network response:
+
 ```csharp
 Response<NetworkRetrievalResult> response = deviceNetworkApcClient.Retrieve(ApcGatewayId, networkIdentifier);
+Console.WriteLine($"Network Identifier result: {networkResponse.Value}");
 ```
+
 ![alt text](image-3.png)
 
 
 ##### APC SDK: Sim Swap retrieve/verify
 
-To make the first operator network API call, once you have the client configured and retrieved the network information:
+Once you have the client configured and retrieved the network identifier, proceed to make a Sim Swap verification request. This call will check whether the SIM card you are using for the cellular network has been replaced recently.For more informtion on this APC Call: [Sim Swap Detection](#sim-swap-detection). 
 
 1. Add code to access the subclient for sim-swap from the base client created earlier `apcClient`:
+
 ```csharp
 var deviceNetworkApcClient = apcClient.GetSimSwapClient()
 ```
-2. Create the sim-swap request content using the SDK class `SimSwapVerificationContent`. PhoneNumber `phone-number` with your actual number associated with the cellular network you are using:
+
+2. Create the sim-swap request content using the SDK class `SimSwapVerificationContent`. PhoneNumber `phone-number` with your actual number associated with the cellular network you are using. Include the country code. You should have the cellular network identifier in the previous request:
+
 ```csharp
-SimSwapVerificationContent content = new SimSwapVerificationContent(new NetworkIdentifier("NetworkCode", "Orange_Spain"))
+// Retrieve SIM swap verification
+SimSwapVerificationContent simSwapContent = new SimSwapVerificationContent(new NetworkIdentifier("NetworkCode", networkResponse.Value.NetworkCode))
 {
-    PhoneNumber = "phone-number",
-    MaxAgeHours = 120,
+    PhoneNumber = "+00number-with-countrycode",
+    MaxAgeHours = 240
 };
 ```
+
 3. Retrieve the device-network response:
+
 ```csharp
 Response<SimSwapVerificationResult> response = client.Verify(ApcGatewayId, content);
 Console.WriteLine($"Verification result: {response.Value.VerificationResult}");
 ```
+
 ![alt text](image-5.png)
+
+(OPTIONAL) If you wish to test more APC APIs using this method, find in the annex additional APC API calls with implementation details using the APC .NET SDK approach:
+
+- [APC SDK: Device Location](#apc-sdk-device-location)
+- [APC SDK: Number Verification ](#apc-sdk-number-verification)
 
 ### Use Network APIs with APC REST APIs
 
@@ -347,7 +385,7 @@ To make authenticated requests to the APC API, you need to set up Postman with t
 
 ![Import collection](image-6.png)
 
-2. Double click the collection name that appeared on the collection side menu and go to the tab `Variables`. From there, update the `auth-secret`, `auth-clientId`, `auth-secret` and also the `app-gateway-id` values. 
+2. Double click the collection name that appeared on the collection side menu and go to the tab `Variables`. From there, update the `auth-secret`, `auth-clientId`, `auth-tenantid` and also the `apc-id` and `endpont` values. 
 
 ![Collection auth var](image-30.png)
 ![Collection APC Gateway id var](image-33.png)
@@ -356,7 +394,7 @@ To make authenticated requests to the APC API, you need to set up Postman with t
 
 ![Collection auth tab](image-7.png)
 
-4. Scroll down to `Configure New Token` advanced section and click the values for `Generate New Access Token`
+4. Scroll down to `Configure New Token` advanced section and click the button `Generate New Access Token`
 
 ![Collection Get new token](image-32.png)
 
@@ -364,13 +402,45 @@ To make authenticated requests to the APC API, you need to set up Postman with t
 
 ![Collection use token](image-31.png)
 
+
+##### Postman APC SimSwap Verify Request
+
+To make APC operator API calls, you'll need the network identifier for the cellular network device address you are calling from. More informtion on this APC Call: [Device Netwrok](#device-network).
+
+1. Navigate to `network:retrive` request
+
+![alt text](image-42.png)
+
+2. Adjust the request payload in the `Body` tab
+
+For the `identifier` property use your public IP for you cellular connection. TODO explain how
+
+**Body**:
+  ```json
+  {
+      "identifierType": "IPv4",
+      "identifier": "176.83.74.44"
+  }
+  ```
+
+![alt text](image-43.png)
+
+3. Click `Send` and view the response
+
+![alt text](image-11.png)
+
 ##### Postman APC SimSwap Verify Request
 
 1. Navigate to `sim-swap:verify` request
 
-![alt text](image-9.png)
+![alt text](image-44.png)
 
 2. Adjust the request payload in the `Body` tab
+
+- For the `networkIdentifier.identifier` property should contain the result from the network retrieve request you made earlier.
+- `phoneNumber` property should contain the phone number including country code **you are using for cellular network connectiviy**.
+
+More information on properties for this Network API: [Sim Swap Detection](#sim-swap-detection)
 
 Here's an example for the request payload to perform a SIM Swap verify:
 
@@ -397,19 +467,28 @@ You can also use the .NET HttpClient to make authenticated calls to APC. Here's 
 
 ##### Set up a .NET httpClient for APC
 1. Create a Console App project in Net8.0 in your preferred IDE.
-2. Add code for your Azure EntraId client credentials and APC Gateway Id
-```csharp
-// Endpoint and Gateway ID for your APC.
-string baseUrl = "https://eastus.prod.apcgatewayapi.azure.com";
-string apcGatewayId = "/subscriptions/65e6256a-defe-45dd-9137-caf300f71460/resourceGroups/APC-TEST/providers/Microsoft.programmableconnectivity/gateways/apc-turing-prv-01";
-//"/subscriptions/your-subscription-id/resourceGroups/your-resource-group/providers/Microsoft.programmableconnectivity/gateways/your-gateway-name";
+2. In Program.cs, create values for the recorded APC Gateway information and Entra client credentials from earlier steps.
 
-// Azure AD application's details for OAuth.
-string clientId = "your-application-client-id";
-string clientSecret = "your-application-client-secret";
-string tenantId = "your-tenant-id";
+```csharp
+// Setup your APC endpoint and gateway resource id here
+var apcEndpoint = "https://eastus.prod.apcgatewayapi.azure.com";
+var apcGatewayId = "/subscriptions/$your-subscription-id/resourceGroups/$your-resource-group/providers/Microsoft.programmableconnectivity/gateways/$your-gateway-name";
+
+// Your Azure Entra application's details
+var clientId = "your-application-client-id";
+var clientSecret = "your-application-client-secret";
+var tenantId = "your-tenant-id";
 ```
-3. Retrieve a token for your HttpClient by installing the nuget package Azure.Identity and adding the following code:
+
+1. Install Azure.Identity nugget package with the Nuget Package Manager or with the following command:
+
+```sh
+dotnet add package Azure.Identity
+```
+
+![Azure.Identity nugget install](image-41.png)
+
+3. Add the following code to Retrieve a token for your HttpClient.:
 ```csharp
 // Authentication with Azure AD to obtain Bearer Token.
 var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
@@ -430,7 +509,7 @@ Now you are ready to start calling APC API:
 ![alt text](image-18.png)
 
 ##### Http APC Call #1: Retrieve Network Information
-To make most of the APC calls, you'll need the network information of the device. Request this information from APC:
+To make APC operator API calls, you'll need the network identifier for the cellular network device address you are calling from. More informtion on this APC Call: [Device Netwrok](#device-network).
 
 1. Prepare the network retrieve request content:
 ```csharp
@@ -452,7 +531,13 @@ Console.WriteLine($"Network retrieval result: {networkResult}");
 ![alt text](image-19.png)
 
 ##### Http APC Call #3: Verify Sim Swap
+
+Once you have the HTTP client configured and retrieved the network identifier, proceed to make a Sim Swap verification request. This call will check whether the SIM card you are using for the cellular network has been replaced recently. For more informtion on this APC Call: [Sim Swap Detection](#sim-swap-detection). 
+
 1. Prepare the verify sim swap content:
+
+// TODO fix networkIdentifier
+
 ```csharp
 string simSwapApiUrl = $"{baseUrl}/sim-swap/sim-swap:verify";
 var simSwapContent = new
@@ -473,9 +558,7 @@ Console.WriteLine($"Sim swap verification result: {simSwapResult.VerificationRes
 ```
 ![alt text](image-21.png)
 
-
-
-Find in the annex additional REST calls with implementation details using the HttpClient approach.
+(OPTIONAL) If you wish to test more APC APIs using this method, find in the annex additional REST calls with implementation details using the HttpClient approach:
 
 - [Location REST APC call using .NET HttpClient]()
 - [Number Verification  REST APC call using .NET HttpClient]()
@@ -631,6 +714,10 @@ This will open the app on your mobile device, allowing you to test its features 
 
 ---
 - [Annex](#annex)
+  - [Network APIs](#network-apis)
+    - [SIM Swap Detection](#sim-swap-detection)
+    - [Number Verification](#number-verification)
+    - [Location Services](#location-services) 
   - [Additional APC SDK requests using .NET SDK](#additional-apc-sdk-examples-using-net-sdk)
     - [Location APC SDK request](#apc-sdk-device-location)
     - [Number Verification APC SDK request](#apc-sdk-number-verification)
@@ -639,6 +726,51 @@ This will open the app on your mobile device, allowing you to test its features 
     - [Number Verification APC REST HttpClient request](#httpclient-apc-number-verification)
   - [Additional REST APC requests using Postman](#additional-apc-rest-http-examples-using-postman)
     - [Number Verification APC REST Postman request](#postman-apc-number-verification-request)
+
+### Network APIs
+
+#### SIM Swap Detection
+
+##### Description
+Detect changes in SIM card associations with mobile numbers to enhance security and fraud detection mechanisms. This API monitors and alerts on suspicious activity suggesting a SIM swap.
+
+##### Properties
+- **SubscriberId**: The unique identifier of the mobile subscriber.
+- **LastSwapDate**: The timestamp of the last detected SIM swap.
+- **AlertEnabled**: Boolean to enable real-time alerts on SIM swap detection.
+
+
+#### Properties
+- **SubscriberId**: The unique identifier of the mobile subscriber.
+- **LastSwapDate**: The timestamp of the last detected SIM swap.
+- **AlertEnabled**: Boolean to enable real-time alerts on SIM swap detection.
+
+#### Number Verification
+
+##### Description
+Verify the authenticity of a mobile number to ensure it is currently active and can receive communications. This helps in validating user identity and reducing fraud.
+
+##### Properties
+- **PhoneNumber**: The mobile number to verify.
+- **VerificationStatus**: Indicates whether the number is verified.
+- **VerificationMethod**: Method used for number verification (SMS, Call, etc.).
+
+##### OAuth Flow
+WIP
+
+#### Location Services
+
+##### Description
+Provide real-time location data of a mobile device with the consent of the mobile user. Useful for applications requiring geolocation, such as logistics and personal security.
+
+##### Properties
+- **DeviceId**: Identifier for the device whose location is being tracked.
+- **Location**: Current geolocation data (latitude, longitude).
+- **Accuracy**: Accuracy of the location data.
+
+##### Consent Error - Operator Permission
+- If location data access is denied by the operator, the API will return a `ConsentError`.
+- Error handling should account for permissions being revoked or not granted by the user or operator.
 
 
 ### Additional APC SDK examples using .NET SDK
