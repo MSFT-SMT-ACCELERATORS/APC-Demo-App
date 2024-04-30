@@ -5,7 +5,7 @@ Mobile App with Cloud Service Demo consuming Azure Programmable Connectivity API
 
 This section provides a brief technical description of the demo application's architecture. The application is designed to interact with APC for enhanced anti-fraud security measures such as SIM swap detection, number verification, and user location verification.
 
-![Architecture Diagram](hol/image-13.png)
+![Architecture Diagram](image-13.png)
 
 ### Components
 
@@ -34,6 +34,71 @@ Before starting, ensure you have the following installed:
 - .NET 8 SDK
 - Azure CLI (for deployment)
 - An active Azure subscription
+
+## APC Gateway deployment and configuration
+
+#### Create APC Gateway Instance
+
+* Follow the [guide](https://learn.microsoft.com/azure/programmable-connectivity/azure-programmable-connectivity-create-gateway) to create a gateway, or have one already.
+* Once you are done creating the gateway, note down the APC Gateway resoruce id endpoint, as explained in this section.
+
+Deploying an APC Gateway in Azure is a straightforward process that involves the following steps:
+
+1. In the Azure portal, search for **APC Gateways** and then select **Create**.
+
+   ![Search for APC Gateway](hol/imgs/001-01-set-up-portal-create.jpg)
+
+2. Select your **Subscription**, **Resource Group**, and **Region**.
+
+   ![Create APC Gateway](hol/imgs/001-02-set-up-portal-create-step1.jpg)
+
+3. Provide a unique **Name** for your gateway and proceed to the next steps.
+
+Once your gateway is created, you'll need to configure it:
+
+1. Assign the telecom operator setup, selecting the SimSwap, Location and Number Verification APIs and plans.
+
+2. Complete the application details, which will be shared with the operator for validation.
+
+   ![Configure APC](hol/imgs/001-02-set-up-portal-create-step2.jpg)
+
+3. Agree to the operators' terms and conditions to finalize the setup.
+
+Now, note down relevant resource information for later steps:
+
+1. Navigate to your APC Gateway resource in the Azure portal and copy the `resource Id` and the `endpoint` value:
+
+![APC Gateway resource](hol/image-38.png)
+
+#### Set up authentication
+
+To authenticate and access the APC Gateway, create a Microsoft Entra application in the same directory or tenant.
+
+1. Follow the instructions to [register an application with Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal), create a service principal and record the clientId and secret.
+    1. Sign in to the [Microsoft Entra admin center](https://entra.microsoft.com) as at least a **Cloud Application Administrator**. 
+    1. Browse to **Identity** > **Applications** > **App registrations** then select **New registration**.
+    1. Name the application, for example "apc-hol-exercise". 
+    1. Select a supported account type, which determines who can use the application. For the exercises in this lab it won´t matter since we are using a client credentials flow with Client Id and secret.
+    1. Select **Register**.
+
+    ![App Registration](image-40.png)
+
+2. Create and record the application client ID and client secret or certificate for future use.
+    1. Browse to **Identity** > **Applications** > **App registrations**, then select your application.
+    1. Select **Certificates & secrets**.
+    1. Select **Client secrets**, and then Select **New client secret**.
+    1. Provide a description of the secret, and a duration.
+    1. Select **Add**.
+
+![Record Client Secret](image-34.png)
+
+3. Assign the necessary role to interact with the APC Gateway to your application by running the following Azure CLI command. Replace or assign values to `$SUB_ID` with your subscription id, `RG_NAME` with resource group name where the APC Gateway resource is and `$GATEWAY_NAME` for and the APC Gateway resource name. Log in using `az login` if you have to:
+
+```sh
+az role assignment create --role 609c0c20-e0a0-4a71-b99f-e7e755ac493d
+--scope /subscriptions/$SUB_ID/resourceGroups/$RG_NAME/providers/Microsoft.ProgrammableConnectivity/gateways/$GATEWAY_NAME
+--assignee $APP_ID
+```
 
 
 ## Backend configuration and deployment
@@ -70,12 +135,15 @@ For local testing and development, you will need to update up the `appsettings.D
 
 3. **Run the Backend Service**
    ```
-   dotnet run
+   dotnet run --project APC.ProxyServer
    ```
 
-4. **Open the swagger UI url int the browser for testing**
+4. **Open the swagger UI url int the browser for testing**. Make sure the port is correct and the uri is HTTP, not HTTPS.
+   
+   ![alt text](image-14.png)
+
    ```
-      https://localhost:7127/swagger/index.html
+      http://localhost:5009/swagger/index.html
    ```
 
    ![swagger](image-1.png)
