@@ -1,28 +1,27 @@
 # APC-Demo-App
 Mobile App with Cloud Service Demo consuming Azure Programmable Connectivity APIs with Telcos network APIs under the covers
 
-## Components
+## Architecture
 
-### APC API
-- **Location**: Cloud.
-- **Functionality**: WIP
+This section provides a brief technical description of the demo application's architecture. The application is designed to interact with APC for enhanced anti-fraud security measures such as SIM swap detection, number verification and user location verification.
 
-### APCProxyServer
-- **Hosting**: Azure App Service API.
-- **Role**: Acts as an intermediary between the React Native app and the APC API.
-- **Responsibilities**: Authentication, request forwarding, and minimal data processing.
+![Architecture Diagram](image-13.png)
 
-### React Native Application
-- **Environment**: Client devices (smartphones).
-- **Features**: Interaction demo with the APCProxyServer for APC interactions.
-- **Technology**: Built using React Native and Expo Go.
+### Components
 
-## Repository Structure
-- `/APCProxyServer`: Source code for the proxy server (.NET 8 with ASP.NET Core).
-- `/APC.MobileApp/ReactNativeApp`: Source code for the React Native application.
-- `/docs`: Documentation, including diagrams.
-- `README.md`: Setup guide and project overview.
+- **Leaves Bank App**
+  - **Technology**: Built using React Native and Expo Go. Runs on client devices (smartphones).
+  - **Features**: Interaction demo with the APCProxyServer for APC interactions.
+  - **Repository path**: *src/APC.MobileApp/ReactNative*
 
+- **Leaves Bank Backend Service**
+  - **Technology**: .NET8 Web API hosted in an Azure App Service.
+  - **Features**: Acts as an intermediary between the React Native app and the APC API and could host additional app logic.
+  - **Repository path**: *src/APC.Proxy.API*
+
+- **APC Gateway**
+  - **Technology**: Azure service
+  - **Features**:  interfaces with mobile network operator APIs.
 
 ## Get Started (temporal)
 
@@ -39,7 +38,7 @@ To set up and run the project locally, follow these steps:
 
 1. **Clone the Project**
    ```
-   git clone [Repository URL]
+   git clone https://github.com/MSFT-SMT-ACCELERATORS/APC-Demo-App.git
    ```
 
 2. **Navigate to the React Native App Directory**
@@ -60,7 +59,7 @@ To set up and run the project locally, follow these steps:
 5. **Open in a Web Browser**
    - Once the Metro Bundler is running in your terminal, press `W` to open the app in your web browser. Use responsive mode when opening the developer console with F12.
 
-![Dev Responsive](docs/img/desktop.png)
+![Dev Responsive](img/desktop.png)
 
 ### Mobile Testing
 
@@ -74,10 +73,9 @@ To test the app on a mobile device, follow these additional steps:
    - Select the option to scan the QR code.
    - Scan the QR code that appears in your terminal after you've run `npm start` from the React Native app directory.
 
-![QR Code](docs/img/QR.png)
-![Scan QR](docs/img/scan.png)
+![QR Code](img/QR.png)
+![Scan QR](img/scan.png)
 
 
 This will open the app on your mobile device, allowing you to test its features in a mobile environment.
-
 

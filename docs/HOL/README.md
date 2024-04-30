@@ -18,7 +18,8 @@ Welcome to the Azure Programmable Connectivity Hands-On Lab. In this lab, we wil
 
 - **Part 1** of this lab is designed to give you a swift yet comprehensive introduction to APC, equipping you with the knowledge to deploy an APC Gateway and make initial API calls. It's ideal for learners who are new to APC or require a quick start guide for incorporating APC into their applications.
 
-- **Part 2** is designed for a deeper dive into APC's real-world applications. It's ideal for those looking to understand the intricacies of integrating APC within a backend system and leveraging its full potential in complex projects. This section is recommended for anyone interested in the technical implementation of APC.
+- **Part 2** provides a deeper dive into APC's real-world applications. It's ideal for those looking to understand the intricacies APC application, integration into frontend and backend services, along with some Network API-specific caveats. This section is recommended for anyone interested in the technical implementation of APC. 
+
 
 ### Complete index
 
@@ -44,10 +45,8 @@ Welcome to the Azure Programmable Connectivity Hands-On Lab. In this lab, we wil
       - [Postman APC Number Verification Request](#postman-apc-number-verification-request)
     - [.NET HttpClient APC requests](#b-make-apc-requests-with-net-httpclient)
       - [HttpClient APC Retrieve Network Information Request](#http-apc-call-1-retrieve-network-information)
-      - [HttpClient APC Verify Device Location Request](#http-apc-call-2-verify-device-location)
-      - [HttpClient APC Verify Sim Swap Request](#http-apc-call-3-verify-sim-swap)
-      - [HttpClient APC Number Verification Request](#http-apc-call-4-number-verification)
-- **Part 2:**[ Advanced Use Case - Integrating APC into a Banking App](#part-2
+      - [HttpClient APC Verify Sim Swap Request](#http-apc-call-2-verify-sim-swap)
+- **Part 2:**[ Advanced Use Case - Integrating APC into a Banking App](#part-2-advanced-use-case---integrating-apc-into-a-banking-app)
   - [Architecture](#architecture)
   - [Advanced Integration Details](#advanced-integration-details)
     - [React Service Calling APC](#react-service-calling-apc)
@@ -67,6 +66,9 @@ Welcome to the Azure Programmable Connectivity Hands-On Lab. In this lab, we wil
   - [Additional REST APC calls using Postman](#additional-rest-apc-calls-using-postman)
     - [Location REST APC calls using Postman](#location-rest-apc-calls-using-postman)
     - [Number Verification REST APC calls using Postman](#number-verification-rest-apc-calls-using-postman)
+  - [.NET HttpClient APC requests](#b-make-apc-requests-with-net-httpclient)
+    - [HttpClient APC Verify Device Location Request](#http-apc-call-2-verify-device-location)
+    - [HttpClient APC Number Verification Request](#http-apc-call-4-number-verification)
 ---
 
 ## Introduction to Azure Programmable Connectivity (APC)
@@ -99,9 +101,12 @@ APC enables direct access to a range of operator APIs, designed to streamline co
 
 | API                 | Description                                                                                   |
 |---------------------|-----------------------------------------------------------------------------------------------|
-c  | Provides network-based location data, ideal for location-sensitive applications.              |
+| [SIM Swap Detection](#sim-swap-detection) | Allows detection of SIM card changes, crucial for fraud prevention in security-sensitive operations. |
+| [Number Verification](#number-verification) | Verifies the authenticity of mobile numbers, enhancing trust and reducing spam.                |
+| [Device Location](#device-location)   | Provides network-based location data, ideal for location-sensitive applications.              |
 
-Find in the annex detailed information about eachc Operator API.
+
+Find in the annex detailed information about each [Network APIs](#network-apis).
 
 **Bellow are the planned Operator APIs coming to APC:**
 
@@ -301,7 +306,7 @@ For each call that you make to APC with the SDK, you will follow the same patter
 
 ##### APC SDK: Retrieve Network Information
 
-To make APC operator API calls, you'll need the network identifier for the cellular network device address you are calling from. More informtion on this APC Call: [Device Netwrok](#device-network).
+To make APC operator API calls, you'll need the network identifier for the cellular network device address you are calling from. More informtion on this APC Call: [Device Network](#device-network).
 
 
 1. Access the subclient for the device network from the base client created earlier `apcClient`:
@@ -480,7 +485,7 @@ var clientSecret = "your-application-client-secret";
 var tenantId = "your-tenant-id";
 ```
 
-1. Install Azure.Identity nugget package with the Nuget Package Manager or with the following command:
+3. Install Azure.Identity nugget package with the Nuget Package Manager or with the following command:
 
 ```sh
 dotnet add package Azure.Identity
@@ -488,7 +493,7 @@ dotnet add package Azure.Identity
 
 ![Azure.Identity nugget install](image-41.png)
 
-3. Add the following code to Retrieve a token for your HttpClient.:
+4. Add the following code to Retrieve a token for your HttpClient.:
 ```csharp
 // Authentication with Azure AD to obtain Bearer Token.
 var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
@@ -496,7 +501,7 @@ var token = await credential.GetTokenAsync(new Azure.Core.TokenRequestContext(ne
 string accessToken = token.Token;
 ```
 
-4. Add the required headers to call APC using a REST client:
+5. Add the required headers to call APC using a REST client:
 ```csharp
 // Prepare the HttpClient with the Bearer token and common headers.
 using var httpClient = new HttpClient();
@@ -530,7 +535,7 @@ Console.WriteLine($"Network retrieval result: {networkResult}");
 ```
 ![alt text](image-19.png)
 
-##### Http APC Call #3: Verify Sim Swap
+##### Http APC Call #2: Verify Sim Swap
 
 Once you have the HTTP client configured and retrieved the network identifier, proceed to make a Sim Swap verification request. This call will check whether the SIM card you are using for the cellular network has been replaced recently. For more informtion on this APC Call: [Sim Swap Detection](#sim-swap-detection). 
 
@@ -566,11 +571,19 @@ Console.WriteLine($"Sim swap verification result: {simSwapResult.VerificationRes
 
 ## Part 2: Advanced Use Case - Integrating APC into a Banking App
 
-In this section, we explore how Azure Programmable Connectivity (APC) can be integrated into a banking application to enhance security and user experience by leveraging network APIs.
+In this section, we explore how Azure Programmable Connectivity (APC) can be integrated into an example banking application, leveraging network APIs to enhance security and user experience. The sample application is detailed in this [README file](../README.md) located in the repository.
 
-The sample application explained is available in this repository [github link](../)
 
 ### Contents
+
+- [Architecture](#architecture)
+- [Exercise: Deploying and Testing a Demo Application](#exercise-deploying-and-testing-a-demo-application)
+  - [APC Requests from the Front End](#apc-requests-from-the-front-end)
+  - [Network Limitations](#network-limitations)
+  - [Dependency Injection for APC SDK, HTTP Client, and MockService](#dependency-injection-for-apc-sdk-http-client-and-mockservice)
+  - [Number Verification Flow](#number-verification-flow)
+  - [Device Location](#device-location)
+
 
 ---
 - [Part 2: Advanced Use Case - Integrating APC into a Banking App](#part-2-advanced-use-case---integrating-apc-into-a-banking-app)
@@ -587,26 +600,79 @@ The sample application explained is available in this repository [github link](.
     - [Mobile Testing](#mobile-testing)
 ---
 
+
 ### Architecture
 
-![WIP Diagram just with Leavesbank app components](image-13.png)
+This section provides a brief technical description of the demo application's architecture. The application is designed to interact with APC for enhanced anti-fraud security measures such as SIM swap detection, number verification and user location verification.
+
+![Architecture Diagram](image-13.png)
 
 #### Components
 
-- **React Native Application**
-  - **Environment**: Client devices (smartphones).
+- **Leaves Bank App**
+  - **Technology**: Built using React Native and Expo Go. Runs on client devices (smartphones).
   - **Features**: Interaction demo with the APCProxyServer for APC interactions.
-  - **Technology**: Built using React Native and Expo Go.
+  - **Repository path**: *src/APC.MobileApp/ReactNative*
 
-- **APCProxyServer**
-  - **Hosting**: Azure App Service API.
-  - **Role**: Acts as an intermediary between the React Native app and the APC API.
-  - **Responsibilities**: Authentication, request forwarding, and minimal data processing.
+- **Leaves Bank Backend Service**
+  - **Technology**: .NET8 Web API hosted in an Azure App Service.
+  - **Features**: Acts as an intermediary between the React Native app and the APC API and could host additional app logic.
+  - **Repository path**: *src/APC.Proxy.API*
 
 - **APC Gateway**
-  - **Location**: Cloud.
-  - **Functionality**: WIP
+  - **Technology**: Azure service
+  - **Features**:  interfaces with mobile network operator APIs.
 
+### Exercise: Deploying and Testing a Demo Application
+
+The practical exercise consists of deploying and testing the "Leaves Banking application", a demo application that leverages APC Network APIs to enhance anti-fraud prevention.
+
+#### Prerequisites
+
+This exercise assumes you completed at least the following sections from part 1:
+
+- [Create APC Gateway Instance](#create-apc-gateway-instance)
+- [Set up Authentication](#set-up-authentication)
+
+And will require
+
+- A cellular network from a supported operator TODO explain
+- A smartphone running Android or iOS
+ 
+#### Setup Instructions
+
+Follow the steps in the [demo application README](../README.md) to set up:
+
+- **APC Proxy running in an Azure Web App**
+- **Leaves Bank mobile app running on your phone using Expo Go**
+
+Then, follow the usage instructions intended to complement the advanced thechincal implementations or caveats related to applications using Azure Programmable Connectivity (APC).
+
+### APC Requests from the Front End
+
+Direct APC calls from the frontend are not advisable due to the sensitive nature of the credentials involved (client ID and secret). Instead, APC calls are delegated to the backend service, the APC Proxy, which securely handles authentication and integration. Here's an example of how this is implemented:
+
+```csharp
+public async Task<NetworkInformation> GetNetworkInfo(string ipAddress)
+{
+    return await _apcProxy.GetNetworkInfo(ipAddress);
+}
+```
+
+### Network Limitations
+The application must run on cellular networks to accurately utilize network-based APC features. The backend service (APC Proxy) retrieves the network information using the origin IP address of the frontend requests, which is then used as the identifier for APC requests.
+
+### Dependency Injection for APC SDK, HTTP Client, and MockService
+We utilize dependency injection (DI) to manage different implementations of APC requests:
+
+APC SDK: Direct calls to APC using the provided SDK.
+HTTP Client: Custom implementation for more complex scenarios or where direct SDK support is limited.
+MockService: Provides preconfigured responses for testing without making actual APC calls.
+Number Verification Flow
+The number verification flow includes handling redirections necessary for completing the verification process. The backend service manages these redirections and provides a seamless experience by handling the complex flow internally.
+
+### Device Location
+Handling potential errors from the device location API is crucial. If an operator denies location access, the backend service captures this error and handles it gracefully, informing the frontend of the issue without compromising user experience or security.
 
 ### Advanced integration details
 #### React Service Calling APC
@@ -647,65 +713,6 @@ For number verification, the banking app redirects users to a consent page if re
 
 #### Handling Redirections for Number Verification
 For number verification, the banking app redirects users to a consent page if required by the operator. This ensures compliance with privacy regulations and operator terms.
-
-
-### Exercise: Deploying and Testing a Demo Banking Application
-
-This section provides a step-by-step guide to get the project up and running on your local machine and mobile device.
-
-#### Prerequisites
-Before starting, ensure you have the following installed:
-- Git
-- Node.js
-
-#### Run APC Proxy
-
-#### Run local client
-
-To set up and run the project locally, follow these steps:
-
-1. **Clone the Project**
-   ```
-   git clone [Repository URL]
-   ```
-
-2. **Navigate to the React Native App Directory**
-   ```
-   cd [Repo path]/APC.MobileApp/ReactNative
-   ```
-
-3. **Install Dependencies**
-   ```
-   npm install
-   ```
-
-4. **Start the Application**
-   ```
-   npm start
-   ```
-
-5. **Open in a Web Browser**
-   - Once the Metro Bundler is running in your terminal, press `W` to open the app in your web browser. Use responsive mode when opening the developer console with F12.
-
-![Dev Responsive](img/desktop.png)
-
-#### Mobile Testing
-
-To test the app on a mobile device, follow these additional steps:
-
-1. **Download Expo Go**
-   - Install the Expo Go application from your device's app store (available on iOS and Android).
-
-2. **Scan QR Code**
-   - Open the Expo Go app on your mobile device.
-   - Select the option to scan the QR code.
-   - Scan the QR code that appears in your terminal after you've run `npm start` from the React Native app directory.
-
-![QR Code](img/QR.png)
-![Scan QR](img/scan.png)
-
-
-This will open the app on your mobile device, allowing you to test its features in a mobile environment.
 
 
 ## Annex
@@ -758,7 +765,7 @@ Verify the authenticity of a mobile number to ensure it is currently active and 
 ##### OAuth Flow
 WIP
 
-#### Location Services
+#### Device Location
 
 ##### Description
 Provide real-time location data of a mobile device with the consent of the mobile user. Useful for applications requiring geolocation, such as logistics and personal security.
@@ -1052,12 +1059,6 @@ public class DeviceLocationVerificationResult
     public bool VerificationResult { get; set; }
 }
 ```
-
-
-
-
-
-
 
 ### Additional APC REST HTTP examples using Postman
 

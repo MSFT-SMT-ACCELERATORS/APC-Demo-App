@@ -7,13 +7,13 @@ Welcome to the Azure Programmable Connectivity (APC) Demo App  repository! This 
 The Hands-On Lab provides a step-by-step guide to get you started with APC, from setting up your environment to using APC's powerful network APIs for SIM swap detection, location services, phone number verification, and more.
 
 - **Location**: `/docs/HOL/README.md`
-- **Contents**: Introduction to APC, setting up, using APC SDK, direct HTTP calls to APC, advanced implementation details, and deploying/testing a demo banking application.
+- **Contents**: Introduction to APC, APC SDK set up, APC Network APIs with APC SDK, REST HTTP Client/Postman and advanced implementation details.
 
 To dive into the Hands-On Lab, [click here](./docs/HOL/README.md).
 
 ## 2. APC Demo Application
 
-The APC Demo Application showcases a real-life use case of integrating APC into a banking application. This section provides insights into direct SDK usage, handling APC with HTTP client, integration into frontend and backend services, and detailed implementation of APC features like SIM swap and number verification.
+Source and instructions to build and deploy the APC Demo Application "Leaves Banking App" which showcases a real-life use case of leveraging APC Network APIs for anti fraud features into a banking application.
 
 - **Readme location**: Guide for setting up and understanding the demo application can now be found at `/docs/APC-Demo-App/README.md`.
 - **Source code**: find the client app and API modules in `/APC.MobileApp` and `/APC.Proxy.API`, respectively.
@@ -21,3 +21,8 @@ The APC Demo Application showcases a real-life use case of integrating APC into 
 For more information on the APC Demo Application, [click here](./docs/README.md).
 
 ---
+
+## Repository Structure
+- `/APCProxyServer`: Source code for the proxy server (.NET 8 with ASP.NET Core).
+- `/APC.MobileApp/ReactNativeApp`: Source code for the React Native application.
+- `/docs`: Setup guide and project overview and Hands on Lab (HOL) documentation.
