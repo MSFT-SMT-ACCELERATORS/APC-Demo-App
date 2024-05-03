@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Location from 'expo-location';
 import { readConfigurations, AppConfiguration, ConnectionMode, } from '../Services/SettingsService';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
 
@@ -21,9 +21,11 @@ import AppContainer from '../components/AppContainer';
 import CheckboxWithText from '../components/CheckBox';
 import CustomModal from '../components/CustomModal';
 import { RadioButton, Modal, } from 'react-native-paper';
-import { StyleSheet, View, ScrollView, Pressable, FlatList, TouchableOpacity, KeyboardAvoidingView, Platform, } from 'react-native';
+import { StyleSheet, View, ScrollView, Pressable, FlatList, TouchableOpacity, KeyboardAvoidingView, Platform, NativeSyntheticEvent, TextInputFocusEventData, findNodeHandle, UIManager, TextInput, Keyboard, } from 'react-native';
 
 import Icon from 'react-native-vector-icons/AntDesign';
+import { Logger } from '../utils/Logger';
+import { useStep } from '../utils/StepContext';
 
 interface StepProps {
     setProgress: (progress: number) => void;
@@ -35,6 +37,12 @@ const ResidenceLocation: React.FC<StepProps> = ({
     setLoading,
 }) => {
     const navigation = useNavigation();
+    const { setCurrentStep } = useStep();
+    const scrollRef = useRef<ScrollView>(null);
+    const countryRef = useRef<TextInput>(null);
+    const stateRef = useRef<TextInput>(null);
+    const cityRef = useRef<TextInput>(null);
+    const [focusedInputRef, setFocusedInputRef] = useState<React.RefObject<TextInput> | null>(null);
     const apiClient = useApiClient();
     const [hackedGPS, setHackedGPS] = useState<Location.LocationObjectCoords>();
     const [gpsPosition, setGPSPosition] = useState<Position>();
@@ -61,18 +69,30 @@ const ResidenceLocation: React.FC<StepProps> = ({
     const [citiesSuggestions, setCitySuggestions] = useState<string[]>([]);
     const [selectedCity, setCityValue] = useState('');
 
-
-
     useEffect(() => {
         (async () => {
+            const currentConfig = await readConfigurations(); 
+            setConfig(currentConfig);
+
+            if (currentConfig?.skipGeolocationCheck) {
+                console.log("Skipping geolocation check based on configuration.");
+                setHasLocationPermission(false);
+                return;
+            }
+
             let { status } = await Location.requestForegroundPermissionsAsync();
-            console.log('STATUS:' + status);
+            Logger.log('STATUS: ' + status);
             if (status !== 'granted') {
                 setHasLocationPermission(false);
                 return;
             }
 
             setHasLocationPermission(true);
+
+            APCService.getDeviceGPSLocation()
+                .then(setGPSPosition)
+                .catch(Logger.error);
+
         })();
     }, []);
 
@@ -110,17 +130,22 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
     const handleCountryChange = async (query: string) => {
         setCountryQuery(query);
-        setCountryValue(query);
+        setCountryValue('');
+
+        setStateQuery('');
+        setStateSuggestions([]);
+        setStateValue('');
+
+        setCityQuery('');
+        setCitySuggestions([]);
+        setCityValue('');
+
+        setHackedGPS(undefined);
+
         if (query.length > 1) {
             const suggestions = await BingService.getCountrySuggestions(query);
             const uniqueSuggestions = Array.from(new Set(suggestions));
-            const match = uniqueSuggestions.some(suggestion => suggestion.toLowerCase() === query.toLowerCase());
-
-            if (match) {
-                setCountrySuggestions([]);
-            } else {
-                setCountrySuggestions(uniqueSuggestions);
-            }
+            setCountrySuggestions(uniqueSuggestions);
         } else {
             setCountrySuggestions([]);
         }
@@ -130,22 +155,23 @@ const ResidenceLocation: React.FC<StepProps> = ({
         setCountryQuery(suggestion);
         setCountrySuggestions([]);
         setCountryValue(suggestion);
+        Keyboard.dismiss();
     };
 
     const handleStateChange = async (query: string) => {
         setStateQuery(query);
-        setStateValue(query);
+        setStateValue('');
+
+        setCityQuery('');
+        setCitySuggestions([]);
+        setCityValue('');
+
+        setHackedGPS(undefined);
+
         if (query.length >= 2) {
             const suggestions = await BingService.getStateSuggestions(query, selectedCountry);
             const uniqueSuggestions = Array.from(new Set(suggestions));
-            const match = uniqueSuggestions.some(suggestion => suggestion.toLowerCase() === query.toLowerCase());
-
-            if (match) {
-                setStateSuggestions([]);
-            } else {
-
-                setStateSuggestions(uniqueSuggestions);
-            }
+            setStateSuggestions(uniqueSuggestions);
         } else {
             setStateSuggestions([]);
         }
@@ -155,32 +181,32 @@ const ResidenceLocation: React.FC<StepProps> = ({
         setStateQuery(suggestion);
         setStateSuggestions([]);
         setStateValue(suggestion);
+        Keyboard.dismiss();
     };
 
 
     const handleCityChange = async (query: string) => {
         setCityQuery(query);
-        setCityValue(query);
+        setCityValue('');
+        setHackedGPS(undefined);
+
         if (query.length > 1) {
             const suggestions = await BingService.getCitySuggestions(query, selectedCountry, selectedState);
             const uniqueSuggestions = Array.from(new Set(suggestions));
-            const match = uniqueSuggestions.some(suggestion => suggestion.toLowerCase() === query.toLowerCase());
-
-            if (match) {
-                setCitySuggestions([]);
-            } else {
-                setCitySuggestions(uniqueSuggestions);
-            }
+            setCitySuggestions(uniqueSuggestions);
         } else {
             setCitySuggestions([]);
         }
     };
 
     const handleCitySuggestion = async (suggestion: string) => {
+        setCityValue(suggestion);
         setCityQuery(suggestion);
         setCitySuggestions([]);
-        setCityValue(suggestion);
-        const hackedLocation = await BingService.getCityCoordinates(selectedCity, selectedCountry);
+        Keyboard.dismiss();
+
+        const hackedLocation = await BingService.getCityCoordinates(suggestion, selectedCountry);
+        Logger.log(`handleCitySuggestion:`, suggestion, JSON.stringify(hackedLocation));
         setHackedGPS(
             APCService.getLocationCoords(
                 hackedLocation?.latitude,
@@ -192,16 +218,24 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
     const onFormValid = async (data: FieldValues) => {
         try {
+
+            // Business validation
+            Logger.log('validating business rule');
+            if (config?.skipGeolocationCheck || !hasLocationPermission) {
+                setShouldNavigate(true);
+                setLoading(false);
+                return
+            }
+
             const networkCode = await APCService.getNetworkCode(apiClient);
-            console.log(`El código de red es: ${networkCode}`);
-            console.log('Submitted Data:', data);
+            Logger.log('Submitted Data: ', data);
             setLoading(true, 'Validating your data...');
 
 
             const selectedLocation = await BingService.getCityCoordinates(selectedCity, selectedCountry);
             if (!selectedCity) {
-                console.log('Selection required');
-                handleModalToggle('Selection required', 'Select a valid option from the drop-down menus to continue', '#dadaed', undefined, 'information-circle-outline', palette.black);
+                Logger.log('Selection required');
+                handleModalToggle('Selection required', 'Select a valid location to continue', '#dadaed', undefined, 'information-circle-outline', palette.black);
                 setLoading(false);
 
                 return;
@@ -212,9 +246,9 @@ const ResidenceLocation: React.FC<StepProps> = ({
                 selectedLocation?.longitude
             );
 
-            console.log('Get: device gps location');
+            Logger.log('Get: device gps location');
             let coordsGPS = await APCService.getDeviceGPSLocation();
-            console.log('Get: device gps location OK');
+            Logger.log('Get: device gps location OK');
 
             let coords: Location.LocationObjectCoords;
             if (data.GPSOption == 'true') coords = coordsGPS.coords;
@@ -223,45 +257,39 @@ const ResidenceLocation: React.FC<StepProps> = ({
             let hasError = false;
 
 
-            // Business validation
-            console.log('validating business rule');
-            if (config?.skipGeolocationCheck || !hasLocationPermission) {
-                setShouldNavigate(true);
-                setLoading(false);
-                return
-            }
 
             if (!(await APCService.matchesCoords(coords, coordsForm, config?.residenceLocationRadius!))) {
                 handleModalToggle(
                     'Blocking business rule: Not allowed device location',
                     'For anti-fraud purposes, this application requires the user to be using the app in a location relatively close to the user’s residence location (i.e. same state). You are currently far away'
                 );
-                console.log('Business validation failed!!');
+                Logger.log('Business validation failed!!');
                 hasError = true;
             } else {
                 if (!data.UseAPC) {
                     handleModalToggle('Warning', 'APC Check Skipped: Location authenticity not verified. Enable APC for fraud protection', palette.warning, undefined, 'information-circle-outline', palette.black);
                     setShouldNavigate(true);
-                    console.log('Business validation success!!');
+                    Logger.log('Business validation success!!');
                 } else {  //APC Validation
-                    console.log('USING APC validating apc matches location');
+                    Logger.log('USING APC validating apc matches location');
                     const response = await APCService.verificateAPCLocation(apiClient, coords);
                     if (!response) {
                         handleModalToggle(
                             'Blocking anti-hacking rule: GPS coordinates hacking attempted',
                             'A possible hacking has been detected. The device GPS location does not match the device’s actual location provided by the network carrier. The application’s flow must stop'
                         );
-                        console.log('APC validation failed!!');
+                        Logger.log('APC validation failed!!');
                         hasError = true;
                     } else {
                         handleModalToggle('Information message', 'Congratulations, you have been verified in a location close to your residence location so you can continue with the loan request', palette.accent200, undefined, 'information-circle-outline', palette.black);
                         setShouldNavigate(true);
-                        console.log('APC validation success!!');
+                        Logger.log('APC validation success!!');
                     }
                 }
             }
 
         } catch (error) {
+            Logger.log(error);
             setSkipLocation(true);
             handleModalToggle('Warning', 'The application cannot check your location', palette.warning, undefined, 'information-circle-outline', palette.black);
             setShouldNavigate(true);
@@ -276,43 +304,65 @@ const ResidenceLocation: React.FC<StepProps> = ({
     useEffect(() => {
         if (!modalVisible && shouldNavigate) {
             setTimeout(() => {
-                navigation.navigate('StarterPage');
+                navigation.navigate('Information');
                 setShouldNavigate(false);
             }, 100);
         }
     }, [modalVisible, shouldNavigate, navigation]);
 
     useEffect(() => {
+        setCurrentStep(2);
+    }, [setCurrentStep]);
+
+
+    useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             setLoading(false);
-            setProgress(25);
+            setProgress(66.6);
         });
 
         return unsubscribe;
     }, [navigation]);
 
     useEffect(() => {
-        readConfigurations().then(setConfig);
-        APCService.getDeviceGPSLocation()
-            .then(setGPSPosition)
-            .catch(console.error);
-    }, []);
-
-    useEffect(() => {
         if (config) {
             setSkipLocation(config.skipGeolocationCheck ?? false);
-            console.log('LOC' + skipGeolocationCheck + " " + config.skipGeolocationCheck);
+            Logger.log('LOC' + skipGeolocationCheck + " " + config.skipGeolocationCheck);
         }
     }, [config, skipGeolocationCheck]);
+
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+            if (focusedInputRef && focusedInputRef.current) {
+                const scrollViewNode = findNodeHandle(scrollRef.current);
+                focusedInputRef.current.measureLayout(
+                    scrollViewNode!,
+                    (x, y, width, height) => {
+                        scrollRef.current?.scrollTo({ y: y - 40, animated: true });
+                    },
+                    () => Logger.error("Failed to measure layout."),
+                );
+            }
+        });
+
+        return () => {
+            keyboardDidShowListener.remove();
+        };
+    }, [focusedInputRef]);
+
+    const handleFocus = (inputRef: React.RefObject<TextInput>) => (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+        setFocusedInputRef(inputRef);
+    };
+
     return (
         <AppContainer>
             <View style={[styles.parent]}>
                 <KeyboardAvoidingView
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
                     style={{ flex: 1 }}
-                    keyboardVerticalOffset={Platform.OS === "ios" ? 180 : 0}
+                    keyboardVerticalOffset={Platform.OS === "ios" ? 165 : 165}
                 >
-                    <ScrollView style={[styles.contentContainer]}>
+                    <ScrollView style={[styles.contentContainer]} ref={scrollRef} keyboardShouldPersistTaps="handled">
                         <View style={[styles.title]}>
                             <StyledText customStyle={['title2', 'extrabold']}>
                                 Residence location
@@ -332,17 +382,17 @@ const ResidenceLocation: React.FC<StepProps> = ({
                             </StyledText>
                         </View>
 
-                        <View
-                            style={[styles.separatorContainer, customStyles.mb4]}
-                        ></View>
+                        <View style={[styles.separatorContainer, customStyles.mb4]}>
+                        </View>
+
                         <View style={styles.bodyContent}>
                             <Controller name='Country' control={control} render={({ field }) => (
                                 <>
-                                    <StyledInputText customStyle={['mb0']} labelText="Country" value={countryQuery} onChangeText={handleCountryChange} placeholder="Select a Country..." />
+                                    <StyledInputText customStyle={['mb0']} labelText="Country" value={countryQuery} onChangeText={handleCountryChange} placeholder="Select a Country..." ref={countryRef} onFocus={handleFocus(countryRef)} />
                                     {countrySuggestions.length > 0 && (
-                                        <FlatList style={styles.sectionContent} data={countrySuggestions}
+                                        <FlatList style={styles.sectionContent} data={countrySuggestions} scrollEnabled={false} keyboardShouldPersistTaps="handled"
                                             renderItem={({ item }) => (
-                                                <TouchableOpacity onPress={() => handleCountrySuggestion(item)}>
+                                                <TouchableOpacity onPress={() => { field.onChange(item); handleCountrySuggestion(item) }}>
                                                     <StyledText customStyle={['m4']}>{item}</StyledText>
                                                     <View style={[styles.separatorList]}></View>
                                                 </TouchableOpacity>
@@ -357,11 +407,11 @@ const ResidenceLocation: React.FC<StepProps> = ({
 
                             <Controller name='StateProvince' control={control} render={({ field }) => (
                                 <>
-                                    <StyledInputText customStyle={['mb0']} labelText="State/Province" value={stateQuery} onChangeText={handleStateChange} placeholder="Select a State/Province..." />
+                                    <StyledInputText customStyle={['mb0']} labelText="State/Province" value={stateQuery} onChangeText={handleStateChange} placeholder="Select a State/Province..." editable={selectedCountry != ''} ref={stateRef} onFocus={handleFocus(stateRef)} />
                                     {stateSuggestions.length > 0 && (
-                                        <FlatList style={styles.sectionContent} data={stateSuggestions}
+                                        <FlatList style={styles.sectionContent} data={stateSuggestions} scrollEnabled={false} keyboardShouldPersistTaps="handled"
                                             renderItem={({ item }) => (
-                                                <TouchableOpacity onPress={() => handleStateSuggestion(item)}>
+                                                <TouchableOpacity onPress={() => { field.onChange(item); handleStateSuggestion(item) }}>
                                                     <StyledText customStyle={['m4']}>{item}</StyledText>
                                                     <View style={[styles.separatorList]}></View>
                                                 </TouchableOpacity>
@@ -379,11 +429,11 @@ const ResidenceLocation: React.FC<StepProps> = ({
                                 control={control}
                                 render={({ field }) => (
                                     <>
-                                        <StyledInputText customStyle={['mb0']} labelText="City" value={cityQuery} onChangeText={handleCityChange} placeholder="Select a City..." />
+                                        <StyledInputText customStyle={['mb0']} labelText="City" value={cityQuery} onChangeText={handleCityChange} placeholder="Select a City..." editable={selectedState != ''} ref={cityRef} onFocus={handleFocus(cityRef)} />
                                         {citiesSuggestions.length > 0 && (
-                                            <FlatList style={styles.sectionContent} data={citiesSuggestions}
+                                            <FlatList style={styles.sectionContent} data={citiesSuggestions} scrollEnabled={false} keyboardShouldPersistTaps="handled"
                                                 renderItem={({ item }) => (
-                                                    <TouchableOpacity style={styles.itemList} onPress={() => handleCitySuggestion(item)}>
+                                                    <TouchableOpacity style={styles.itemList} onPress={() => { field.onChange(item); handleCitySuggestion(item) }}>
                                                         <StyledText customStyle={['m4']}>{item}</StyledText>
                                                         <View style={[styles.separatorList]}></View>
                                                     </TouchableOpacity>
@@ -478,17 +528,16 @@ const ResidenceLocation: React.FC<StepProps> = ({
                             )}
                         </View>
                     </ScrollView>
+                    <View style={[styles.footer]}>
+                        <Button
+                            title="Next"
+                            style={[styles.button]}
+                            size="long"
+                            useGradient={true}
+                            onPress={handleSubmit(onFormValid)}
+                        />
+                    </View>
                 </KeyboardAvoidingView>
-
-                <View style={[styles.footer]}>
-                    <Button
-                        title="Next"
-                        style={[styles.button]}
-                        size="long"
-                        useGradient={true}
-                        onPress={handleSubmit(onFormValid)}
-                    />
-                </View>
 
                 <Modal
                     visible={tooltipVisible}

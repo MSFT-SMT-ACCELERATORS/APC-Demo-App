@@ -12,7 +12,6 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import NetInfo from '@react-native-community/netinfo';
 import CustomModal from '../components/CustomModal';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 interface WelcomeProps {

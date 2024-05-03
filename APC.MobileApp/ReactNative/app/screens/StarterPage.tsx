@@ -21,10 +21,19 @@ import AppContainer from '../components/AppContainer';
 import { Modal } from 'react-native-paper';
 import CustomModal from '../components/CustomModal';
 import Icon from 'react-native-vector-icons/AntDesign';
+import { Logger } from '../utils/Logger';
+
+
 
 interface StepProps {
   setProgress: (progress: number) => void;
   setLoading: (isLoading: boolean) => void;
+}
+
+export enum ConnectionMode {
+  Online = "online",
+  Offline = "offline",
+  Mock = "mock"
 }
 
 enum ButtonNames {
@@ -40,7 +49,6 @@ const isSmallScreen = screenWidth < 200;
 const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const navigation = useNavigation();
   const apiClient = useApiClient();
-  const { setCurrentStep } = useStep();
   const { control, handleSubmit } = useForm();
 
   const [tooltipVisible, setTooltipVisible] = useState<boolean>(false);
@@ -66,28 +74,30 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
     setIcon(iconName);
     setColorIcon(iconColor);
   };
-
-
+  
   const onFormValid = async (data: FieldValues) => {
-    console.log(data);
+    Logger.log(data);
     setLoading(true, "Validating your data...");
+
+    const currentConfig = await readConfigurations();
 
     try {
       // APC validation
       const response = await APCService.checkSimChange(apiClient, phoneNumber);
-      console.log("SIMSWAP: ", response);
+      Logger.log("SIMSWAP: ", response);
 
       if (response) {
-        console.log("SIM swap detected");
+        Logger.log("SIM swap detected");
         handleModalToggle("SIM swap detected", "A recent SIM change has been detected on this device, for security reasons you cannot continue with this local request");
 
       } else {
-        console.log("SIM swap not detected");
+        Logger.log("SIM swap not detected");
         handleModalToggle("SIM swap not detected", "For security reasons we checked that your phone line didn’t have any SIM swap recently. You can continue with this loan request.", palette.accent200, true, 'information-circle-outline', palette.black);
         setShouldNavigate(true);
       }
     } catch (error) {
-      console.log('Error' + error);
+      handleModalToggle('Warning', 'The application cannot check if your phone line had any SIM swap recently.', palette.warning, undefined, 'information-circle-outline', palette.black);
+      Logger.log('Error' + error);
     } finally {
       setLoading(false);
     }
@@ -96,7 +106,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   useEffect(() => {
     if (!modalVisible && shouldNavigate) {
       setTimeout(() => {
-        navigation.navigate('Information');
+        navigation.navigate('ResidenceLocation');
         setShouldNavigate(false);
       }, 100);
     }
@@ -105,15 +115,12 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       setLoading(false);
-      setProgress(50);
+      setProgress(33.3);
     });
 
     return unsubscribe;
   }, [navigation]);
 
-  useEffect(() => {
-    setCurrentStep(2);
-  }, [setCurrentStep]);
 
   useEffect(() => {
     readConfigurations().then(setConfig);
@@ -165,12 +172,13 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
         isValid = false;
       }
       handleModalToggle(title, message, backgroundColor, undefined, icon, iconColor);
-      Keyboard.dismiss();
       setIsPhoneNumberValid(isValid);
 
     } catch (error) {
-      console.log('Error' + error);
+      Logger.log('Error' + error);
+      handleModalToggle('Warning', 'The application cannot validate your phone number.', palette.warning, undefined, 'information-circle-outline', palette.black);
     } finally {
+      Keyboard.dismiss();
       setLoading(false);
     }
 
@@ -183,6 +191,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 165 : 165}
         >
           <ScrollView keyboardShouldPersistTaps="handled" style={[styles.contentContainer]}>
             <View style={[styles.title]}>

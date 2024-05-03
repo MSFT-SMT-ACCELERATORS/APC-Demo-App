@@ -29,13 +29,6 @@ const Success: React.FC<SuccessProps> = ({ setLoading }) => {
                 <FontAwesome5 name="check-circle" size={200} color={Colors.accent200} />
                 <StyledText customStyle={['title2']} color='accent200'>Credit is being evaluated</StyledText>
                 <StyledText style={styles.textCentered} customStyle={['title4']} color='accent200'>Congratulations! Your credit is being evaluated. You will be contacted soon by email with a loan confirmation</StyledText>
-                {/* <Button
-                        title='Get Started'
-                        size='normal'
-                        style={customStyles.my4}
-                        useGradient={true}
-                        onPress={() => navigation.navigate('Consents')}
-                    /> */}
             </View>
 
         </AppContainer>

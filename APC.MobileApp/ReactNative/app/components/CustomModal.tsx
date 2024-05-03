@@ -59,7 +59,6 @@ const CustomModal: React.FC<CustomModalProps> = ({
       transparent={true}
       visible={visible}
       onRequestClose={() => {
-        Alert.alert('Modal has been closed.');
         onClose();
       }}
     >

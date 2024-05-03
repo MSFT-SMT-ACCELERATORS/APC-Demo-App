@@ -4,26 +4,19 @@ import { StyleSheet, View, ScrollView, Pressable, KeyboardAvoidingView, Platform
 import { useNavigation } from '@react-navigation/native';
 
 import Colors from '../themes/Colors';
-import {
-    storeConfigurations,
-    readConfigurations,
-    AppConfiguration,
-    defaultConfig,
-    ConnectionMode,
-} from '../Services/SettingsService';
+import { storeConfigurations, readConfigurations, AppConfiguration, defaultConfig, ConnectionMode, USE_STORAGE_LOGGING} from '../Services/SettingsService';
 
 import AppContainer from '../components/AppContainer';
 import Button from '../components/Button';
 import StyledInputText from '../components/StyledInputText';
-import {
-    Controller,
-    SubmitHandler,
-    useForm,
-} from 'react-hook-form';
+import { Controller, SubmitHandler, useForm,} from 'react-hook-form';
 import StyledText from '../components/StyledText';
-import { RadioButton } from 'react-native-paper';
+import { RadioButton, TextInput } from 'react-native-paper';
 import palette from '../themes/Colors';
 import CheckboxWithText from '../components/CheckBox';
+import { Logger } from '../utils/Logger';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Clipboard from 'expo-clipboard';
 
 interface SettingsProps {
     setLoading: (isLoading: boolean, text?: string) => void;
@@ -43,6 +36,13 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
         useState<boolean>(false);
     const [simSwap, setSimSwap] = useState<boolean>(false);
     const connectionMode = watch('connectionMode');
+    const [logContent, setLogContent] = useState<string | undefined | null>();
+
+    if(USE_STORAGE_LOGGING) {
+        useEffect(() => {
+            AsyncStorage.getItem("log").then(setLogContent);
+        }, []);
+    }
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -62,6 +62,31 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
         return unsubscribe;
     }, [navigation]);
 
+    const handleInputChange = (text: string, setValue: (value: string) => void) => {
+        let newText = text.replace(/[^0-9\-.,]/g, '');
+    
+        newText = newText.startsWith('-') ? '-' + newText.slice(1).replace(/-/g, '') : newText.replace(/-/g, '');
+    
+        newText = newText.replace(/^[.,]+/, ''); 
+        let decimalPointFound = false;
+        let commaFound = false;
+        newText = newText.split('').filter(char => {
+            if (char === '.' && !decimalPointFound) {
+                decimalPointFound = true;
+                return true;
+            } else if (char === ',' && !commaFound) {
+                commaFound = true;
+                return true;
+            }
+            return char !== '.' && char !== ',';
+        }).join('');
+    
+        setValue(newText);
+    };
+    
+    
+    
+    
     const saveConfig: SubmitHandler<AppConfiguration> = async (data) => {
         let updatedAutovalidatePhoneNumber = autovalidatePhoneNumber;
         let updatedSimSwap = simSwap;
@@ -82,7 +107,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
             residenceLocationRadius: Number(data.residenceLocationRadius)
         };
 
-        console.log(formattedData);
+        Logger.log(formattedData);
         storeConfigurations(formattedData);
         navigation.navigate('Welcome');
     };
@@ -92,8 +117,9 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
         <AppContainer>
             <View style={[styles.parent]}>
                 <KeyboardAvoidingView
-                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    behavior={Platform.OS === "ios" ? "height" : "height"}
                     style={{ flex: 1 }}
+                    keyboardVerticalOffset={Platform.OS === "ios" ? 98 : 90}
                 >
                     <ScrollView style={styles.contentContainer}>
                         <View style={styles.bodyContent}>
@@ -116,6 +142,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                     render={({ field }) => (
                                         <StyledInputText
                                             labelText="Radius Km (allowed gps deviation)"
+                                            inputType='decimal'
                                             value={field.value?.toString() || ''}
                                             onChangeText={field.onChange}
                                         />
@@ -143,6 +170,7 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                     render={({ field }) => (
                                         <StyledInputText
                                             labelText="Radius Km (allowed deviation for residence location)"
+                                            inputType='decimal'
                                             value={field.value?.toString() || ''}
                                             onChangeText={field.onChange}
                                         />
@@ -282,10 +310,11 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                         render={({ field }) => (
                                             <StyledInputText
                                                 labelText="Simulated APC Latitude"
+                                                inputType='text'
                                                 value={
                                                     field.value?.toString() || ''
                                                 }
-                                                onChangeText={field.onChange}
+                                                onChangeText={(text) => handleInputChange(text, field.onChange)}
                                             />
                                         )}
                                     />
@@ -315,10 +344,11 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                         render={({ field }) => (
                                             <StyledInputText
                                                 labelText="Simulated APC Longitude"
+                                                inputType='text'
                                                 value={
                                                     field.value?.toString() || ''
                                                 }
-                                                onChangeText={field.onChange}
+                                                onChangeText={(text) => handleInputChange(text, field.onChange)}
                                             />
                                         )}
                                     />
@@ -332,9 +362,21 @@ const Settings: React.FC<SettingsProps> = ({ setLoading }) => {
                                     )}
                                 </View>
                             ) : null}
+
+                            { USE_STORAGE_LOGGING ?
+                                <View style={styles.sectionContent}>
+                                    <StyledText customStyle={['bold', 'title4']} color='accent200'>Logging</StyledText>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                        <Button title="Clear logs" onPress={() => { AsyncStorage.removeItem("log"); setLogContent(null) }} useGradient={true}></Button>
+                                        <Button title="Copy" disabled={!(logContent)} onPress={() => { Clipboard.setStringAsync(logContent ?? '') }} useGradient={true}></Button>
+                                    </View>
+                                    <TextInput multiline={true} editable={false}>
+                                        {logContent}
+                                    </TextInput>
+                                </View> 
+                            : null }
                         </View>
                     </ScrollView>
-
                     <View style={[styles.footer]}>
                         <Button
                             title="Save and close"

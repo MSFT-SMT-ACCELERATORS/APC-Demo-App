@@ -11,6 +11,7 @@ import customStyles from '../themes/CustomStyles';
 import AppContainer from '../components/AppContainer';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
 import { useStep } from '../utils/StepContext';
+import { Logger } from '../utils/Logger';
 
 interface StepProps {
   setProgress: (progress: number) => void;
@@ -25,7 +26,7 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       setLoading(false);
-      setProgress(75);
+      setProgress(100);
     });
 
     return unsubscribe;
@@ -36,7 +37,7 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   }, [setCurrentStep]);
 
   const onFormValid = async (data: FieldValues) => {
-    console.log(data);
+    Logger.log(data);
     setProgress(100);
     navigation.navigate('Success');
   }
@@ -46,7 +47,7 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 180 : 0}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 165 : 165}
       >
         <View style={[styles.parent]}>
           <ScrollView style={[styles.contentContainer]}>
@@ -105,7 +106,7 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
                 name='zipcode'
                 control={control}
                 render={({ field }) => (
-                  <StyledInputText labelText="Zip code" placeholder="Zip code" onChangeText={field.onChange}></StyledInputText>
+                  <StyledInputText labelText="Zip code" placeholder="Zip code" onChangeText={field.onChange} inputType='numeric'></StyledInputText>
                 )} />
               <View style={[styles.idContainer]}>
                 <StyledText>Identity verification</StyledText>
@@ -140,17 +141,18 @@ const Information: React.FC<StepProps> = ({ setProgress, setLoading }) => {
                 )} />
             </View>
           </ScrollView>
+          <View style={[styles.footer]}>
+            <Button
+              title="Confirm request"
+              style={[styles.button]}
+              size='long'
+              useGradient={true}
+              onPress={handleSubmit(onFormValid)}
+            />
+          </View>
         </View>
       </KeyboardAvoidingView>
-      <View style={[styles.footer]}>
-        <Button
-          title="Confirm request"
-          style={[styles.button]}
-          size='long'
-          useGradient={true}
-          onPress={handleSubmit(onFormValid)}
-        />
-      </View>
+
     </AppContainer >
   );
 }
