@@ -1,13 +1,8 @@
 ﻿using APC.Client;
 using APC.DataModel;
 using Microsoft.Extensions.Options;
-using System.Net;
-using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text;
-using System.Xml;
 
-public class APCMockService : IAPCClient
+public class APCMockService : IAPCMockService
 {
     private readonly APCMockSettings _settings;
 
@@ -30,35 +25,21 @@ public class APCMockService : IAPCClient
         };
     }
 
-    public Task<HttpResponseMessage> DeviceLocationVerifyAsync(DeviceLocationVerificationContent? request = null)
-        => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(_settings.MockDeviceLocationVerificationResult), Encoding.UTF8, "application/json")
-        });
+    public Task<DeviceLocationVerificationResult> DeviceLocationVerifyAsync(DeviceLocationVerificationContent? request = null)
+        => Task.FromResult(_settings.MockDeviceLocationVerificationResult);
 
-    public Task<HttpResponseMessage> DeviceNetworkRetrieveAsync(NetworkIdentifier? request = null)
-        => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(_settings.MockNetworkRetrievalResult), Encoding.UTF8, "application/json")
-        });
-    public Task<HttpResponseMessage> NumberVerificationRetrieveAsync(NetworkIdentifier? request = null)
-        => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(_settings.MockNumberRetrievalResult), Encoding.UTF8, "application/json")
-        });
-    public Task<HttpResponseMessage> NumberVerificationVerifyAsync(NumberVerificationContent? request = null)
-        => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(_settings.MockNumberVerificationResult), Encoding.UTF8, "application/json")
-        });
-    public Task<HttpResponseMessage> SimSwapRetrieveAsync(SimSwapRetrievalContent? request = null)
-        => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(_settings.MockSimSwapRetrievalResult), Encoding.UTF8, "application/json")
-        });
-    public Task<HttpResponseMessage> SimSwapVerifyAsync(SimSwapVerificationContent? request = null)
-        => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(_settings.MockSimSwapVerificationResult), Encoding.UTF8, "application/json")
-        });
+    public Task<NetworkRetrievalResult> DeviceNetworkRetrieveAsync(NetworkIdentifier? request = null)
+        => Task.FromResult(_settings.MockNetworkRetrievalResult);
+
+    public Task<NumberRetrievalResult> NumberVerificationRetrieveAsync(NetworkIdentifier? request = null)
+        => Task.FromResult(_settings.MockNumberRetrievalResult);
+
+    public Task<NumberVerificationResult> NumberVerificationVerifyAsync(NumberVerificationContent? request = null)
+        => Task.FromResult(_settings.MockNumberVerificationResult);
+
+    public Task<SimSwapRetrievalResult> SimSwapRetrieveAsync(SimSwapRetrievalContent? request = null)
+        => Task.FromResult(_settings.MockSimSwapRetrievalResult);
+
+    public Task<SimSwapVerificationResult> SimSwapVerifyAsync(SimSwapVerificationContent? request = null)
+        => Task.FromResult(_settings.MockSimSwapVerificationResult);
 }

@@ -4,12 +4,13 @@ namespace APC.Client
 {
     public interface IAPCClient
     {
-        Task<HttpResponseMessage> DeviceLocationVerifyAsync(DeviceLocationVerificationContent request);
-        Task<HttpResponseMessage> DeviceNetworkRetrieveAsync(NetworkIdentifier request);
-        Task<HttpResponseMessage> NumberVerificationRetrieveAsync(NetworkIdentifier request);
-        Task<HttpResponseMessage> NumberVerificationVerifyAsync(NumberVerificationContent request);
-        Task<HttpResponseMessage> SimSwapRetrieveAsync(SimSwapRetrievalContent request);
-        Task<HttpResponseMessage> SimSwapVerifyAsync(SimSwapVerificationContent request);
+        Task<HttpResponseMessage> DeviceLocationVerifyAsync(DeviceLocationVerificationContent request, bool useMock = false);
+        Task<HttpResponseMessage> DeviceNetworkRetrieveAsync(NetworkIdentifier request, bool useMock = false);
+        Task<HttpResponseMessage> NumberVerificationRetrieveAsync(NetworkIdentifier request, bool useMock = false);
+        Task<HttpResponseMessage> NumberVerificationVerifyAsync(NumberVerificationContent request, bool useMock = false);
+        Task<HttpResponseMessage> SimSwapRetrieveAsync(SimSwapRetrievalContent request, bool useMock = false);
+        Task<HttpResponseMessage> SimSwapVerifyAsync(SimSwapVerificationContent request, bool useMock = false);
+        Task<string> GetAccessTokenAsync();
     }
 
 }
