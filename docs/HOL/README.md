@@ -6,13 +6,13 @@ Welcome to the Azure Programmable Connectivity Hands-On Lab. In this lab, we wil
 | Time    | Activity |
 | ------- | -------- |
 | 10 min  | [Introduction to Azure Programmable Connectivity (APC)](#introduction-to-azure-programmable-connectivity-apc) |
-| 30 min  | **Part 1:** [Getting Started with APC](#part-1-get-started-with-apc)   |
+| 30 min  | **Part 1:** [Get Started with APC](#part-1-get-started-with-apc)   |
 |         | [Use Network APIs with the APC SDK Client](#use-network-apis-with-the-apc-sdk-client) |
 |         | [Use Network APIs with APC REST APIs](#use-network-apis-with-apc-rest-apis) |
-|  1 hour   | **Part 2:** [ Advanced Use Case - Integrating APC into a Banking App](#part-2-advanced-use-case---integrating-apc-into-a-banking-app) |
-|         |  [Architecture](#architecture) |
-|         |  [Advanced Integration Details](#advanced-integration-details) |
-|         |  [Exercise: Deploying and Testing a Demo Banking Application](#exercise-deploying-and-testing-a-demo-banking-application) |
+|  1 hour | **Part 2:** [Advanced Use Case - Integrating APC into a Banking App](#part-2-advanced-use-case---integrating-apc-into-a-banking-app) |
+|         | [Architecture](#architecture) |
+|         | [Exercise: Deploying and Testing a Demo Banking Application](#exercise-deploying-and-testing-a-demo-banking-application) |
+|         | [Advanced Integration Details](#advanced-integration-details) |
 | 30 min  | [Annex](#annex) (optional)   |
 
 
@@ -28,7 +28,7 @@ Welcome to the Azure Programmable Connectivity Hands-On Lab. In this lab, we wil
   - [Architecture](#architecture)
   - [APC Planned Operator APIs](#apc-planned-operator-apis)
   - [Additional Information](#additional-information)
-- **Part 1:**[ Get Started with APC](#part-1-get-started-with-apc)
+- **Part 1:** [Get Started with APC](#part-1-get-started-with-apc)
   - [Prerequisites](#prerequisites)
     - [Create APC Gateway Instance](#create-apc-gateway-instance)
     - [Set up Authentication](#set-up-authentication)
@@ -36,9 +36,9 @@ Welcome to the Azure Programmable Connectivity Hands-On Lab. In this lab, we wil
     - [Create a Console Application](#create-a-console-application)
     - [Install the APC SDK](#install-the-apc-sdk)
     - [Instantiate an Authenticated Client](#instantiate-an-authenticated-client)
-    - [Make APC Requests](#make-apc-requests)
-      - [APC Call #1: Retrieve Network Information](#apc-call-1-retrieve-network-information)
-      - [APC Call #2: Sim Swap Retrieve/Verify](#apc-call-2-sim-swap-retrieveverify)
+    - [Make APC SDK Requests](#make-apc-sdk-requests)
+      - [APC Call: Retrieve Network Information](#apc-sdk-retrieve-network-information)
+      - [APC Call: Sim Swap Retrieve/Verify](#apc-sdk-sim-swap-retrieveverify)
   - [Use Network APIs with APC REST APIs](#use-network-apis-with-apc-rest-apis)
     - [Postman APC requests](#a-make-apc-requests-with-postman)
       - [Postman APC SimSwap Verify Request](#postman-apc-simswap-verify-request)
@@ -46,19 +46,15 @@ Welcome to the Azure Programmable Connectivity Hands-On Lab. In this lab, we wil
     - [.NET HttpClient APC requests](#b-make-apc-requests-with-net-httpclient)
       - [HttpClient APC Retrieve Network Information Request](#http-apc-call-1-retrieve-network-information)
       - [HttpClient APC Verify Sim Swap Request](#http-apc-call-2-verify-sim-swap)
-- **Part 2:**[ Advanced Use Case - Integrating APC into a Banking App](#part-2-advanced-use-case---integrating-apc-into-a-banking-app)
+- **Part 2:** [Advanced Use Case - Integrating APC into a Banking App](#part-2-advanced-use-case---integrating-apc-into-a-banking-app)
   - [Architecture](#architecture)
+  - [Exercise: Deploying and Testing a Demo Banking Application](#exercise-deploying-and-testing-a-demo-banking-application)
   - [Advanced Integration Details](#advanced-integration-details)
     - [React Service Calling APC](#react-service-calling-apc)
     - [APC Proxy SDK Usage](#apc-proxy-sdk-usage)
     - [Dependency Injection for SDK + HttpClient](#dependency-injection-for-sdk--httpclient)
-    - [Handling Consent permission for Locaction Number Verification](#handling-consent-permission-for-locaction-verification)
+    - [Handling Consent Permission for Location Number Verification](#handling-consent-permission-for-location-number-verification)
     - [Handling Redirections for Number Verification](#handling-redirections-for-number-verification)
-  - [Exercise: Deploying and Testing a Demo Banking Application](#exercise-deploying-and-testing-a-demo-banking-application)
-    - [Prerequisites](#prerequisites-1)
-    - [Run APC Proxy](#run-apc-proxy)
-    - [Run Local Client](#run-local-client)
-    - [Mobile Testing](#mobile-testing)
 - [Annex](#annex)
   - [Additional REST APC calls using .NET HttpClient](#additional-rest-apc-calls-using-net-httpclient)
     - [Location REST APC calls using .NET HttpClient](#location-rest-apc-calls-using-net-httpclient)
@@ -69,7 +65,7 @@ Welcome to the Azure Programmable Connectivity Hands-On Lab. In this lab, we wil
   - [.NET HttpClient APC requests](#b-make-apc-requests-with-net-httpclient)
     - [HttpClient APC Verify Device Location Request](#http-apc-call-2-verify-device-location)
     - [HttpClient APC Number Verification Request](#http-apc-call-4-number-verification)
----
+
 
 ## Introduction to Azure Programmable Connectivity (APC)
 
@@ -130,7 +126,7 @@ For a deeper understanding of Azure Programmable Connectivity (APC), including i
 ## Part 1: Get Started with APC
 
 ### Contents
-- [Part 1: Get Started with APC](#part-1-get-started-with-apc)
+
   - [Prerequisites](#prerequisites)
     - [Create APC Gateway Instance](#create-apc-gateway-instance)
     - [Set up Authentication](#set-up-authentication)
@@ -138,22 +134,27 @@ For a deeper understanding of Azure Programmable Connectivity (APC), including i
     - [Create a Console Application](#create-a-console-application)
     - [Install the APC SDK](#install-the-apc-sdk)
     - [Instantiate an Authenticated Client](#instantiate-an-authenticated-client)
-    - [SDK APC Requests](#make-apc-requests)
-      - [APC SDK Call #1: Retrieve Network Information](#apc-call-1-retrieve-network-information)
-      - [APC SDK Call #3: Sim Swap Retrieve/Verify](#apc-call-3-sim-swap-retrieveverify)
+    - [Make APC SDK Requests](#make-apc-sdk-requests)
+      - [APC Call: Retrieve Network Information](#apc-sdk-retrieve-network-information)
+      - [APC Call: Sim Swap Retrieve/Verify](#apc-sdk-sim-swap-retrieveverify)
   - [Use Network APIs with APC REST APIs](#use-network-apis-with-apc-rest-apis)
     - [Postman APC requests](#a-make-apc-requests-with-postman)
       - [Postman APC SimSwap Verify Request](#postman-apc-simswap-verify-request)
       - [Postman APC Number Verification Request](#postman-apc-number-verification-request)
     - [.NET HttpClient APC requests](#b-make-apc-requests-with-net-httpclient)
       - [HttpClient APC Retrieve Network Information Request](#http-apc-call-1-retrieve-network-information)
-      - [HttpClient APC Verify Sim Swap Request](#http-apc-call-3-verify-sim-swap)
-- (optional) [Part 1 Annex: Make APC Requests](#use-network-apis-with-the-apc-sdk-client)
+      - [HttpClient APC Verify Sim Swap Request](#http-apc-call-2-verify-sim-swap)
+
+(Optional annex sections) 
+  - [Additional REST APC calls using .NET HttpClient](#additional-rest-apc-calls-using-net-httpclient)
+    - [Location REST APC calls using .NET HttpClient](#location-rest-apc-calls-using-net-httpclient)
+    - [Number Verification REST APC calls using .NET HttpClient](#number-verification-rest-apc-calls-using-net-httpclient)
+  - [Additional REST APC calls using Postman](#additional-rest-apc-calls-using-postman)
+    - [Location REST APC calls using Postman](#location-rest-apc-calls-using-postman)
+    - [Number Verification REST APC calls using Postman](#number-verification-rest-apc-calls-using-postman)
+  - [.NET HttpClient APC requests](#b-make-apc-requests-with-net-httpclient)
     - [HttpClient APC Verify Device Location Request](#http-apc-call-2-verify-device-location)
     - [HttpClient APC Number Verification Request](#http-apc-call-4-number-verification)
-    - [APC SDK Call #2: Device Location](#apc-call-2-device-location)
-    - [APC SDK Call #3: Number verification](#apc-call-4-number-verification)
----
 
 ### Prerequisites
 
@@ -295,7 +296,7 @@ ProgrammableConnectivityClient apcClient = new ProgrammableConnectivityClient(ap
 
 ![Console app APC SDK setup with auth](image-1.png)
 
-#### Make APC requests
+#### Make APC SDK requests
 
 For each call that you make to APC with the SDK, you will follow the same pattern:
 * Create a client `apcClient = new ProgrammableConnectivityClient()`
@@ -577,29 +578,13 @@ In this section, we explore how Azure Programmable Connectivity (APC) can be int
 ### Contents
 
 - [Architecture](#architecture)
-- [Exercise: Deploying and Testing a Demo Application](#exercise-deploying-and-testing-a-demo-application)
-  - [APC Requests from the Front End](#apc-requests-from-the-front-end)
-  - [Network Limitations](#network-limitations)
-  - [Dependency Injection for APC SDK, HTTP Client, and MockService](#dependency-injection-for-apc-sdk-http-client-and-mockservice)
-  - [Number Verification Flow](#number-verification-flow)
-  - [Device Location](#device-location)
-
-
----
-- [Part 2: Advanced Use Case - Integrating APC into a Banking App](#part-2-advanced-use-case---integrating-apc-into-a-banking-app)
-  - [Architecture](#architecture)
-  - [Advanced Integration Details](#advanced-integration-details)
-    - [React Service Calling APC](#react-service-calling-apc)
-    - [APC Proxy SDK Usage](#apc-proxy-sdk-usage)
-    - [Dependency Injection for SDK + HttpClient](#dependency-injection-for-sdk--httpclient)
-    - [Handling Redirections for Number Verification](#handling-redirections-for-number-verification)
-  - [Exercise: Deploying and Testing a Demo Banking Application](#exercise-deploying-and-testing-a-demo-banking-application)
-    - [Prerequisites](#prerequisites-1)
-    - [Run APC Proxy](#run-apc-proxy)
-    - [Run Local Client](#run-local-client)
-    - [Mobile Testing](#mobile-testing)
----
-
+- [Exercise: Deploying and Testing a Demo Banking Application](#exercise-deploying-and-testing-a-demo-banking-application)
+- [Advanced Integration Details](#advanced-integration-details)
+  - [React Service Calling APC](#react-service-calling-apc)
+  - [APC Proxy SDK Usage](#apc-proxy-sdk-usage)
+  - [Dependency Injection for SDK + HttpClient](#dependency-injection-for-sdk--httpclient)
+  - [Handling Consent Permission for Location Number Verification](#handling-consent-permission-for-location-number-verification)
+  - [Handling Redirections for Number Verification](#handling-redirections-for-number-verification)
 
 ### Architecture
 

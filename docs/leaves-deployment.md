@@ -143,7 +143,7 @@ To authenticate and access the APC Gateway, create a Microsoft Entra application
 6. **Runtime stack**: Choose **.NET 8**.
 7. **Operating System**: Select your preferred OS (Windows or Linux).
 8. **Region**: Choose the region that is closest to your users or other services.
-9. **Prigcing plan**: Create or select an existing pricing plan. For development use F1 Free shared plan or better.
+9. **Pricing plan**: Create or select an existing pricing plan. For development use F1 Free shared plan or better.
 10. **Review and create**: Review the configuration details, then click **Create** to provision and deploy the web app.
 
    ![alt text](image-6.png)
