@@ -170,9 +170,10 @@ To authenticate and access the APC Gateway, create a Microsoft Entra application
 
 Use an IDE such as [Visual Studio Code](https://learn.microsoft.com/en-us/aspnet/core/tutorials/publish-to-azure-webapp-using-vscode?view=aspnetcore-8.0#publish-to-azure), [Visual Studio](https://learn.microsoft.com/en-us/visualstudio/deployment/quickstart-deploy-aspnet-web-app?view=vs-2022&tabs=azure) or similar to deploy to the newly created web app or follow these steps to do it with Azure CLI:
 
-1. **Set Azure Subscription.** Replace `<subscription-name-or-id>` with your actual subscription name or ID.
+1. **Login and set Azure Subscription.** Replace `<subscription-name-or-id>` with your actual subscription name or ID.
 
    ```bash
+   az login
    az account set --subscription "<subscription-name-or-id>"
    ```
 
@@ -197,9 +198,9 @@ Use the Azure CLI to upload and deploy the ZIP file to your Azure WebApp. Replac
    az webapp deployment source config-zip --resource-group rg-HOL-lab --name apc-hol-leavesbank-service --src "./publish.zip"
    ```
 
-5. Once done, **Open the swagger UI url int the browser for verification**
+5. Once done, **Open the swagger UI url in the browser for verification**
    ```
-      https://localhost:7127/swagger/index.html
+      https://YOUR-WEB-APP-UI.azurewebsite.net/swagger/index.html
    ```
 
 
@@ -209,32 +210,47 @@ Use the Azure CLI to upload and deploy the ZIP file to your Azure WebApp. Replac
 
 To set up and run the project locally, follow these steps:
 
-1. **Navigate to the React Native App Directory**
+1. **Create an Expo Account**
+   - Visit [Expo](https://expo.dev/signup) and sign up for an account.
+   - After signing up, verify your email to activate your account.
+
+2. **Login via Terminal**
+   - Open your terminal and run the following command to login to your Expo account:
+     ```
+     npx expo login
+     ```
+   - Enter your Expo credentials when prompted.
+
+3. **Navigate to the React Native App Directory**
    ```
    cd [Repo path]/APC.MobileApp/ReactNative
    ```
 
-2. **Install Dependencies**
+4. **Install Dependencies**
    ```
    npm install
    ```
 
-3. **Configure Environment Variables for Expo**
+![FE env variables](image-17.png)
+5. **Configure Environment Variables for Expo**
 - Create a `.env` file in the root directory of the React Native project (*src/APC.MobileApp/ReactNative*)
-- Add a variable named `API_URL` and set as value the Azure App Service uri for the backend service APC Proxy you deployed in an earlier step, or the local address for the locally running instance if you wish to test the backend locally.
+- Set`API_URL` value with the Azure App Service uri for the backend service APC Proxy you deployed in an earlier step, or the local address for the locally running instance if you wish to test the backend locally.
+- Set `BING_KEY` with your own API KEY for bing maps or register and generate one (TODO WIP)
 
   ```
   API_URL=your-app-service-uri
+  BING_URL=https://dev.virtualearth.net/REST/v1
+  BING_KEY=your-bing-api-key
   ```
 
    ![FE env variables](image-17.png)
 
-4. **Start the Application**
+6. **Start the Application**
    ```
    npm start
    ```
 
-5. **Open in a Web Browser**
+7. **Open in a Web Browser**
 - Once the process is complete, the Metro Bundler should be running in your terminal. Press `W` to open the app in your web browser. Use responsive mode when opening the developer console with F12.
 
    ![alt text](image-12.png)

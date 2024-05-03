@@ -1145,5 +1145,3 @@ public class DeviceLocationVerificationResult
 ```
 ![alt text](image-29.png)
 
-### Arch diagram
-![Arch](imgs/004-apc-app-arch.jpg)
