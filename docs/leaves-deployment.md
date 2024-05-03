@@ -21,11 +21,10 @@ Deploying an APC Gateway in Azure is a straightforward process that involves the
 
 1. In the Azure portal, search for **APC Gateways** and then select **Create**.
 
-   ![Search for APC Gateway](./hol/imgs/001-01-set-up-portal-create.jpg)
-
+   ![Search for APC Gateway](image-18.png)
 2. Select your **Subscription**, **Resource Group**, and **Region**.
 
-   ![Create APC Gateway](./hol/imgs/001-02-set-up-portal-create-step1.jpg)
+   ![Create APC Gateway](image-19.png)
 
 3. Provide a unique **Name** for your gateway and proceed to the next steps.
 
@@ -35,7 +34,7 @@ Once your gateway is created, you'll need to configure it:
 
 2. Complete the application details, which will be shared with the operator for validation.
 
-   ![Configure APC](./hol/imgs/001-02-set-up-portal-create-step2.jpg)
+   ![Configure APC](image-20.png)
 
 3. Agree to the operators' terms and conditions to finalize the setup.
 
@@ -43,7 +42,7 @@ Now, note down relevant resource information for later steps:
 
 1. Navigate to your APC Gateway resource in the Azure portal and copy the `resource Id` and the `endpoint` value:
 
-   ![APC Gateway resource](./hol/image-38.png)
+   ![APC Gateway resource](image-21.png)
 
 #### Set up authentication
 
@@ -56,7 +55,7 @@ To authenticate and access the APC Gateway, create a Microsoft Entra application
     1. Select a supported account type, which determines who can use the application. For the exercises in this lab it won´t matter since we are using a client credentials flow with Client Id and secret.
     1. Select **Register**.
 
-    ![App Registration](./hol/image-40.png)
+    ![App Registration](image-22.png)
 
 2. Create and record the application client ID and client secret or certificate for future use.
     1. Browse to **Identity** > **Applications** > **App registrations**, then select your application.
@@ -65,7 +64,7 @@ To authenticate and access the APC Gateway, create a Microsoft Entra application
     1. Provide a description of the secret, and a duration.
     1. Select **Add**.
 
-   ![Record Client Secret](./hol/image-34.png)
+   ![Record Client Secret](image-23.png)
 
 3. Assign the necessary role to interact with the APC Gateway to your application by running the following Azure CLI command. Replace or assign values to `$SUB_ID` with your subscription id, `RG_NAME` with resource group name where the APC Gateway resource is and `$GATEWAY_NAME` for and the APC Gateway resource name. Log in using `az login` if you have to:
 
