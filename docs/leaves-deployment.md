@@ -66,55 +66,59 @@ To authenticate and access the APC Gateway, create a Microsoft Entra application
 
    ![Record Client Secret](image-23.png)
 
-3. Assign the necessary role to interact with the APC Gateway to your application by running the following Azure CLI command. Replace or assign values to `$SUB_ID` with your subscription id, `RG_NAME` with resource group name where the APC Gateway resource is and `$GATEWAY_NAME` for and the APC Gateway resource name. Log in using `az login` if you have to:
+3. Assign the necessary role to interact with the APC Gateway to your application by running the following Azure CLI command. Replace or assign values to `$SUB_ID` with your subscription id, `$RG_NAME` with resource group name where the APC Gateway resource is and `$GATEWAY_NAME` for and the APC Gateway resource name. Replace `$APP_ID` with the client Id from the authentication step. Log in using `az login` if you have to:
 
-```sh
-az role assignment create --role 609c0c20-e0a0-4a71-b99f-e7e755ac493d
---scope /subscriptions/$SUB_ID/resourceGroups/$RG_NAME/providers/Microsoft.ProgrammableConnectivity/gateways/$GATEWAY_NAME
---assignee $APP_ID
-```
+   ```sh
+   az role assignment create --role 609c0c20-e0a0-4a71-b99f-e7e755ac493d
+   --scope /subscriptions/$SUB_ID/resourceGroups/$RG_NAME/providers/Microsoft.ProgrammableConnectivity/gateways/$GATEWAY_NAME
+   --assignee $APP_ID
+   ```
 
 
 ## Backend configuration and deployment
 
 ### Build and configure the backend service locally
 
-For local testing and development, you will need to update up the `appsettings.Development.json` file with the necessary configurations:
-
-```json
-{
-   "APCClientSettings": {
-   "AuthAppCredentials": {
-      "ClientId": "your-client-id",
-      "TenantId": "your-tenant-id",
-      "ClientSecret": "your-client-secret"
-   },
-   "GatewayId": "your-gateway-id",
-   "BaseUri": "https://your-apc-endpoint"
-   }
-}
-```
-
-Find detailed application settings in the [implementation details file](implementation-details.md)
-
 #### Run the backend locally
 
-1. **Navigate to the Backend Service Directory**
+1. **Clone the Project**
+   ```
+   git clone https://github.com/MSFT-SMT-ACCELERATORS/APC-Demo-App.git
+   ```
+
+2. **Navigate to the Backend Service Directory**
    ```
    cd [Repo path]/APC.Proxy.API
    ```
+3. update up the `appsettings.Development.json` file with the necessary configurations:
 
-2. **Build the Project**
+   ```json
+   {
+      "APCClientSettings": {
+      "AuthAppCredentials": {
+         "ClientId": "your-client-id",
+         "TenantId": "your-tenant-id",
+         "ClientSecret": "your-client-secret"
+      },
+      "GatewayId": "your-gateway-id",
+      "BaseUri": "https://your-apc-endpoint"
+      }
+   }
+   ```
+
+   Find more information on the application settings for this app in the [implementation details file](implementation-details.md)
+
+4. **Build the Project**
    ```
    dotnet build
    ```
 
-3. **Run the Backend Service**
+5. **Run the Backend Service**
    ```
    dotnet run --project APC.ProxyServer
    ```
 
-4. **Open the swagger UI url int the browser for testing**. Make sure the port is correct and the uri is HTTP, not HTTPS.
+6. **Open the swagger UI url int the browser for testing**. Make sure the port is correct and the uri is HTTP, not HTTPS.
    
    ![alt text](image-14.png)
 
@@ -205,22 +209,17 @@ Use the Azure CLI to upload and deploy the ZIP file to your Azure WebApp. Replac
 
 To set up and run the project locally, follow these steps:
 
-1. **Clone the Project**
-   ```
-   git clone https://github.com/MSFT-SMT-ACCELERATORS/APC-Demo-App.git
-   ```
-
-2. **Navigate to the React Native App Directory**
+1. **Navigate to the React Native App Directory**
    ```
    cd [Repo path]/APC.MobileApp/ReactNative
    ```
 
-3. **Install Dependencies**
+2. **Install Dependencies**
    ```
    npm install
    ```
 
-4. **Configure Environment Variables for Expo**
+3. **Configure Environment Variables for Expo**
 - Create a `.env` file in the root directory of the React Native project (*src/APC.MobileApp/ReactNative*)
 - Add a variable named `API_URL` and set as value the Azure App Service uri for the backend service APC Proxy you deployed in an earlier step, or the local address for the locally running instance if you wish to test the backend locally.
 
@@ -235,7 +234,7 @@ To set up and run the project locally, follow these steps:
    npm start
    ```
 
-6. **Open in a Web Browser**
+5. **Open in a Web Browser**
 - Once the process is complete, the Metro Bundler should be running in your terminal. Press `W` to open the app in your web browser. Use responsive mode when opening the developer console with F12.
 
    ![alt text](image-12.png)
