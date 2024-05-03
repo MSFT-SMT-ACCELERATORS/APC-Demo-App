@@ -8,7 +8,7 @@ const processQueue = async () => {
     if (isLogging || logQueue.length === 0) return;
 
     isLogging = true;
-    const currentLog = logQueue.shift(); // Obtiene el primer elemento de la cola
+    const currentLog = logQueue.shift();
 
     let logs = (await AsyncStorage.getItem("log")) || "";
     logs += `${currentLog}\n`;
@@ -16,7 +16,7 @@ const processQueue = async () => {
     await AsyncStorage.setItem("log", logs).then(() => {
         isLogging = false;
         if (logQueue.length > 0) {
-            processQueue(); // Procesa el siguiente elemento en la cola si hay alguno
+            processQueue(); 
         }
     });
 };

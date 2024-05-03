@@ -23,6 +23,8 @@ import CustomModal from '../components/CustomModal';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { Logger } from '../utils/Logger';
 
+
+
 interface StepProps {
   setProgress: (progress: number) => void;
   setLoading: (isLoading: boolean) => void;
@@ -47,7 +49,6 @@ const isSmallScreen = screenWidth < 200;
 const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
   const navigation = useNavigation();
   const apiClient = useApiClient();
-  const { setCurrentStep } = useStep();
   const { control, handleSubmit } = useForm();
 
   const [tooltipVisible, setTooltipVisible] = useState<boolean>(false);
@@ -73,11 +74,7 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
     setIcon(iconName);
     setColorIcon(iconColor);
   };
-
-  const sleep = (milliseconds: number): Promise<void> => {
-    return new Promise(resolve => setTimeout(resolve, milliseconds));
-  };
-
+  
   const onFormValid = async (data: FieldValues) => {
     Logger.log(data);
     setLoading(true, "Validating your data...");
@@ -124,9 +121,6 @@ const StarterPage: React.FC<StepProps> = ({ setProgress, setLoading }) => {
     return unsubscribe;
   }, [navigation]);
 
-  // useEffect(() => {
-  //   setCurrentStep(2);
-  // }, [setCurrentStep]);
 
   useEffect(() => {
     readConfigurations().then(setConfig);

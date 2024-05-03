@@ -2,13 +2,12 @@ import * as Network from 'expo-network';
 import * as Location from 'expo-location';
 import { Platform } from 'react-native';
 import axios from 'axios'
-import { storeConfigurations, readConfigurations, updateConfiguration, AppConfiguration, ConnectionMode } from './SettingsService'
-import { useApiClient } from '../api/ApiClientProvider';
+import { readConfigurations, ConnectionMode } from './SettingsService'
 import { APCApi, AuthApi, Configuration } from '../api/generated';
 import * as BingService from './BingService'
 import { LocationObjectCoords } from 'expo-location';
 import { Logger } from '../utils/Logger';
-
+import {API_URL} from '@env';
 
 export interface Position {
     coords: LocationObjectCoords;
@@ -19,11 +18,12 @@ const sleep = (milliseconds: number): Promise<void> => {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
 };
 
+
 export const verificateAPCLocation = async (apiClient: APCApi, coords: LocationObjectCoords) => {
     const config = await readConfigurations();
 
     const ip = await ipify();
-    let accuracy = coords.accuracy === null ? 2 : coords.accuracy;   //Accuracy should be between 2-200 both included
+    let accuracy = coords.accuracy === null ? 2 : coords.accuracy;   //Accuracy should be between 2-20 both included, APC limits
     accuracy = accuracy <= 1 ? 2 : accuracy;
     accuracy = accuracy > 20 ? 20 : accuracy;
     if (config.connectionMode == ConnectionMode.Offline) {
@@ -90,11 +90,8 @@ export const getNetworkCode = async (apiClient: APCApi): Promise<string> => {
 
     const config = await readConfigurations();
     if (config.connectionMode == ConnectionMode.Mock || config.connectionMode == ConnectionMode.Offline) {
-        return 'Telefonica_Spain'
+        return ''
     }
-
-    // const mockHeader = config.connectionMode == ConnectionMode.Mock ? { headers: { 'X-Use-Mock': true } } : undefined;
-    //'90.167.43.219'
 
     const ip = await ipify();
 
@@ -102,7 +99,6 @@ export const getNetworkCode = async (apiClient: APCApi): Promise<string> => {
         identifierType: 'IPv4',
         identifier: ip
     });
-    // Logger.log("Respuesta completa:", JSON.stringify(response, null, 2));
 
     Logger.log("CODE: " + response.data.networkCode);
     return response.data.networkCode ?? 'Empty';
@@ -161,33 +157,6 @@ export const getDeviceGPSLocation = async () => {
 
 }
 
-// export const getDeviceGPSLocation = async () => {
-//     async function getLocationPermission() {
-//         Logger.log("Requesting gps permission...");
-//         const { status } = await Location.requestForegroundPermissionsAsync();
-//         if (status !== 'granted') {
-//             Logger.error('Permission to access location was denied');
-//             return;
-//         }
-//         Logger.log("Requesting gps permission... OK");
-//     }
-
-//     const config = await readConfigurations();
-//     await getLocationPermission();
-
-//     let location: Location.LocationObject;
-//     Logger.log("Getting current position...");
-
-//     location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-//     let coords = location.coords;
-//     coords = getLocationCoords(41.3851, 2.1734, 0);
-//     Logger.log("Getting current position... OK");
-
-//     const bingLocation = config.connectionMode != ConnectionMode.Offline ? await BingService.translateCoordsToLocation(coords) : undefined;
-
-//     return { coords: coords, location: bingLocation } as Position;
-
-// }
 
 export const getLocationCoords = (latitude: number, longitude: number, accuracy: number = 200) => {
     return {
