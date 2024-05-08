@@ -166,6 +166,8 @@ Before starting your journey with Azure Programmable Connectivity (APC), make su
 
 - **Development Environment**: Set up your preferred IDE or code editor, such as Visual Studio Code or Visual Studio, configured for console app development.
 
+- **Cellular Network Connection**: Ensure that your development environment is connected to a supported cellular network. This could be via a mobile hotspot connection from a mobile device or through a 4G/5G router equipped with a SIM card. [Read more about supported cellular connections for these exercises](#network-limitations)
+
 #### Create APC Gateway Instance
 
 * Follow the [guide](https://learn.microsoft.com/azure/programmable-connectivity/azure-programmable-connectivity-create-gateway) to create a gateway, or have one already.
@@ -185,7 +187,13 @@ Deploying an APC Gateway in Azure is a straightforward process that involves the
 
 Once your gateway is created, you'll need to configure it:
 
-1. Assign the telecom operator setup, selecting the appropriate APIs and plans.
+1. Assign the telecom operator setup for the cellular network you'll be using and selecting the the Network API plans for:
+
+    - Location
+    - SIM Swap
+    - Number Verification
+
+    ![alt text](image-47.png)
 
 2. Complete the application details, which will be shared with the operator for validation.
 
@@ -220,15 +228,15 @@ To authenticate and access the APC Gateway, create a Microsoft Entra application
     1. Provide a description of the secret, and a duration.
     1. Select **Add**.
 
-![Record Client Secret](image-34.png)
+        ![Record Client Secret](image-34.png)
 
 3. Assign the necessary role to interact with the APC Gateway to your application by running the following Azure CLI command. Replace or assign values to `$SUB_ID` with your subscription id, `RG_NAME` with resource group name where the APC Gateway resource is and `$GATEWAY_NAME` for and the APC Gateway resource name. Log in using `az login` if you have to:
 
-```sh
-az role assignment create --role 609c0c20-e0a0-4a71-b99f-e7e755ac493d
---scope /subscriptions/$SUB_ID/resourceGroups/$RG_NAME/providers/Microsoft.ProgrammableConnectivity/gateways/$GATEWAY_NAME
---assignee $APP_ID
-```
+    ```sh
+    az role assignment create --role 609c0c20-e0a0-4a71-b99f-e7e755ac493d
+    --scope /subscriptions/$SUB_ID/resourceGroups/$RG_NAME/providers/Microsoft.ProgrammableConnectivity/gateways/$GATEWAY_NAME
+    --assignee $APP_ID
+    ```
 
 ### Use Network APIs with the APC SDK Client
 
@@ -246,16 +254,16 @@ To start using the Azure Programmable Connectivity (APC) SDK, you'll need to cre
 
 With your project created, the next step is to install the APC SDK:
 
-1. Use the NuGet Package Manager and search for `Azure.Communication.ProgrammableConnectivity`.
-2. Install the latest stable version of the SDK to your project.
+1. Use the NuGet Package Manager and search for `Azure.Communication.ProgrammableConnectivity` and install the latest stable version of the SDK to your project.
 
-![APC SDK nugget install](image-41.png) TODO Repalce with actual Nuget
+    ![APC SDK nugget install](image-41.png)
+    **TODO Repalce with actual APC SDK Nuget picture**
 
-or use dotnet CLI to install the NuGet Package from the project folder path:
+2. or use dotnet CLI to install the NuGet Package from the project folder path:
 
-```sh
-dotnet add package Azure.Communication.ProgrammableConnectivity --prerelease
-```
+    ```sh
+    dotnet add package Azure.Communication.ProgrammableConnectivity --prerelease
+    ```
 
 #### Instanciate an authenticated client
 
@@ -263,36 +271,36 @@ The client library uses [`Azure.Identity`](https://learn.microsoft.com/dotnet/ap
 
 1. Install Azure.Identity nugget package with the Nuget Package Manager or with the following command:
 
-```sh
-dotnet add package Azure.Identity
-```
+    ```sh
+    dotnet add package Azure.Identity
+    ```
 
-![Azure.Identity nugget install](image-41.png)
+    ![Azure.Identity nugget install](image-41.png)
 
 2. In Program.cs, create values for the recorded APC Gateway information and Entra client credentials from earlier steps.
 
-```csharp
-// Setup your APC endpoint and gateway resource id here
-var apcEndpoint = "https://eastus.prod.apcgatewayapi.azure.com";
-var apcGatewayId = "/subscriptions/$your-subscription-id/resourceGroups/$your-resource-group/providers/Microsoft.programmableconnectivity/gateways/$your-gateway-name";
+    ```csharp
+    // Setup your APC endpoint and gateway resource id here
+    var apcEndpoint = "https://eastus.prod.apcgatewayapi.azure.com";
+    var apcGatewayId = "/subscriptions/$your-subscription-id/resourceGroups/$your-resource-group/providers/Microsoft.programmableconnectivity/gateways/$your-gateway-name";
 
-// Your Azure Entra application's details
-var clientId = "your-application-client-id";
-var clientSecret = "your-application-client-secret";
-var tenantId = "your-tenant-id";
-```
+    // Your Azure Entra application's details
+    var clientId = "your-application-client-id";
+    var clientSecret = "your-application-client-secret";
+    var tenantId = "your-tenant-id";
+    ```
 
 3. Obtain client credential by implementing this authentication logic in your application using the noted clientId and clientSecret from the authentication section in prerequisites.
 
-```csharp
-TokenCredential credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
-```
+    ```csharp
+    TokenCredential credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+    ```
 
 3. Instanciate the SDK client using:
 
-```csharp
-ProgrammableConnectivityClient apcClient = new ProgrammableConnectivityClient(apcEndpoint, credential);
-```
+    ```csharp
+    ProgrammableConnectivityClient apcClient = new ProgrammableConnectivityClient(apcEndpoint, credential);
+    ```
 
 ![Console app APC SDK setup with auth](image-1.png)
 
@@ -305,6 +313,8 @@ For each call that you make to APC with the SDK, you will follow the same patter
 * Call the client with the content you've created
 * Access the result
 
+**Reminder:** As noted in the prerequisites, make sure that your device is connected to a cellular network (via a mobile hotspot or a 4G/5G router with a SIM card) while performing these requests. This is crucial for successfully testing and validating features that require real network interactions, such as device network retrieval or number verification.
+
 ##### APC SDK: Retrieve Network Information
 
 To make APC operator API calls, you'll need the network identifier for the cellular network device address you are calling from. More informtion on this APC Call: [Device Network](#device-network).
@@ -312,26 +322,34 @@ To make APC operator API calls, you'll need the network identifier for the cellu
 
 1. Access the subclient for the device network from the base client created earlier `apcClient`:
 
-```csharp
-// Retrieve network information
-var deviceNetworkApcClient = apcClient.GetDeviceNetworkClient();
-```
+    ```csharp
+    // Retrieve network information
+    var deviceNetworkApcClient = apcClient.GetDeviceNetworkClient();
+    ```
 
-2. Create the device-network request content using the SDK class `Networkidentifier`. Use `phone-number` to retrieve your public ip. APC will identify which is operator network is managing it:
+2. **Retrieve the Local IP Address:** Add code to dynamically retrieve the IP address of the network interface that is up and running and not a loopback interface.
 
-```csharp
-// TODO get actual IP and test
-var networkIdentifier = new NetworkIdentifier("IPv4", "176.83.74.44");
-```
+    ```csharp
+    // Retrieve the local IP address dynamically
+    var host = Dns.GetHostEntry(Dns.GetHostName());
+    var localIP = host.AddressList.FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+    ```
+
+
+2. Create the device-network request content using the SDK class `Networkidentifier`. Use the previously obtained public ip. APC will identify which operator network is managing it:
+
+    ```csharp
+    var networkIdentifier = new NetworkIdentifier("IPv4", localIP.ToString());
+    ```
 
 3. Retrieve the device-network response:
 
-```csharp
-Response<NetworkRetrievalResult> response = deviceNetworkApcClient.Retrieve(ApcGatewayId, networkIdentifier);
-Console.WriteLine($"Network Identifier result: {networkResponse.Value}");
-```
+    ```csharp
+    Response<NetworkRetrievalResult> response = deviceNetworkApcClient.Retrieve(ApcGatewayId, networkIdentifier);
+    Console.WriteLine($"Network Identifier result: {networkResponse.Value}");
+    ```
 
-![alt text](image-3.png)
+![alt text](image-46.png)
 
 
 ##### APC SDK: Sim Swap retrieve/verify
@@ -340,27 +358,27 @@ Once you have the client configured and retrieved the network identifier, procee
 
 1. Add code to access the subclient for sim-swap from the base client created earlier `apcClient`:
 
-```csharp
-var deviceNetworkApcClient = apcClient.GetSimSwapClient()
-```
+    ```csharp
+    var deviceNetworkApcClient = apcClient.GetSimSwapClient()
+    ```
 
 2. Create the sim-swap request content using the SDK class `SimSwapVerificationContent`. PhoneNumber `phone-number` with your actual number associated with the cellular network you are using. Include the country code. You should have the cellular network identifier in the previous request:
 
-```csharp
-// Retrieve SIM swap verification
-SimSwapVerificationContent simSwapContent = new SimSwapVerificationContent(new NetworkIdentifier("NetworkCode", networkResponse.Value.NetworkCode))
-{
-    PhoneNumber = "+00number-with-countrycode",
-    MaxAgeHours = 240
-};
-```
+    ```csharp
+    // Retrieve SIM swap verification
+    SimSwapVerificationContent simSwapContent = new SimSwapVerificationContent(new NetworkIdentifier("NetworkCode", networkResponse.Value.NetworkCode))
+    {
+        PhoneNumber = "+00number-with-countrycode",
+        MaxAgeHours = 240
+    };
+    ```
 
 3. Retrieve the device-network response:
 
-```csharp
-Response<SimSwapVerificationResult> response = client.Verify(ApcGatewayId, content);
-Console.WriteLine($"Verification result: {response.Value.VerificationResult}");
-```
+    ```csharp
+    Response<SimSwapVerificationResult> response = client.Verify(ApcGatewayId, content);
+    Console.WriteLine($"Verification result: {response.Value.VerificationResult}");
+    ```
 
 ![alt text](image-5.png)
 
@@ -383,30 +401,32 @@ To make authenticated requests to APC using REST HTTP calls, follow the process 
 - Send the request
 - Access the result
 
+**Reminder:** As noted in the prerequisites, make sure that your device is connected to a cellular network (via a mobile hotspot or a 4G/5G router with a SIM card) while performing these requests. This is crucial for successfully testing and validating features that require real network interactions, such as device network retrieval or number verification.
+
 ##### Setup: Configure Postman for Authenticated Requests to APC
 
 To make authenticated requests to the APC API, you need to set up Postman with the correct authorization headers. Here are the steps to configure Postman:
 
 1. Open Postman, click import and drag the collection linked in this repo [Link to APC Postman collection](apc-postman.json)
 
-![Import collection](image-6.png)
+    ![Import collection](image-6.png)
 
 2. Double click the collection name that appeared on the collection side menu and go to the tab `Variables`. From there, update the `auth-secret`, `auth-clientId`, `auth-tenantid` and also the `apc-id` and `endpont` values. 
 
-![Collection auth var](image-30.png)
-![Collection APC Gateway id var](image-33.png)
+    ![Collection auth var](image-30.png)
+    ![Collection APC Gateway id var](image-33.png)
 
 3. Click save or press `Ctrl+S` and go to the tab `Authorization`
 
-![Collection auth tab](image-7.png)
+    ![Collection auth tab](image-7.png)
 
 4. Scroll down to `Configure New Token` advanced section and click the button `Generate New Access Token`
 
-![Collection Get new token](image-32.png)
+    ![Collection Get new token](image-32.png)
 
 5. Once succeeded, select `Use Token`. This token will be valid for 1 hour. You can skip to the Generate New Token step every time it expires.
 
-![Collection use token](image-31.png)
+    ![Collection use token](image-31.png)
 
 
 ##### Postman APC SimSwap Verify Request
@@ -415,36 +435,42 @@ To make APC operator API calls, you'll need the network identifier for the cellu
 
 1. Navigate to `network:retrive` request
 
-![alt text](image-42.png)
+  ![alt text](image-42.png)
 
-2. Adjust the request payload in the `Body` tab
+2. **Obtain Your Public IP Address**: Before adjusting the request payload, you need to obtain the public IP address of your cellular connection. You can do this by:
+   
+   - **Using Postman Echo Service**: Postman provides a free service that echoes the requests made to it. Send a request to `https://postman-echo.com/ip`, and it will return your public IP address. You can then copy this IP address into your APC request.
+   
+   - **Alternative Method**:
+     If you prefer using an online tool, visit a website such as `https://www.whatismyip.com` from your device connected via the cellular network to find out your public IP address.
 
-For the `identifier` property use your public IP for you cellular connection. TODO explain how
+3. **Adjust the Request Payload in the `Body` Tab**
+   With your public IP address in hand, adjust the payload under the `Body` tab of your request. Replace the `identifier` value with the IP address you obtained.
 
-**Body**:
-  ```json
-  {
-      "identifierType": "IPv4",
-      "identifier": "176.83.74.44"
-  }
-  ```
+   **Body**:
+   ```json
+   {
+       "identifierType": "IPv4",
+       "identifier": "<your-public-IP-using-cellular-network>"
+   }
+    ```
 
-![alt text](image-43.png)
+    ![alt text](image-43.png)
 
 3. Click `Send` and view the response
 
-![alt text](image-11.png)
+    ![alt text](image-11.png)
 
 ##### Postman APC SimSwap Verify Request
 
 1. Navigate to `sim-swap:verify` request
 
-![alt text](image-44.png)
+    ![alt text](image-44.png)
 
 2. Adjust the request payload in the `Body` tab
 
-- For the `networkIdentifier.identifier` property should contain the result from the network retrieve request you made earlier.
-- `phoneNumber` property should contain the phone number including country code **you are using for cellular network connectiviy**.
+    - For the `networkIdentifier.identifier` property should contain the result from the network retrieve request you made earlier.
+    - `phoneNumber` property should contain the phone number including country code **you are using for cellular network connectiviy**.
 
 More information on properties for this Network API: [Sim Swap Detection](#sim-swap-detection)
 
@@ -460,12 +486,11 @@ Here's an example for the request payload to perform a SIM Swap verify:
     }
   }
   ```
-
-![alt text](image-10.png)
+  ![alt text](image-10.png)
 
 3. Click `Send` and view the response
 
-![alt text](image-11.png)
+  ![alt text](image-11.png)
 
 #### B. Make APC requests with .NET HttpClient
 
@@ -475,66 +500,87 @@ You can also use the .NET HttpClient to make authenticated calls to APC. Here's 
 1. Create a Console App project in Net8.0 in your preferred IDE.
 2. In Program.cs, create values for the recorded APC Gateway information and Entra client credentials from earlier steps.
 
-```csharp
-// Setup your APC endpoint and gateway resource id here
-var apcEndpoint = "https://eastus.prod.apcgatewayapi.azure.com";
-var apcGatewayId = "/subscriptions/$your-subscription-id/resourceGroups/$your-resource-group/providers/Microsoft.programmableconnectivity/gateways/$your-gateway-name";
+    ```csharp
+    // Setup your APC endpoint and gateway resource id here
+    var apcEndpoint = "https://eastus.prod.apcgatewayapi.azure.com";
+    var apcGatewayId = "/subscriptions/$your-subscription-id/resourceGroups/$your-resource-group/providers/Microsoft.programmableconnectivity/gateways/$your-gateway-name";
 
-// Your Azure Entra application's details
-var clientId = "your-application-client-id";
-var clientSecret = "your-application-client-secret";
-var tenantId = "your-tenant-id";
-```
+    // Your Azure Entra application's details
+    var clientId = "your-application-client-id";
+    var clientSecret = "your-application-client-secret";
+    var tenantId = "your-tenant-id";
+    ```
 
 3. Install Azure.Identity nugget package with the Nuget Package Manager or with the following command:
 
-```sh
-dotnet add package Azure.Identity
-```
+    ```sh
+    dotnet add package Azure.Identity
+    ```
 
-![Azure.Identity nugget install](image-41.png)
+    ![Azure.Identity nugget install](image-41.png)
 
 4. Add the following code to Retrieve a token for your HttpClient.:
-```csharp
-// Authentication with Azure AD to obtain Bearer Token.
-var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
-var token = await credential.GetTokenAsync(new Azure.Core.TokenRequestContext(new[] { "https://management.azure.com/.default" }));
-string accessToken = token.Token;
-```
+    ```csharp
+    // Authentication with Azure AD to obtain Bearer Token.
+    var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+    var token = await credential.GetTokenAsync(new Azure.Core.TokenRequestContext(new[] { "https://management.azure.com/.default" }));
+    string accessToken = token.Token;
+    ```
 
 5. Add the required headers to call APC using a REST client:
-```csharp
-// Prepare the HttpClient with the Bearer token and common headers.
-using var httpClient = new HttpClient();
-httpClient.BaseAddress = new Uri(baseUrl);
-httpClient.DefaultRequestHeaders.Add("apc-gateway-id", apcGatewayId);
-httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-```
+    ```csharp
+    // Prepare the HttpClient with the Bearer token and common headers.
+    using var httpClient = new HttpClient();
+    httpClient.BaseAddress = new Uri(baseUrl);
+    httpClient.DefaultRequestHeaders.Add("apc-gateway-id", apcGatewayId);
+    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+    ```
 
 Now you are ready to start calling APC API:
+
 ![alt text](image-18.png)
 
 ##### Http APC Call #1: Retrieve Network Information
 To make APC operator API calls, you'll need the network identifier for the cellular network device address you are calling from. More informtion on this APC Call: [Device Netwrok](#device-network).
 
-1. Prepare the network retrieve request content:
-```csharp
-string networkApiUrl = $"{baseUrl}/device-network/network:retrieve";
-var networkIdentifier = new
+
+2. **Retrieve the Local IP Address:** Add code to dynamically retrieve the IP address of the network interface that is up and running and not a loopback interface.
+
+    ```csharp
+    // Retrieve the local IP address dynamically
+    var host = Dns.GetHostEntry(Dns.GetHostName());
+    var localIP = host.AddressList.FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+    ```
+
+1. Prepare the network retrieve request content. Use the previously obtained public ip. APC will identify which operator network is managing it:
+
+    ```csharp
+    string networkApiUrl = $"{baseUrl}/device-network/network:retrieve";
+    var networkIdentifier = new
     {
         identifierType = "IPv4",
-        identifier = "your-ip" // phone?
+        identifier = localIP.ToString()
     };
-var networkContent = new StringContent(JsonSerializer.Serialize(networkIdentifier), Encoding.UTF8, "application/json");
-```
+    var networkContent = new StringContent(JsonSerializer.Serialize(networkIdentifier), Encoding.UTF8, "application/json");
+    ```
 
-2. Retrieve the device-network response:
-```csharp
-HttpResponseMessage networkResponse = await httpClient.PostAsync(networkApiUrl, networkContent);
-var networkResult = await JsonSerializer.DeserializeAsync<NetworkRetrievalResult>(await networkResponse.Content.ReadAsStreamAsync(), new JsonSerializerOptions{PropertyNameCaseInsensitive = true});
-Console.WriteLine($"Network retrieval result: {networkResult}");
-```
-![alt text](image-19.png)
+2. Create `NetworkRetrievalResult` class: This class will hold the result from the network retrieval call. You can place it at the end of Program.cs for simplicity.
+
+    ```csharp
+    public class NetworkRetrievalResult
+    {
+        public string NetworkCode { get; set; }
+    }
+    ```
+
+3. Retrieve the device-network response:
+
+    ```csharp
+    HttpResponseMessage networkResponse = await httpClient.PostAsync(networkApiUrl, networkContent);
+    var networkResult = await JsonSerializer.DeserializeAsync<NetworkRetrievalResult>(await networkResponse.Content.ReadAsStreamAsync(), new JsonSerializerOptions{PropertyNameCaseInsensitive = true});
+    Console.WriteLine($"Network retrieval result: {networkResult}");
+    ```
+    ![alt text](image-49.png)
 
 ##### Http APC Call #2: Verify Sim Swap
 
@@ -542,27 +588,34 @@ Once you have the HTTP client configured and retrieved the network identifier, p
 
 1. Prepare the verify sim swap content:
 
-// TODO fix networkIdentifier
+    ```csharp
+    string simSwapApiUrl = $"{baseUrl}/sim-swap/sim-swap:verify";
+    var simSwapContent = new
+    {
+        phoneNumber = "your-phone-with-country-code",
+        maxAgeHours = 240,
+        networkCode = networkResult.networkCode
+    };
+    var simSwapRequestContent = new StringContent(JsonSerializer.Serialize(simSwapContent), Encoding.UTF8, "application/json");
+    ```
 
-```csharp
-string simSwapApiUrl = $"{baseUrl}/sim-swap/sim-swap:verify";
-var simSwapContent = new
-{
-    phoneNumber = "your-phone-with-country-code",
-    maxAgeHours = 240,
-    networkCode = networkResult.networkCode
-};
-var simSwapRequestContent = new StringContent(JsonSerializer.Serialize(simSwapContent), Encoding.UTF8, "application/json");
-```
+2. Create `SimSwapVerificationResult` class: This class will hold the result from the sim swap verification call. You can place it at the end of Program.cs for simplicity.
 
-2. Retrieve the verify sim swap response:
-```csharp
-HttpResponseMessage simSwapResponse = await httpClient.PostAsync(simSwapApiUrl, simSwapRequestContent);
-var simSwapResult = await JsonSerializer.DeserializeAsync<SimSwapVerificationResult>(await simSwapResponse.Content.ReadAsStreamAsync(),
-    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-Console.WriteLine($"Sim swap verification result: {simSwapResult.VerificationResult}");
-```
-![alt text](image-21.png)
+    ```csharp
+    public class SimSwapVerificationResult
+    {
+        public bool VerificationResult  { get; set; }
+    }
+    ```
+
+3. Retrieve the verify sim swap response:
+    ```csharp
+    HttpResponseMessage simSwapResponse = await httpClient.PostAsync(simSwapApiUrl, simSwapRequestContent);
+    var simSwapResult = await JsonSerializer.DeserializeAsync<SimSwapVerificationResult>(await simSwapResponse.Content.ReadAsStreamAsync(),
+        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+    Console.WriteLine($"Sim swap verification result: {simSwapResult.VerificationResult}");
+    ```
+    ![alt text](image-50.png)
 
 (OPTIONAL) If you wish to test more APC APIs using this method, find in the annex additional REST calls with implementation details using the HttpClient approach:
 
@@ -690,6 +743,8 @@ export const checkSimChange = async (apiClient: APCApi, phoneNumber: string) => 
 ### Network Limitations
 
 For this application to use Azure Programmable Connectivity (APC) effectively, it must run over cellular networks. This requirement comes from how APC works with these networks to check and approve requests. APC uses the IP address from which a request is made as a key part of its authentication process to ensure the requests actually come from the network they say they do. This is crucial for sensitive actions like SIM swap detection or getting network-specific information.
+
+TODO add supported operator list
 
 In this demo app, the APC Proxy backend gathers network info using the IP from frontend requests and uses this IP as the identifier for further APC requests:
 
