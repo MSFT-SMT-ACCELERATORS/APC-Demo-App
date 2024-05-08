@@ -1,6 +1,24 @@
 # APC-Demo-App
 Mobile App with Cloud Service Demo consuming Azure Programmable Connectivity APIs with Telcos network APIs under the covers
 
+WIP WHAT IT DOES
+
+- screen 1 
+
+![alt text](image-27.png)
+
+- screen 2
+
+![alt text](image-28.png)
+
+- screen 1 
+
+![alt text](image-27.png)
+
+- screen 2
+
+![alt text](image-28.png)
+
 ## Architecture
 
 This section provides a brief technical description of the demo application's architecture. The application is designed to interact with APC for enhanced anti-fraud security measures such as SIM swap detection, number verification, and user location verification.
@@ -25,7 +43,7 @@ This section provides a brief technical description of the demo application's ar
 
 Find detailed implementation details in this guide: [Implementation Details](details.md) or refer to the [APC Hands on Lab](./HOL/README.md).
 
-## Get Started
+## Get Started: Deploy and Configure
 
 To **deploy and configure** this application refer to this guide: [Get Started](leaves-deployment.md)
 
