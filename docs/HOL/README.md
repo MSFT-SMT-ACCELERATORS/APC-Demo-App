@@ -741,9 +741,14 @@ export const checkSimChange = async (apiClient: APCApi, phoneNumber: string) => 
 
 ### Network Limitations
 
-For this application to use Azure Programmable Connectivity (APC) effectively, it must run over cellular networks. This requirement comes from how APC works with these networks to check and approve requests. APC uses the IP address from which a request is made as a key part of its authentication process to ensure the requests actually come from the network they say they do. This is crucial for sensitive actions like SIM swap detection or getting network-specific information.
+- Disable WiFi access for your devicec
+- **Open the application:** Use the QR as described in the [Leaves Bank app documentation](../leaves-deployment.md).
+    - If your wifi connection is active when opening the applicatiom, it will display a warning message. Using WiFi is still permited since it could be a phone sharing its cellular connection, which is valid for these HOL exercises.
+- **Click Get Started:** During the first steps, the application will make a **device-network request** to the backend where the later will capture the caller IP.
 
-TODO add supported operator list
+    ![alt text](image-52.png)
+
+For this application to use Azure Programmable Connectivity (APC) effectively, it must run over cellular networks. This requirement comes from how APC works with these networks to check and approve requests. APC uses the IP address from which a request is made as a key part of its authentication process to ensure the requests actually come from the network they say they do. This is crucial for sensitive actions like SIM swap detection or getting network-specific information.
 
 In this demo app, the APC Proxy backend gathers network info using the IP from frontend requests and uses this IP as the identifier for further APC requests:
 
@@ -776,7 +781,15 @@ Additionally, operations like number verification follow a specific process that
 
 ### Number Verification Process Overview
 
-The number verification process involves several steps where the client application, the backend service, and the APC gateway interact through direct API calls and handle redirections for proper authentication and authorization.
+- Input the phone number for the cellular network you are using.
+    - This could be either phone number for the sim card used in your device or if you are connecting to a hotspot network for this exercise, the phone number for the hotspot device. More information in [network limitations](#network-limitations).
+
+    ![alt text](image-51.png)
+- Press the checkmark icon to verify the phone number
+
+    ![alt text](image-53.png)
+
+The request the loan workflow in the demo application requires the user to do a number verification. This is done using a [Number Verification Network API request](#number-verification). This process involves several steps where the client application, the backend service, and the APC gateway interact through direct API calls and handle redirections for proper authentication and authorization during the Number verification request.
 
 #### Initial Request from Client App to Backend Service:
 1. **Client App (Leaves Bank App)** sends a request to initiate number verification.
