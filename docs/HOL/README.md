@@ -627,7 +627,6 @@ Once you have the HTTP client configured and retrieved the network identifier, p
 
 In this section, we explore how Azure Programmable Connectivity (APC) can be integrated into an example banking application, leveraging network APIs to enhance security and user experience. The sample application is detailed in this [README file](../README.md) located in the repository.
 
-
 ### Contents
 
 - [Architecture](#architecture)
@@ -674,7 +673,7 @@ This exercise assumes you completed at least the following sections from part 1:
 
 And will require
 
-- A cellular network from a supported operator TODO explain
+- **Cellular Network Connection**: Ensure that your development environment is connected to a supported cellular network. This could be via a mobile hotspot connection from a mobile device or through a 4G/5G router equipped with a SIM card. [Read more about supported cellular connections for these exercises](#network-limitations)
 - A smartphone running Android or iOS
  
 #### Setup Instructions

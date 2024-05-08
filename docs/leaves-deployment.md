@@ -146,7 +146,7 @@ To authenticate and access the APC Gateway, create a Microsoft Entra application
 9. **Pricing plan**: Create or select an existing pricing plan. For development use F1 Free shared plan or better.
 10. **Review and create**: Review the configuration details, then click **Create** to provision and deploy the web app.
 
-   ![alt text](image-6.png)
+      ![alt text](image-6.png)
 
 #### Step 2: Configure Application Settings in Azure
 
@@ -200,7 +200,7 @@ Use the Azure CLI to upload and deploy the ZIP file to your Azure WebApp. Replac
 
 5. Once done, **Open the swagger UI url in the browser for verification**
    ```
-      https://YOUR-WEB-APP-UI.azurewebsite.net/swagger/index.html
+   https://YOUR-WEB-APP-UI.azurewebsite.net/swagger/index.html
    ```
 
 
@@ -231,30 +231,43 @@ To set up and run the project locally, follow these steps:
    npm install
    ```
 
-![FE env variables](image-17.png)
-5. **Configure Environment Variables for Expo**
-- Create a `.env` file in the root directory of the React Native project (*src/APC.MobileApp/ReactNative*)
-- Set`API_URL` value with the Azure App Service uri for the backend service APC Proxy you deployed in an earlier step, or the local address for the locally running instance if you wish to test the backend locally.
-- Set `BING_KEY` with your own API KEY for bing maps or register and generate one (TODO WIP)
+5. **Create a Bing Maps Key** follow [this guide](https://learn.microsoft.com/en-us/bingmaps/getting-started/bing-maps-dev-center-help/getting-a-bing-maps-key)
+   - Visit the [Bing Maps Dev Center](https://www.bingmapsportal.com/).
+   - If you have a Bing Maps account, sign in with the Microsoft account that you used to create the account or [create a new one](https://learn.microsoft.com/en-us/bingmaps/getting-started/bing-maps-dev-center-help/creating-a-bing-maps-account).
+   - Under "My account" menu, select "My keys".
+   - Click on "Create a new key".
+   - Fill out the form to create a key. Use the following settings:
+      - **Application name**: Provide a name for your application.
+      - **Application URL**: You can leave this blank.
+      - **Key type**: Choose `Basic`.
+      - **Application type**: Select the most appropriate type for your project, such as `Mobile Application`.
+   - Submit the form and copy your new Bing Maps Key.
+   ![alt text](image-26.png)
 
-  ```
-  API_URL=your-app-service-uri
-  BING_URL=https://dev.virtualearth.net/REST/v1
-  BING_KEY=your-bing-api-key
-  ```
+6. **Configure Environment Variables for Expo**
+   - Create a `.env` file in the root directory of the React Native project (*src/APC.MobileApp/ReactNative*).
+   - Set `API_URL` with the Azure App Service URI for the backend service APC Proxy you deployed in an earlier step, or the local address if testing the backend locally.
+   - Set `BING_KEY` with the Bing Maps API key you just generated.
+
+   ```
+   API_URL=your-app-service-uri
+   BING_URL=https://dev.virtualearth.net/REST/v1
+   BING_KEY=your-bing-api-key
+   ```
 
    ![FE env variables](image-17.png)
 
-6. **Start the Application**
+7. **Start the Application**
    ```
    npm start
    ```
 
-7. **Open in a Web Browser**
-- Once the process is complete, the Metro Bundler should be running in your terminal. Press `W` to open the app in your web browser. Use responsive mode when opening the developer console with F12.
+8. **Open in a Web Browser**
+   - Once the process is complete, the Metro Bundler should be running in your terminal. Press `W` to open the app in your web browser. Use responsive mode when opening the developer console with F12.
 
    ![alt text](image-12.png)
    ![Dev Responsive](image-15.png)
+
 ### Run the app on Mobile
 
 To test the app on a mobile device, follow these additional steps:
@@ -268,14 +281,26 @@ To test the app on a mobile device, follow these additional steps:
 - Scan the QR code that appears in your terminal after you've run `npm start` from the React Native app directory.
 
    ![QR Code](img/QR.png)
+
    ![Scan QR](img/scan.png)
+
+**TODO Update with iOS screen recording**
+
 
 This will open the app on your mobile device, allowing you to test its features in a mobile environment.
 
+### Deploy the app on App Store and Play Store
 
-### Deploy the app on App Store and Play Store (WIP)
+Deploying your mobile app on the App Store and Play Store involves several steps, including enrolling in developer programs, preparing your app for release, and submitting it for review. Here's a high-level overview of the process for each platform:
 
-WIP pointers
+#### App Store (iOS)
+1. **Enroll in the Apple Developer Program**: To distribute your app on the App Store, you must be a member of the [Apple Developer Program](https://developer.apple.com/programs/). There is an annual fee associated with this membership.
+2. **Prepare Your App for Submission**: Use Xcode to archive and upload your app. Ensure that you have tested it thoroughly, have all necessary app metadata, and have complied with Apple's [App Store Review Guidelines](https://developer.apple.com/app-store/review/guidelines/).
+3. **TestFlight**: Before submitting your app for review, you may want to distribute it to testers using [TestFlight](https://developer.apple.com/testflight/), which allows you to collect valuable feedback and make improvements.
+4. **Submit Through App Store Connect**: Once your app is ready, submit it through [App Store Connect](https://appstoreconnect.apple.com/). After submission, your app will undergo Apple's review process before it can go live on the App Store.
 
-- Testflight for App Store (iOS)
-- Dev acc Play Store
+#### Play Store (Android)
+1. **Register for a Google Play Developer Account**: You need to create a [Google Play Developer account](https://play.google.com/apps/publish/signup/) to publish apps on the Play Store. This requires a one-time registration fee.
+2. **Prepare and Build Your App for Release**: Ensure your app meets Google's [Launch checklist](https://developer.android.com/distribute/best-practices/launch/launch-checklist). This includes setting the version information, configuring APK or App Bundle, and defining the app's content rating.
+3. **Test with Google Play’s Internal Testing**: Before going public, you can use Google Play’s internal testing features to distribute your app to up to 100 testers to gather feedback and make any necessary adjustments.
+4. **Publish Your App on Google Play Console**: Upload your APK or App Bundle to the Google Play Console and fill in the listing details. Then, submit your app for review. Once approved, it will be available on the Google Play Store.
