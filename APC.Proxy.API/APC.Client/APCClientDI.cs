@@ -6,7 +6,7 @@ using System.Net.Http.Headers;
 
 namespace APC.Client
 {
-    public class APCRestClient : IAPCClientDI
+    public class APCRestClient : IAPCClient
     {
         private readonly IConfidentialClientApplication _authApp;
         private readonly HttpClient _apcHttpClient;

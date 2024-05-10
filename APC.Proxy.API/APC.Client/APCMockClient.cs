@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using System.Net;
 using System.Text.Json;
 
-public class APCMockClient : IAPCClientDI
+public class APCMockClient : IAPCClient
 {
     private readonly APCMockSettings _settings;
 
@@ -22,16 +22,16 @@ public class APCMockClient : IAPCClientDI
         return Task.FromResult(response);
     }
 
-    Task<HttpResponseMessage> IAPCClientDI.DeviceLocationVerifyAsync(DeviceLocationVerificationContent request)
+    Task<HttpResponseMessage> IAPCClient.DeviceLocationVerifyAsync(DeviceLocationVerificationContent request)
         => CreateMockResponseAsync(_settings.MockDeviceLocationVerificationResult);
-    Task<HttpResponseMessage> IAPCClientDI.DeviceNetworkRetrieveAsync(NetworkIdentifier request)
+    Task<HttpResponseMessage> IAPCClient.DeviceNetworkRetrieveAsync(NetworkIdentifier request)
         => CreateMockResponseAsync(_settings.MockNetworkRetrievalResult);
-    Task<HttpResponseMessage> IAPCClientDI.NumberVerificationVerifyAsync(NumberVerificationWithoutCodeContent request)
+    Task<HttpResponseMessage> IAPCClient.NumberVerificationVerifyAsync(NumberVerificationWithoutCodeContent request)
         => CreateMockResponseAsync(_settings.MockNumberVerificationResult);
-    Task<HttpResponseMessage> IAPCClientDI.NumberVerificationCallbackVerifyAsync(NumberVerificationWithCodeContent request)
+    Task<HttpResponseMessage> IAPCClient.NumberVerificationCallbackVerifyAsync(NumberVerificationWithCodeContent request)
         => CreateMockResponseAsync(_settings.MockNumberCallbackVerificationResult);
-    Task<HttpResponseMessage> IAPCClientDI.SimSwapRetrieveAsync(SimSwapRetrievalContent request)
+    Task<HttpResponseMessage> IAPCClient.SimSwapRetrieveAsync(SimSwapRetrievalContent request)
         => CreateMockResponseAsync(_settings.MockSimSwapRetrievalResult);
-    Task<HttpResponseMessage> IAPCClientDI.SimSwapVerifyAsync(SimSwapVerificationContent request)
+    Task<HttpResponseMessage> IAPCClient.SimSwapVerifyAsync(SimSwapVerificationContent request)
         => CreateMockResponseAsync(_settings.MockSimSwapVerificationResult);
 }

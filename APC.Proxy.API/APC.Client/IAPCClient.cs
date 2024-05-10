@@ -11,5 +11,4 @@ namespace APC.Client
         Task<HttpResponseMessage> SimSwapRetrieveAsync(SimSwapRetrievalContent request);
         Task<HttpResponseMessage> SimSwapVerifyAsync(SimSwapVerificationContent request);
     }
-
 }

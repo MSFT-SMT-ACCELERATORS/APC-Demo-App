@@ -15,7 +15,7 @@ using SimSwapVerificationContent = Azure.Communication.ProgrammableConnectivity.
 
 namespace APC.Client
 {
-    public class APCSdkClient : IAPCClientDI
+    public class APCSdkClient : IAPCClient
     {
         private readonly ProgrammableConnectivityClient _apcClient;
         private readonly string _apcGatewayId;

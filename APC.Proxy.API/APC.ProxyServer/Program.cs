@@ -19,7 +19,7 @@ builder.Services.AddTransient<APCSdkClient>();
 builder.Services.AddTransient<APCRestClient>();
 builder.Services.AddTransient<APCMockClient>();
 
-builder.Services.AddTransient<IAPCClientDI>(serviceProvider =>
+builder.Services.AddTransient<IAPCClient>(serviceProvider =>
 {
     var env = Environment.GetEnvironmentVariable("APCImplementationType");
     switch (env)
