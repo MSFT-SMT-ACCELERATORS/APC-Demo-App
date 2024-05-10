@@ -2,7 +2,7 @@
 
 namespace APC.Client
 {
-    public interface IAPCClient
+    public interface IAPCClientDI
     {
         Task<HttpResponseMessage> DeviceLocationVerifyAsync(DeviceLocationVerificationContent request);
         Task<HttpResponseMessage> DeviceNetworkRetrieveAsync(NetworkIdentifier request);
@@ -11,5 +11,4 @@ namespace APC.Client
         Task<HttpResponseMessage> SimSwapRetrieveAsync(SimSwapRetrievalContent request);
         Task<HttpResponseMessage> SimSwapVerifyAsync(SimSwapVerificationContent request);
     }
-
 }

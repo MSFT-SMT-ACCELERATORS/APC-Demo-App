@@ -6,13 +6,13 @@ using System.Net.Http.Headers;
 
 namespace APC.Client
 {
-    public class APCClient : IAPCClient
+    public class APCRestClient : IAPCClientDI
     {
         private readonly IConfidentialClientApplication _authApp;
         private readonly HttpClient _apcHttpClient;
         private readonly APCClientSettings _settings;
 
-        public APCClient(IHttpClientFactory httpClientFactory, IOptions<APCClientSettings> settings)
+        public APCRestClient(IHttpClientFactory httpClientFactory, IOptions<APCClientSettings> settings)
         {
             _apcHttpClient = httpClientFactory.CreateClient("NoRedirectClient");
             _settings = settings.Value;
@@ -40,10 +40,10 @@ namespace APC.Client
         public async Task<HttpResponseMessage> SimSwapVerifyAsync(SimSwapVerificationContent request)
             => await CallApcApiAsync(HttpMethod.Post, APCPaths.SimSwapVerify, request);
 
-        public async Task<HttpResponseMessage> NumberVerificationVerifyAsync(NumberVerificationWithoutCodeContent request)
+        public async Task<HttpResponseMessage> NumberVerificationCallbackVerifyAsync(NumberVerificationWithCodeContent request)
             => await CallApcApiAsync(HttpMethod.Post, APCPaths.NumberVerificationVerify, request);
 
-        public async Task<HttpResponseMessage> NumberVerificationCallbackVerifyAsync(NumberVerificationWithCodeContent request)
+        public async Task<HttpResponseMessage> NumberVerificationVerifyAsync(NumberVerificationWithoutCodeContent request)
             => await CallApcApiAsync(HttpMethod.Post, APCPaths.NumberVerificationVerify, request);
 
         private async Task<HttpResponseMessage> CallApcApiAsync(HttpMethod httpMethod, string endpoint, object? requestContent = null)

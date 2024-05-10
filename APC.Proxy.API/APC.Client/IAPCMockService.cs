@@ -7,8 +7,7 @@ namespace APC.Client
         Task<object> RetrieveMockResultAsync(string apcPath);
         Task<DeviceLocationVerificationResult> DeviceLocationVerifyAsync(DeviceLocationVerificationContent? request = null);
         Task<NetworkRetrievalResult> DeviceNetworkRetrieveAsync(NetworkIdentifier? request = null);
-        Task<NumberRetrievalResult> NumberVerificationRetrieveAsync(NetworkIdentifier? request = null);
-        Task<NumberVerificationResult> NumberVerificationVerifyAsync(NumberVerificationContent? request = null);
+        Task<NumberVerificationResult> NumberVerificationVerifyAsync(NumberVerificationWithoutCodeContent? request = null);
         Task<SimSwapRetrievalResult> SimSwapRetrieveAsync(SimSwapRetrievalContent? request = null);
         Task<SimSwapVerificationResult> SimSwapVerifyAsync(SimSwapVerificationContent? request = null);
     }

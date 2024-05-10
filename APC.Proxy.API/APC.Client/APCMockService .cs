@@ -17,7 +17,6 @@ public class APCMockService : IAPCMockService
         {
             APCPaths.DeviceLocationVerify => Task.FromResult<object>(_settings.MockDeviceLocationVerificationResult),
             APCPaths.DeviceNetworkRetrieve => Task.FromResult<object>(_settings.MockNetworkRetrievalResult),
-            APCPaths.NumberVerificationRetrieve => Task.FromResult<object>(_settings.MockNumberRetrievalResult),
             APCPaths.NumberVerificationVerify => Task.FromResult<object>(_settings.MockNumberVerificationResult),
             APCPaths.SimSwapRetrieve => Task.FromResult<object>(_settings.MockSimSwapRetrievalResult),
             APCPaths.SimSwapVerify => Task.FromResult<object>(_settings.MockSimSwapVerificationResult),
@@ -31,10 +30,7 @@ public class APCMockService : IAPCMockService
     public Task<NetworkRetrievalResult> DeviceNetworkRetrieveAsync(NetworkIdentifier? request = null)
         => Task.FromResult(_settings.MockNetworkRetrievalResult);
 
-    public Task<NumberRetrievalResult> NumberVerificationRetrieveAsync(NetworkIdentifier? request = null)
-        => Task.FromResult(_settings.MockNumberRetrievalResult);
-
-    public Task<NumberVerificationResult> NumberVerificationVerifyAsync(NumberVerificationContent? request = null)
+    public Task<NumberVerificationResult> NumberVerificationVerifyAsync(NumberVerificationWithoutCodeContent? request = null)
         => Task.FromResult(_settings.MockNumberVerificationResult);
 
     public Task<SimSwapRetrievalResult> SimSwapRetrieveAsync(SimSwapRetrievalContent? request = null)
