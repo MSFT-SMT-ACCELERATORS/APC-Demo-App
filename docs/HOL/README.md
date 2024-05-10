@@ -56,6 +56,11 @@ Welcome to the Azure Programmable Connectivity Hands-On Lab. In this lab, we wil
     - [Handling Consent Permission for Location Number Verification](#handling-consent-permission-for-location-number-verification)
     - [Handling Redirections for Number Verification](#handling-redirections-for-number-verification)
 - [Annex](#annex)
+  - [Network APIs](#network-apis)
+    - [Device Network Retrieval](#device-network-retrieval)
+    - [SIM Swap Detection](#sim-swap-detection)
+    - [Number Verification](#number-verification)
+    - [Device Location Verification](#device-location-verification) 
   - [Additional REST APC calls using .NET HttpClient](#additional-rest-apc-calls-using-net-httpclient)
     - [Location REST APC calls using .NET HttpClient](#location-rest-apc-calls-using-net-httpclient)
     - [Number Verification REST APC calls using .NET HttpClient](#number-verification-rest-apc-calls-using-net-httpclient)
@@ -89,28 +94,30 @@ Azure Programmable Connectivity (APC) is an Azure service that connects cloud ap
 
 Here is an overview diagram depicting the interaction between these components:
 
-![APC Simple diagram](image-39.png)
+![APC Simple diagram](image-54.png)
 
 ### APC Planned Operator APIs
 
-APC enables direct access to a range of operator APIs, designed to streamline complex telecom functionalities into developer-friendly services. Below is a table summarizing the currently supported operator APIs:
+APC provides direct access to a range of operator APIs, designed to streamline complex telecom functionalities into developer-friendly services. Below is a table summarizing the currently supported and planned operator APIs:
+
+**Initial Focus: Anti-fraud Network APIs**
+
+| API                         | Description                                                                                   |
+|-----------------------------|-----------------------------------------------------------------------------------------------|
+| [SIM Swap Detection](#sim-swap-detection) | Checks the last time a SIM was swapped, crucial for fraud prevention. Alerts if a SIM swap has occurred recently, indicating potential fraud. |
+| [Number Verification](#number-verification) | Validates phone numbers to authenticate mobile devices seamlessly, reducing the need for SMS one-time passwords and enabling faster, more secure login and registration processes. |
+| [Device Location Verification](#device-location)   | Validates the geographical location of devices using network technologies. Offers precise location tracking, enhancing anti-fraud measures. |
+
+
+**Near Future Focus**
 
 | API                 | Description                                                                                   |
 |---------------------|-----------------------------------------------------------------------------------------------|
-| [SIM Swap Detection](#sim-swap-detection) | Allows detection of SIM card changes, crucial for fraud prevention in security-sensitive operations. |
-| [Number Verification](#number-verification) | Verifies the authenticity of mobile numbers, enhancing trust and reducing spam.                |
-| [Device Location](#device-location)   | Provides network-based location data, ideal for location-sensitive applications.              |
+| Quality of Demand   | Ensures prioritized network traffic for essential services, maintaining performance standards. |
+| Carrier Billing     | Facilitates direct carrier billing capabilities, enabling seamless transactions.               |
+| Discover Optimal Latency Endpoint | Optimizes connectivity by identifying the best endpoint based on latency.                      |
 
-
-Find in the annex detailed information about each [Network APIs](#network-apis).
-
-**Bellow are the planned Operator APIs coming to APC:**
-
-| API                 | Description                                                                                   |
-|---------------------|-----------------------------------------------------------------------------------------------|
-| Quality on Demand (QoD)  | Ensures prioritized network traffic for essential services, maintaining performance standards. |
-| Billing | Facilitates direct carrier billing capabilities, enabling seamless transactions.                |
-
+Find detailed information about each [Network API](#network-apis) in the annex.
 
 ### Additional information
 
@@ -160,22 +167,28 @@ For a deeper understanding of Azure Programmable Connectivity (APC), including i
 
 Before starting your journey with Azure Programmable Connectivity (APC), make sure you have the following prerequisites ready:
 
-- **Azure Subscription**: Access to an Azure subscription is necessary to deploy APC resources. If you don't have one, you can create a [free account](https://azure.microsoft.com/free/).
+- **Azure Subscription**: Access to an Azure subscription is necessary to deploy resources necessary for this app to work. If you don't have one, you can create a [free account](https://azure.microsoft.com/free/).
+
+- **APC Public Preview Access**: To create an APC Gateway, you must be signed up for the public preview of Azure Programmable Connectivity. If you have not already done so, please register using the form available at [APC Public Preview Signup](https://aka.ms/APCpublicpreview).
 
 - **Azure CLI and PowerShell**: Familiarity with Azure CLI or PowerShell is essential for deploying resources and automation scripting.
 
 - **Development Environment**: Set up your preferred IDE or code editor, such as Visual Studio Code or Visual Studio, configured for console app development.
 
-- **Cellular Network Connection**: Ensure that your development environment is connected to a supported cellular network. This could be via a mobile hotspot connection from a mobile device or through a 4G/5G router equipped with a SIM card. [Read more about supported cellular connections for these exercises](#network-limitations)
+- **Cellular Network Connection**: Ensure that your development environment is connected to a supported cellular network. This could be via a mobile hotspot connection from a mobile device or through a 4G/5G router equipped with a SIM card. [Read more about supported cellular connections for these exercises](#network-limitations).
 
 #### Create APC Gateway Instance
+
+Before you proceed with creating an APC Gateway instance, ensure you have completed all prerequisites outlined in the [prerequisites section](#prerequisites). This includes signing up for the APC Public Preview, which is necessary for the APC Gateway to be available in your Azure portal.
 
 * Follow the [guide](https://learn.microsoft.com/azure/programmable-connectivity/azure-programmable-connectivity-create-gateway) to create a gateway, or have one already.
 * Once you are done creating the gateway, note down the APC Gateway resoruce id endpoint, as explained in this section.
 
 Deploying an APC Gateway in Azure is a straightforward process that involves the following steps:
 
-1. In the Azure portal, search for **APC Gateways** and then select **Create**.
+1. **Open Azure Portal**: Navigate to [Azure Portal](https://portal.azure.com/) and log in with your credentials.
+
+1. **Search for `APC Gateways`** and then select **Create**. If the APC Gateway does not appear as an available resource, please revisit the [prerequisites section](#prerequisites) and ensure you have successfully registered for the [APC public preview](https://aka.ms/APCpublicpreview).
 
    ![Search for APC Gateway](imgs/001-01-set-up-portal-create.jpg)
 
@@ -638,11 +651,11 @@ In this section, we explore how Azure Programmable Connectivity (APC) can be int
   - [Handling Consent Permission for Location Number Verification](#handling-consent-permission-for-location-number-verification)
   - [Handling Redirections for Number Verification](#handling-redirections-for-number-verification)
 
-### Architecture
+### Applicaction Architecture
 
 This section provides a brief technical description of the demo application's architecture. The application is designed to interact with APC for enhanced anti-fraud security measures such as SIM swap detection, number verification and user location verification.
 
-![Architecture Diagram](image-13.png)
+![Architecture Diagram](image-55.png)
 
 #### Components
 
@@ -685,7 +698,12 @@ Follow the steps in the [demo application README](../README.md) to set up:
 
 Then, follow the usage instructions intended to complement the advanced technical implementations or caveats related to applications using Azure Programmable Connectivity (APC).
 
-### APC Requests from the Front End
+### Application code highlighs
+TODO WIP introduce steps
+
+#### APC Requests from the Front End
+TODO reference to diagram 1 *fe -> be -> APC
+TODO link to app files for each code snippet and add more snippets
 
 Direct APC calls from the frontend are not advisable due to the sensitive nature of the credentials involved (client ID and secret). Exposing these details can lead to unauthorized access and misuse of Azure resources, as browser tools allow easy access to frontend code.
 
@@ -739,7 +757,8 @@ export const checkSimChange = async (apiClient: APCApi, phoneNumber: string) => 
 
 3. **The APC Gateway respone is returned to the client application**
 
-### Network Limitations
+#### Network Limitations
+TODO WIP nuances in client ip origin and actual APC calls from BE not cellular network
 
 - Disable WiFi access for your devicec
 - **Open the application:** Use the QR as described in the [Leaves Bank app documentation](../leaves-deployment.md).
@@ -780,6 +799,8 @@ In this demo app, the APC Proxy backend gathers network info using the IP from f
 Additionally, operations like number verification follow a specific process that requires these requests to come from the same network as the phone number being checked. Making requests from IP addresses outside the intended network will result in unathorized results in APC hence **the client application must use the cellular network instead of an available WiFI** connection from a non cellular network.
 
 ### Number Verification Process Overview
+
+TODO WIP add flow diagram simplified
 
 - Input the phone number for the cellular network you are using.
     - This could be either phone number for the sim card used in your device or if you are connecting to a hotspot network for this exercise, the phone number for the hotspot device. More information in [network limitations](#network-limitations).
@@ -827,9 +848,10 @@ For Network API operations that require device location information, such as loc
 ---
 - [Annex](#annex)
   - [Network APIs](#network-apis)
+    - [Device Network Retrieval](#device-network-retrieval)
     - [SIM Swap Detection](#sim-swap-detection)
     - [Number Verification](#number-verification)
-    - [Location Services](#location-services) 
+    - [Device Location Verification](#device-location-verification) 
   - [Additional APC SDK requests using .NET SDK](#additional-apc-sdk-examples-using-net-sdk)
     - [Location APC SDK request](#apc-sdk-device-location)
     - [Number Verification APC SDK request](#apc-sdk-number-verification)
@@ -841,48 +863,169 @@ For Network API operations that require device location information, such as loc
 
 ### Network APIs
 
-#### SIM Swap Detection
+This section provides comprehensive details necessary for developers to understand and implement each API effectively. For the most current information and updates, refer to the [Azure Programmable Connectivity documentation.](https://learn.microsoft.com/en-us/azure/programmable-connectivity/azure-programmable-connectivity-network-apis)
+
+
+####  Device Network Retrieval
+##### Endpoint
+```curl
+POST /device-network/network:retrieve
+```
 
 ##### Description
-Detect changes in SIM card associations with mobile numbers to enhance security and fraud detection mechanisms. This API monitors and alerts on suspicious activity suggesting a SIM swap.
+Retrieves the network a given device is connected to, returning the network in a format that can be used for other API calls.
 
-##### Properties
-- **SubscriberId**: The unique identifier of the mobile subscriber.
-- **LastSwapDate**: The timestamp of the last detected SIM swap.
-- **AlertEnabled**: Boolean to enable real-time alerts on SIM swap detection.
+##### Request Properties
+identifierType: Type of identifier (e.g., IPv4, NetworkCode).
+identifier: The actual identifier, such as an IP address or network code.
+##### Response Properties
+networkCode: Network code that identifies the operator's network.
+##### Example Request
+
+```json
+{
+  "identifierType": "IPv4",
+  "identifier": "173.122.1.1"
+}
+```
+##### Example Response
+
+```json
+{
+  "networkCode": "example-network-code"
+}
+```
 
 
-#### Properties
-- **SubscriberId**: The unique identifier of the mobile subscriber.
-- **LastSwapDate**: The timestamp of the last detected SIM swap.
-- **AlertEnabled**: Boolean to enable real-time alerts on SIM swap detection.
+#### Device Location Verification
+
+##### Description
+Provide real-time location data of a mobile device with the consent of the mobile user. This API is particularly useful for applications that require precise geolocation, such as logistics tracking, personal security services, or compliance with local regulations.
+
+##### Endpoint
+
+```curl
+POST /device-location/location:verify`
+```
+
+Verifies whether a device is within a specified location area, defined as an accuracy (radius) around a point specified by longitude and latitude.
+
+##### Consent Error - Operator Permission
+- If location data access is denied by the operator, the API will return a `ConsentError`.
+- WIP TODO Error handling should account for permissions being revoked or not granted by the user or operator, ensuring that the application complies with privacy laws and user preferences.
+
+##### Request Properties
+- **networkIdentifier**: Network identifier for the query.
+- **latitude**: Latitude of the location to verify.
+- **longitude**: Longitude of the location to verify.
+- **accuracy**: Radius in kilometers within which the location is considered accurate.
+- **locationDevice**: The device details used for locating.
+
+##### Response Properties
+- **verificationResult**: Boolean indicating whether the device is within the specified area.
+
+##### Example Request
+
+```json
+{
+  "networkIdentifier": {
+    "identifierType": "NetworkCode",
+    "identifier": "network-code-here"
+  },
+  "latitude": 34.0522,
+  "longitude": -118.2437,
+  "accuracy": 10,
+  "locationDevice": {
+    "phoneNumber": "+1234567890"
+  }
+}
+```
+
+##### Example Request
+
+```json
+{
+  "verificationResult": true
+}
+```
 
 #### Number Verification
 
 ##### Description
-Verify the authenticity of a mobile number to ensure it is currently active and can receive communications. This helps in validating user identity and reducing fraud.
-
-##### Properties
-- **PhoneNumber**: The mobile number to verify.
-- **VerificationStatus**: Indicates whether the number is verified.
-- **VerificationMethod**: Method used for number verification (SMS, Call, etc.).
+Verify the authenticity of a mobile number to ensure it is currently active and can receive communications. This verification helps in validating user identity and reducing fraud by authenticating mobile devices seamlessly, thus eliminating the need for SMS one-time passwords and enabling faster and more secure user experiences.
 
 ##### OAuth Flow
-WIP
+The number verification process may involve an OAuth flow to ensure that the verification request is authenticated and authorized properly.
+WIP TODO simplified flow diagram + explanation
 
-#### Device Location
+##### Endpoint
+
+```curl 
+POST /number-verification/number:verify
+```
+##### Description
+Verifies the phone number associated with a device to confirm its authenticity and current status.
+
+##### Request Properties
+- **networkIdentifier:** Network identifier for querying the device.
+- **phoneNumber:** Phone number in E.164 format.
+##### Response Properties
+verificationResult: Boolean indicating if the phone number is verified.
+##### Example Request
+```json
+{
+  "networkIdentifier": {
+    "identifierType": "NetworkCode",
+    "identifier": "network-code-here"
+  },
+  "phoneNumber": "+1234567890"
+}
+```
+##### Example Response
+```json
+{
+  "verificationResult": true
+}
+```
+#### SIM Swap Detection
 
 ##### Description
-Provide real-time location data of a mobile device with the consent of the mobile user. Useful for applications requiring geolocation, such as logistics and personal security.
+Detect changes in SIM card associations with mobile numbers to enhance security and fraud detection mechanisms. This API monitors and alerts on suspicious activity suggesting a SIM swap, which is often indicative of identity theft or fraudulent attempts to gain access to user accounts.
 
-##### Properties
-- **DeviceId**: Identifier for the device whose location is being tracked.
-- **Location**: Current geolocation data (latitude, longitude).
-- **Accuracy**: Accuracy of the location data.
+This API is crucial for applications requiring high-security measures to prevent fraud, especially in financial services, by ensuring that any change in SIM information is promptly and accurately detected.
 
-##### Consent Error - Operator Permission
-- If location data access is denied by the operator, the API will return a `ConsentError`.
-- Error handling should account for permissions being revoked or not granted by the user or operator.
+TODO add retrieve endpoint 
+
+##### Endpoint
+```curl
+POST /sim-swap/sim-swap:verify
+```
+##### Description
+Verifies if a SIM swap has occurred for a given phone number within a specified time period.
+
+##### Request Properties
+- **phoneNumber:** Phone number in E.164 format.
+- **maxAgeHours:** Time period in hours to check for SIM swap.
+- **networkIdentifier:** Network identifier for the query.
+##### Response Properties
+verificationResult: Boolean indicating if a SIM swap has occurred in the specified period.
+##### Example Request
+```json
+{
+  "phoneNumber": "+1234567890",
+  "maxAgeHours": 48,
+  "networkIdentifier": {
+    "identifierType": "NetworkCode",
+    "identifier": "network-code-here"
+  }
+}
+```
+##### Example Response
+```json
+{
+  "verificationResult": false
+}
+```
 
 
 ### Additional APC SDK examples using .NET SDK

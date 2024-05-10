@@ -4,22 +4,29 @@ This section provides a step-by-step guide to get the project up and running on 
 
 ### Prerequisites
 Before starting, ensure you have the following installed:
+
+- **Azure Subscription**: Access to an Azure subscription is necessary to deploy resources necessary for this app to work. If you don't have one, you can create a [free account](https://azure.microsoft.com/free/).
+
+- **APC Public Preview Access**: To create an APC Gateway, you must be signed up for the public preview of Azure Programmable Connectivity. If you have not already done so, please register using the form available at [APC Public Preview Signup](https://aka.ms/APCpublicpreview).
 - Git
 - Node.js
-- An active Azure subscription
 - Azure CLI installed on your machine
-- .NET SDK installed on your machine
+- .NET SDK 8 installed on your machine
 
 ## APC Gateway deployment and configuration
 
 #### Create APC Gateway Instance
 
-* Follow [this guide](https://learn.microsoft.com/azure/programmable-connectivity/azure-programmable-connectivity-create-gateway) or the one on this document to create a gateway, or have one already.
+Before you proceed with creating an APC Gateway instance, ensure you have completed all prerequisites outlined in the [prerequisites section](#prerequisites). This includes signing up for the APC Public Preview, which is necessary for the APC Gateway to be available in your Azure portal.
+
+* Follow the [guide](https://learn.microsoft.com/azure/programmable-connectivity/azure-programmable-connectivity-create-gateway) to create a gateway, or have one already.
 * Once you are done creating the gateway, note down the APC Gateway resoruce id endpoint, as explained in this section.
 
 Deploying an APC Gateway in Azure is a straightforward process that involves the following steps:
 
-1. In the Azure portal, search for **APC Gateways** and then select **Create**.
+1. **Open Azure Portal**: Navigate to [Azure Portal](https://portal.azure.com/) and log in with your credentials.
+
+1. **Search for `APC Gateways`** and then select **Create**. If the APC Gateway does not appear as an available resource, please revisit the [prerequisites section](#prerequisites) and ensure you have successfully registered for the [APC public preview](https://aka.ms/APCpublicpreview).
 
    ![Search for APC Gateway](image-18.png)
 2. Select your **Subscription**, **Resource Group**, and **Region**.
