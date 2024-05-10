@@ -30,9 +30,6 @@ namespace APC.ProxyServer.Controllers
                 request.Device.Ipv4Address.Ipv4 = Request.HttpContext.Connection.RemoteIpAddress.ToString();
             }
 
-            // MWC FIX:
-            request.Accuracy = request.Accuracy > 20 ? 20 : request.Accuracy;
-
             _logger.LogInformation($"Request model: {JsonSerializer.Serialize(request)}");
 
             return await HandleRequest(
@@ -92,10 +89,6 @@ namespace APC.ProxyServer.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> SimSwapVerify([FromBody] SimSwapVerificationContent request)
         {
-            // MWC FIX:
-            request.PhoneNumber = request.PhoneNumber.StartsWith("+") ? request.PhoneNumber : $"+{request.PhoneNumber}";
-            request.MaxAgeHours = 20;
-
             return await HandleRequest(
                 () => _apcClient.SimSwapVerifyAsync(request),
                 "Error occurred while verifying SIM swap.");
