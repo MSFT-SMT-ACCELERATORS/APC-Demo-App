@@ -1,11 +1,11 @@
 ﻿namespace APC.DataModel
 {
-    public class NumberVerificationCallbackResult
+    public class NumberVerificationWithCodeContent
     {
         public required string ApcCode { get; set; }
     }
 
-    public class NumberVerificationContent
+    public class NumberVerificationWithoutCodeContent
     {
         public required NetworkIdentifier NetworkIdentifier { get; set; }
         public required string PhoneNumber { get; set; }

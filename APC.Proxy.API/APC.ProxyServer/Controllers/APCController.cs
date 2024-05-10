@@ -59,7 +59,7 @@ namespace APC.ProxyServer.Controllers
         public async Task<IActionResult> NumberVerificationRetrieve(string apcCode)
         {
             return await HandleRequest(
-                () => _apcClient.NumberVerificationCallbackVerifyAsync(new NumberVerificationCallbackResult() { ApcCode = apcCode }),
+                () => _apcClient.NumberVerificationCallbackVerifyAsync(new NumberVerificationWithCodeContent() { ApcCode = apcCode }),
                 "Error occurred while retrieving phone number.");
         }
 
@@ -68,7 +68,7 @@ namespace APC.ProxyServer.Controllers
         [ProducesResponseType(typeof(NumberVerificationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> NumberVerificationVerify([FromBody] NumberVerificationContent request)
+        public async Task<IActionResult> NumberVerificationVerify([FromBody] NumberVerificationWithoutCodeContent request)
         {
             _logger.LogInformation($"Request model: {JsonSerializer.Serialize(request)}");
 

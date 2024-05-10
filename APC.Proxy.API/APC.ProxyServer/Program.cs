@@ -14,9 +14,26 @@ builder.Services.Configure<APCClientSettings>(builder.Configuration.GetSection("
 builder.Services.Configure<APCMockSettings>(builder.Configuration.GetSection("MockSettings"));
 
 
-// Register APCClient and APCMockService
-builder.Services.AddSingleton<IAPCMockService, APCMockService>();
-builder.Services.AddScoped<IAPCClient, APCClient>();
+// Register implementations for IAPCClient using SDK, HTTP and Mock
+builder.Services.AddTransient<APCSdkClient>();
+builder.Services.AddTransient<APCRestClient>();
+builder.Services.AddTransient<APCMockClient>();
+
+builder.Services.AddTransient<IAPCClientDI>(serviceProvider =>
+{
+    var env = Environment.GetEnvironmentVariable("APCImplementationType");
+    switch (env)
+    {
+        case "Sdk":
+            return serviceProvider.GetRequiredService<APCSdkClient>();
+        case "Rest":
+            return serviceProvider.GetRequiredService<APCRestClient>();
+        case "Mock":
+            return serviceProvider.GetRequiredService<APCMockClient>();
+        default:
+            throw new KeyNotFoundException("The APC implementation type is not recognized.");
+    }
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

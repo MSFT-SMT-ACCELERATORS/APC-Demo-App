@@ -30,7 +30,7 @@ public class APCMockService : IAPCMockService
     public Task<NetworkRetrievalResult> DeviceNetworkRetrieveAsync(NetworkIdentifier? request = null)
         => Task.FromResult(_settings.MockNetworkRetrievalResult);
 
-    public Task<NumberVerificationResult> NumberVerificationVerifyAsync(NumberVerificationContent? request = null)
+    public Task<NumberVerificationResult> NumberVerificationVerifyAsync(NumberVerificationWithoutCodeContent? request = null)
         => Task.FromResult(_settings.MockNumberVerificationResult);
 
     public Task<SimSwapRetrievalResult> SimSwapRetrieveAsync(SimSwapRetrievalContent? request = null)

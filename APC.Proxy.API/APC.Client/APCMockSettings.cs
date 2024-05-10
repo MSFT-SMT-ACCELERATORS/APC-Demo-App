@@ -16,7 +16,7 @@ namespace APC.Client
         {
             VerificationResult = true
         };
-        public NumberVerificationCallbackResult MockNumberCallbackVerificationResult { get; set; } = new NumberVerificationCallbackResult
+        public NumberVerificationWithCodeContent MockNumberCallbackVerificationResult { get; set; } = new NumberVerificationWithCodeContent
         {
             ApcCode = "1234"
         };
