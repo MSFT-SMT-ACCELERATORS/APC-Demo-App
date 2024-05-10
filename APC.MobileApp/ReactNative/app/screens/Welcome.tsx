@@ -10,8 +10,9 @@ import palette from '../themes/Colors';
 import StyledText from '../components/StyledText';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
+import NetInfo from '@react-native-community/netinfo';
 import CustomModal from '../components/CustomModal';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 interface WelcomeProps {
   setLoading: (isLoading: boolean, text?: string) => void;
@@ -19,34 +20,23 @@ interface WelcomeProps {
 
 const Welcome: React.FC<WelcomeProps> = ({ setLoading }) => {
   const navigation = useNavigation();
-  const [wifiModalVisible, setWifiModalVisible] = useState<boolean>(true)
+  const [modalVisible, setModalVisible] = useState(false);
+  const [isWifiEnabled, setIsWifiEnabled] = useState(false);
+
+  const handleModalToggle = (isVisible : boolean) => {
+    setModalVisible(isVisible);
+  };
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      setLoading(false);
+    const unsubscribe = NetInfo.addEventListener(state => {
+      const wifiEnabled = state.type === 'wifi' && state.isConnected;
+      setIsWifiEnabled(wifiEnabled);
+      handleModalToggle(wifiEnabled);
     });
 
-    const checkIfModalDisplayed = async () => {
-      try {
-        const modalDisplayed = await AsyncStorage.getItem('modalDisplayed');
+    return () => unsubscribe();
+  }, []);
 
-        if (modalDisplayed !== 'true') {
-          setWifiModalVisible(true);
-        }
-      } catch (error) {
-        console.error('Error checking modal display status:', error);
-      }
-    };
-
-    checkIfModalDisplayed();
-
-    return unsubscribe;
-  }, [navigation]);
-
-  const closeModal = async () => {
-    setWifiModalVisible(false);
-    await AsyncStorage.setItem('modalDisplayed', 'true');
-  };
 
   return (
     <AppContainer >
@@ -66,13 +56,13 @@ const Welcome: React.FC<WelcomeProps> = ({ setLoading }) => {
           />
         </View>
 
-        <CustomModal 
-          visible={wifiModalVisible} 
-          onClose={closeModal}
+        <CustomModal
+          visible={modalVisible}
+          onClose={() => handleModalToggle(false)}
           backgroundColor={palette.danger100}
-          title={'Warning'} 
-          text={'Important, in order to use Azure Programmable Connectivity (APC) APIs you need to disable the Wi-Fi in your phone, since APC APIs needs to make identifications and verifications based on your cell line/data, not with the Wi-Fi communication.'} 
-          iconName={'warning'}
+          title={'Warning'}
+          text={'Important, in order to use this demo app that uses Azure Programmable Connectivity (APC) APIs you need to disable the Wi-Fi in your phone, since APC APIs needs to make identifications and verificatiosn based on your cell line/data, not with the Wi-Fi communication'}
+          iconName={'warning-outline'}
         />
 
         <View style={[styles.bodyContainer]}>
@@ -85,7 +75,7 @@ const Welcome: React.FC<WelcomeProps> = ({ setLoading }) => {
             size='normal'
             style={customStyles.my4}
             useGradient={true}
-            onPress={() => navigation.navigate('Consents')}
+            onPress={() => navigation.navigate('Steps')}
           />
 
         </View>
@@ -126,7 +116,7 @@ const styles = StyleSheet.create({
   warningMessage: {
     padding: 15,
     backgroundColor: '#252533',
-}
+  }
 });
 
 export default Welcome;

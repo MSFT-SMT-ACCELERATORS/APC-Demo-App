@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Float } from 'react-native/Libraries/Types/CodegenTypes';
+import { Logger } from '../utils/Logger';
 
 export enum ConnectionMode {
   Online = "online",
@@ -10,6 +10,7 @@ export enum ConnectionMode {
 export type AppConfiguration = {
   connectionMode: ConnectionMode;
   radiusKm: number;
+  residenceLocationRadius: number;
   skipGeolocationCheck: boolean,
   offlineLastSimChange: boolean;
   offlineLatitude: number;
@@ -19,15 +20,17 @@ export type AppConfiguration = {
 };
 
 const CONFIG_KEY = 'app_configuration';
+export const USE_STORAGE_LOGGING = false;
 
 export const defaultConfig = {
   connectionMode: 'online',
   radiusKm: 10,
+  residenceLocationRadius: 500,
   skipGeolocationCheck: false,
   offlineLatitude: 41.374148252686226,
   offlineLongitude: 2.150492242256705,
   offlineLastSimChange: false,
-  offlinePhoneNumber: '+34 677550625',
+  offlinePhoneNumber: '',
   autovalidatePhoneNumber: false,
 } as AppConfiguration;
 
@@ -36,7 +39,7 @@ export const storeConfigurations = async (configurations: AppConfiguration) => {
     const jsonValue = JSON.stringify(configurations);
     await AsyncStorage.setItem(CONFIG_KEY, jsonValue);
   } catch (e) {
-    // guardar error
+    Logger.log(e);
   }
 };
 
@@ -63,6 +66,7 @@ export const updateConfiguration = async <T extends keyof AppConfiguration>(key:
     };
     await AsyncStorage.setItem(CONFIG_KEY, JSON.stringify(newConfig));
   } catch (e) {
+    Logger.log(e);
   }
 };
 

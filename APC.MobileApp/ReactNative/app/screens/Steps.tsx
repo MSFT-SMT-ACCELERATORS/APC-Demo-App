@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, Text, View, Image, ScrollView, GestureResponderEvent, Modal } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import ProgressBar from '../components/ProgressBar';
 import palette from '../themes/Colors';
 import { useEffect, useState } from 'react';
@@ -28,16 +28,16 @@ const Steps: React.FC<StepsProps> = ({ setLoading }) => {
     useEffect(() => {
         switch (currentStep) {
             case 1:
-                navigation.navigate('ResidenceLocation');
-                break;
-            case 2:
                 navigation.navigate('StarterPage');
+                break;
+                case 2:
+                navigation.navigate('ResidenceLocation');
                 break;
             case 3:
                 navigation.navigate('Information');
                 break;
             default:
-                navigation.navigate('ResidenceLocation');
+                navigation.navigate('StarterPage');
                 break;
         }
     }, [currentStep, navigation]);
@@ -47,12 +47,12 @@ const Steps: React.FC<StepsProps> = ({ setLoading }) => {
             <ProgressBar progress={progress} height={20} />
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 <Stack.Screen
-                    name="ResidenceLocation"
-                    children={() => <ResidenceLocation setProgress={setProgress} setLoading={setLoading} />}
-                />
-                <Stack.Screen
                     name="StarterPage"
                     children={() => <StarterPage setProgress={setProgress} setLoading={setLoading} />}
+                />
+                <Stack.Screen
+                    name="ResidenceLocation"
+                    children={() => <ResidenceLocation setProgress={setProgress} setLoading={setLoading} />}
                 />
                 <Stack.Screen
                     children={() => <Information setProgress={setProgress} setLoading={setLoading} />}

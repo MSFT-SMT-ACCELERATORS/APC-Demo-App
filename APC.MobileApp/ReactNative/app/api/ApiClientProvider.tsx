@@ -1,5 +1,6 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { Configuration, APCApi } from '../api/generated';
+import {API_URL} from '@env';
 
 type ApiClientContextType = APCApi | null;
 
@@ -10,7 +11,7 @@ interface ApiClientProviderProps {
 }
 
 export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }) => {
-  const configuration = new Configuration({ basePath: "https://apc-proxy-prv-001.azurewebsites.net" });
+  const configuration = new Configuration({ basePath: API_URL });
   const apiClient = new APCApi(configuration);
 
   return (
