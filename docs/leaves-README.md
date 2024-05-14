@@ -59,7 +59,7 @@ Find detailed implementation details in this guide: [Implementation Details](lea
 
 | | |
 |--------|--------|
-| <img width="150" alt="Get started rocket" src="https://github.com/MSFT-SMT-ACCELERATORS/APC-Demo-App/assets/1712635/f738cb51-b237-4b60-9d45-cf976e03c714"> | [Deploy and configure the APC example/demo app](leaves-deployment.md) |
+| <img width="150" alt="Get started rocket" src="https://github.com/MSFT-SMT-ACCELERATORS/APC-Demo-App/assets/1712635/f738cb51-b237-4b60-9d45-cf976e03c714"> | Follow this guide to [Deploy and configure the APC example/demo app](leaves-deployment.md) |
 
 Note that the above link is a document on how to deploy the example/demo app, including the cloud Azure WebApp with the backend service and the mobile app.
 We also provide here an additional [step-by-step HOL (Hands-On-Lab) about how to use APC APIs](/main/docs/APC-HOL.md). 
