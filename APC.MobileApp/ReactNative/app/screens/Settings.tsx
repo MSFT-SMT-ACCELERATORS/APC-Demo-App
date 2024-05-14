@@ -4,23 +4,12 @@ import { StyleSheet, View, ScrollView, Pressable, KeyboardAvoidingView, Platform
 import { useNavigation } from '@react-navigation/native';
 
 import Colors from '../themes/Colors';
-import {
-    storeConfigurations,
-    readConfigurations,
-    AppConfiguration,
-    defaultConfig,
-    ConnectionMode,
-    USE_STORAGE_LOGGING
-} from '../Services/SettingsService';
+import { storeConfigurations, readConfigurations, AppConfiguration, defaultConfig, ConnectionMode, USE_STORAGE_LOGGING} from '../Services/SettingsService';
 
 import AppContainer from '../components/AppContainer';
 import Button from '../components/Button';
 import StyledInputText from '../components/StyledInputText';
-import {
-    Controller,
-    SubmitHandler,
-    useForm,
-} from 'react-hook-form';
+import { Controller, SubmitHandler, useForm,} from 'react-hook-form';
 import StyledText from '../components/StyledText';
 import { RadioButton, TextInput } from 'react-native-paper';
 import palette from '../themes/Colors';

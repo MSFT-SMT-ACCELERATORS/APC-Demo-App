@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, Text, View, Image, ScrollView, GestureResponderEvent, Modal } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import ProgressBar from '../components/ProgressBar';
 import palette from '../themes/Colors';
 import { useEffect, useState } from 'react';

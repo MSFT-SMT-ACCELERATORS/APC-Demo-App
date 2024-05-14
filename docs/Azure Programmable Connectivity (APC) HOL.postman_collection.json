@@ -1,0 +1,1250 @@
+{
+	"info": {
+		"_postman_id": "ede625fe-1635-4561-b918-8e5c75516a5c",
+		"name": "Azure Programmable Connectivity (APC) HOL",
+		"description": "Azure Programmable Connectivity (APC) provides a unified interface to the Network APIs of multiple Telecom Operators. Note that Operators may deprecate a Network API with less advance notice than the Azure standard, in which case APC will also deprecate that Network API.\n\n> Getting Started Guides streamline the self-serve experience for external API consumers using executable demos for critical processes. Consumers can execute workflows and test endpoints themselves and see the APIs they depend on in action. \n  \n\n## **🪐Get started**\n\nThis collection serves as a showcase for those interested in the APC APIs. The full guide is in LINK TO REPO APC HOL.\n\n## **🔒A note on authorization**\n\nThis API uses an client credentials authorization. In this collection, we store the Azure Entra Id client Id and secret for a registered application. You must replace these in the collection variables with your own as explained in the guide \\[LINK TO REPO AUTH SECTION}()\n\n## **📝Example responses**\n\nWe’ve documented many possible responses in our collection using example responses. This enables you to walk through the different success and error responses for each request without having to configure different parameters.\n\n## **🤔 Troubleshooting**\n\nIf you’re trying out our API and running into issues, we want to help! Here are a couple of common fixes to try:\n\n1. Make sure the `{{baseUrl}}` variable has the correct value.\n2. Make sure you are using a valid token or set of credentials to obtain it. . Chek the auth collection variables and set them to your own. Generate a new toen using the **Generate new Token**.\n3. Verify your APC Gateway is properly configured as explained in the guide, with the necessary operator api connectors. \\[LINK TO REPO AUTH SECTION}()",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26997868",
+		"_collection_link": "https://martian-desert-619290.postman.co/workspace/My-Workspace~d793be6e-85e8-4ae8-8bf7-6ef7d9618a9b/collection/26997868-ede625fe-1635-4561-b918-8e5c75516a5c?action=share&source=collection_link&creator=26997868"
+	},
+	"item": [
+		{
+			"name": "network:retrieve",
+			"item": [
+				{
+					"name": "Device Network Retrieve",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "An opaque, globally-unique, client-generated string identifier for the request.",
+								"key": "x-ms-client-request-id",
+								"value": "{{$guid}}"
+							},
+							{
+								"key": "Timestamp",
+								"value": "{{$isoTimestamp}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"description": "(Required) The identifier of the APC Gateway resource which should handle this request.",
+								"key": "apc-gateway-id",
+								"value": "{{apc-id}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"identifierType\": \"IPv4\",\n  \"identifier\": \"your-public-ip\"\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/device-network/network:retrieve",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"device-network",
+								"network:retrieve"
+							],
+							"query": [
+								{
+									"key": "api-version",
+									"value": "1.0",
+									"description": "(Required) The API version to use for this operation.",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieves the network a given device is on. Returns network in a networkCode format that can be used for other APIs."
+					},
+					"response": [
+						{
+							"name": "The request has succeeded.",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"description": "An opaque, globally-unique, client-generated string identifier for the request.",
+										"key": "x-ms-client-request-id",
+										"value": "<uuid>"
+									},
+									{
+										"description": "(Required) The identifier of the APC Gateway resource which should handle this request.",
+										"key": "apc-gateway-id",
+										"value": "<string>"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"description": "Added as a part of security scheme: oauth2",
+										"key": "Authorization",
+										"value": "<token>"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"identifierType\": \"<string>\",\n  \"identifier\": \"<string>\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/device-network/network:retrieve?api-version=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"device-network",
+										"network:retrieve"
+									],
+									"query": [
+										{
+											"key": "api-version",
+											"value": "<string>",
+											"description": "(Required) The API version to use for this operation."
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "x-ms-client-request-id",
+									"value": "<uuid>",
+									"description": {
+										"content": "An opaque, globally-unique, client-generated string identifier for the request.",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "x-ms-request-id",
+									"value": "<uuid>",
+									"description": {
+										"content": "An opaque, globally-unique, server-generated string identifier for the request.",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"networkCode\": \"h6ptm2p\"\n}"
+						},
+						{
+							"name": "An unexpected error response.",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"description": "An opaque, globally-unique, client-generated string identifier for the request.",
+										"key": "x-ms-client-request-id",
+										"value": "<uuid>"
+									},
+									{
+										"description": "(Required) The identifier of the APC Gateway resource which should handle this request.",
+										"key": "apc-gateway-id",
+										"value": "<string>"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"description": "Added as a part of security scheme: oauth2",
+										"key": "Authorization",
+										"value": "<token>"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"identifierType\": \"<string>\",\n  \"identifier\": \"<string>\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/device-network/network:retrieve?api-version=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"device-network",
+										"network:retrieve"
+									],
+									"query": [
+										{
+											"key": "api-version",
+											"value": "<string>",
+											"description": "(Required) The API version to use for this operation."
+										}
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": {\n    \"code\": \"<string>\",\n    \"message\": \"<string>\",\n    \"target\": \"<string>\",\n    \"details\": [\n      {\n        \"code\": \"<string>\",\n        \"message\": \"<string>\",\n        \"target\": \"<string>\",\n        \"details\": [\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          },\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          }\n        ],\n        \"innererror\": {\n          \"code\": \"<string>\",\n          \"innererror\": {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.InnerError detected>\"\n          }\n        }\n      },\n      {\n        \"code\": \"<string>\",\n        \"message\": \"<string>\",\n        \"target\": \"<string>\",\n        \"details\": [\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          },\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          }\n        ],\n        \"innererror\": {\n          \"code\": \"<string>\",\n          \"innererror\": {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.InnerError detected>\"\n          }\n        }\n      }\n    ],\n    \"innererror\": {\n      \"code\": \"<string>\",\n      \"innererror\": {\n        \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.InnerError detected>\"\n      }\n    },\n    \"consentUrl\": \"<uri>\"\n  }\n}"
+						}
+					]
+				}
+			],
+			"description": "Retrieve operator network name given IP or phone number."
+		},
+		{
+			"name": "sim-swap",
+			"item": [
+				{
+					"name": "Sim Swap Verify",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "An opaque, globally-unique, client-generated string identifier for the request.",
+								"key": "x-ms-client-request-id",
+								"value": "{{$guid}}"
+							},
+							{
+								"key": "Timestamp",
+								"value": "{{$isoTimestamp}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"description": "(Required) The identifier of the APC Gateway resource which should handle this request.",
+								"key": "apc-gateway-id",
+								"value": "{{apc-id}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Use-Mock",
+								"value": "true",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"PhoneNumber\": \"your-phone-number\",\n    \"MaxAgeHours\": 0,\n    \"NetworkIdentifier\": {\n        \"IdentifierType\": \"NetworkCode\",\n        \"Identifier\": \"your-network-code\"\n    }\n}\n",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/sim-swap/sim-swap:verify",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"sim-swap",
+								"sim-swap:verify"
+							],
+							"query": [
+								{
+									"key": "api-version",
+									"value": "1.0",
+									"description": "(Required) The API version to use for this operation.",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Verifies if a SIM swap has been performed during a past period (defined in the request with 'maxAgeHours' attribute). Returns 'True' if a SIM swap has occured."
+					},
+					"response": [
+						{
+							"name": "The request has succeeded.",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"description": "An opaque, globally-unique, client-generated string identifier for the request.",
+										"key": "x-ms-client-request-id",
+										"value": "<uuid>"
+									},
+									{
+										"description": "(Required) The identifier of the APC Gateway resource which should handle this request.",
+										"key": "apc-gateway-id",
+										"value": "<string>"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"description": "Added as a part of security scheme: oauth2",
+										"key": "Authorization",
+										"value": "<token>"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"networkIdentifier\": {\n    \"identifierType\": \"<string>\",\n    \"identifier\": \"<string>\"\n  },\n  \"phoneNumber\": \"714396323\",\n  \"maxAgeHours\": 240\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/sim-swap/sim-swap:verify?api-version=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"sim-swap",
+										"sim-swap:verify"
+									],
+									"query": [
+										{
+											"key": "api-version",
+											"value": "<string>",
+											"description": "(Required) The API version to use for this operation."
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "x-ms-client-request-id",
+									"value": "<uuid>",
+									"description": {
+										"content": "An opaque, globally-unique, client-generated string identifier for the request.",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "x-ms-request-id",
+									"value": "<uuid>",
+									"description": {
+										"content": "An opaque, globally-unique, server-generated string identifier for the request.",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"verificationResult\": \"<boolean>\"\n}"
+						},
+						{
+							"name": "An unexpected error response.",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"description": "An opaque, globally-unique, client-generated string identifier for the request.",
+										"key": "x-ms-client-request-id",
+										"value": "<uuid>"
+									},
+									{
+										"description": "(Required) The identifier of the APC Gateway resource which should handle this request.",
+										"key": "apc-gateway-id",
+										"value": "<string>"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"description": "Added as a part of security scheme: oauth2",
+										"key": "Authorization",
+										"value": "<token>"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"networkIdentifier\": {\n    \"identifierType\": \"<string>\",\n    \"identifier\": \"<string>\"\n  },\n  \"phoneNumber\": \"714396323\",\n  \"maxAgeHours\": 240\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/sim-swap/sim-swap:verify?api-version=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"sim-swap",
+										"sim-swap:verify"
+									],
+									"query": [
+										{
+											"key": "api-version",
+											"value": "<string>",
+											"description": "(Required) The API version to use for this operation."
+										}
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": {\n    \"code\": \"<string>\",\n    \"message\": \"<string>\",\n    \"target\": \"<string>\",\n    \"details\": [\n      {\n        \"code\": \"<string>\",\n        \"message\": \"<string>\",\n        \"target\": \"<string>\",\n        \"details\": [\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          },\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          }\n        ],\n        \"innererror\": {\n          \"code\": \"<string>\",\n          \"innererror\": {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.InnerError detected>\"\n          }\n        }\n      },\n      {\n        \"code\": \"<string>\",\n        \"message\": \"<string>\",\n        \"target\": \"<string>\",\n        \"details\": [\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          },\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          }\n        ],\n        \"innererror\": {\n          \"code\": \"<string>\",\n          \"innererror\": {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.InnerError detected>\"\n          }\n        }\n      }\n    ],\n    \"innererror\": {\n      \"code\": \"<string>\",\n      \"innererror\": {\n        \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.InnerError detected>\"\n      }\n    },\n    \"consentUrl\": \"<uri>\"\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "Sim Swap Retrieve",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "An opaque, globally-unique, client-generated string identifier for the request.",
+								"key": "x-ms-client-request-id",
+								"value": "{{$guid}}"
+							},
+							{
+								"key": "Timestamp",
+								"value": "{{$isoTimestamp}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"description": "(Required) The identifier of the APC Gateway resource which should handle this request.",
+								"key": "apc-gateway-id",
+								"value": "{{apc-id}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"networkIdentifier\": {\n    \"identifierType\": \"NetworkCode\",\n    \"identifier\": \"your-network-code\"\n  },\n  \"phoneNumber\": \"your-phone-number\" \n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/sim-swap/sim-swap:retrieve",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"sim-swap",
+								"sim-swap:retrieve"
+							],
+							"query": [
+								{
+									"key": "api-version",
+									"value": "v2024_01_09_preview",
+									"description": "(Required) The API version to use for this operation.",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Provides timestamp of latest SIM swap"
+					},
+					"response": [
+						{
+							"name": "The request has succeeded.",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"description": "An opaque, globally-unique, client-generated string identifier for the request.",
+										"key": "x-ms-client-request-id",
+										"value": "<uuid>"
+									},
+									{
+										"description": "(Required) The identifier of the APC Gateway resource which should handle this request.",
+										"key": "apc-gateway-id",
+										"value": "<string>"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"description": "Added as a part of security scheme: oauth2",
+										"key": "Authorization",
+										"value": "<token>"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"networkIdentifier\": {\n    \"identifierType\": \"<string>\",\n    \"identifier\": \"<string>\"\n  },\n  \"phoneNumber\": \"+2663193\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/sim-swap/sim-swap:retrieve?api-version=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"sim-swap",
+										"sim-swap:retrieve"
+									],
+									"query": [
+										{
+											"key": "api-version",
+											"value": "<string>",
+											"description": "(Required) The API version to use for this operation."
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "x-ms-client-request-id",
+									"value": "<uuid>",
+									"description": {
+										"content": "An opaque, globally-unique, client-generated string identifier for the request.",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "x-ms-request-id",
+									"value": "<uuid>",
+									"description": {
+										"content": "An opaque, globally-unique, server-generated string identifier for the request.",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"date\": \"<dateTime>\"\n}"
+						},
+						{
+							"name": "An unexpected error response.",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"description": "An opaque, globally-unique, client-generated string identifier for the request.",
+										"key": "x-ms-client-request-id",
+										"value": "<uuid>"
+									},
+									{
+										"description": "(Required) The identifier of the APC Gateway resource which should handle this request.",
+										"key": "apc-gateway-id",
+										"value": "<string>"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"description": "Added as a part of security scheme: oauth2",
+										"key": "Authorization",
+										"value": "<token>"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"networkIdentifier\": {\n    \"identifierType\": \"<string>\",\n    \"identifier\": \"<string>\"\n  },\n  \"phoneNumber\": \"+2663193\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/sim-swap/sim-swap:retrieve?api-version=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"sim-swap",
+										"sim-swap:retrieve"
+									],
+									"query": [
+										{
+											"key": "api-version",
+											"value": "<string>",
+											"description": "(Required) The API version to use for this operation."
+										}
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": {\n    \"code\": \"<string>\",\n    \"message\": \"<string>\",\n    \"target\": \"<string>\",\n    \"details\": [\n      {\n        \"code\": \"<string>\",\n        \"message\": \"<string>\",\n        \"target\": \"<string>\",\n        \"details\": [\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          },\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          }\n        ],\n        \"innererror\": {\n          \"code\": \"<string>\",\n          \"innererror\": {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.InnerError detected>\"\n          }\n        }\n      },\n      {\n        \"code\": \"<string>\",\n        \"message\": \"<string>\",\n        \"target\": \"<string>\",\n        \"details\": [\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          },\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          }\n        ],\n        \"innererror\": {\n          \"code\": \"<string>\",\n          \"innererror\": {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.InnerError detected>\"\n          }\n        }\n      }\n    ],\n    \"innererror\": {\n      \"code\": \"<string>\",\n      \"innererror\": {\n        \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.InnerError detected>\"\n      }\n    },\n    \"consentUrl\": \"<uri>\"\n  }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "device-location",
+			"item": [
+				{
+					"name": "Device Location Verify",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "An opaque, globally-unique, client-generated string identifier for the request.",
+								"key": "x-ms-client-request-id",
+								"value": "{{$guid}}"
+							},
+							{
+								"description": "(Required) The identifier of the APC Gateway resource which should handle this request.",
+								"key": "apc-gateway-id",
+								"value": "{{apc-id}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Timestamp",
+								"value": "{{$isoTimestamp}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"device\": {\n        // javi 682055596\n        \"phoneNumber\": \"+34618698727\" //siimswap\n    },\n    \"networkIdentifier\": {\n        \"identifierType\": \"{{identifier-type-network}}\",\n        \"identifier\": \"{{telefonica-network}}\"\n    },\n    \"latitude\": 0.123,\n    \"longitude\": 45.678,\n    \"accuracy\": 10\n}\n/*\n        \"ipv4Address\":\n        {\n            \"ipv4\": \"176.83.121.240\",\n            //\"176.83.74.44\",\n            \"port\": 22440\n        }\n{\n  \"networkIdentifier\": {\n    \"identifierType\": \"IPv4\",\n    \"identifier\": \"90.167.43.219\"\n  },\n  \"latitude\": \"<double>\",\n  \"longitude\": \"<double>\",\n  \"accuracy\": \"<integer>\",\n  \"locationDevice\": {\n    \"networkAccessIdentifier\": \"<string>\",\n    \"phoneNumber\": \"07639862\",\n    \"ipv4Address\": {\n      \"ipv4\": \"<string>\",\n      \"port\": \"<integer>\"\n    },\n    \"ipv6Address\": {\n      \"ipv6\": \"<string>\",\n      \"port\": \"<integer>\"\n    }\n  }\n}\n*/",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/device-location/location:verify",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"device-location",
+								"location:verify"
+							],
+							"query": [
+								{
+									"key": "api-version",
+									"value": "{{apc-version}}",
+									"description": "(Required) The API version to use for this operation.",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Verifies whether a device is within a specified location area, defined as an accuracy (radius) around a point, specified by longitude and latitude."
+					},
+					"response": [
+						{
+							"name": "The request has succeeded.",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"description": "An opaque, globally-unique, client-generated string identifier for the request.",
+										"key": "x-ms-client-request-id",
+										"value": "<uuid>"
+									},
+									{
+										"description": "(Required) The identifier of the APC Gateway resource which should handle this request.",
+										"key": "apc-gateway-id",
+										"value": "<string>"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"description": "Added as a part of security scheme: oauth2",
+										"key": "Authorization",
+										"value": "<token>"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"networkIdentifier\": {\n    \"identifierType\": \"<string>\",\n    \"identifier\": \"<string>\"\n  },\n  \"latitude\": \"<double>\",\n  \"longitude\": \"<double>\",\n  \"accuracy\": \"<integer>\",\n  \"locationDevice\": {\n    \"networkAccessIdentifier\": \"<string>\",\n    \"phoneNumber\": \"07639862\",\n    \"ipv4Address\": {\n      \"ipv4\": \"<string>\",\n      \"port\": \"<integer>\"\n    },\n    \"ipv6Address\": {\n      \"ipv6\": \"<string>\",\n      \"port\": \"<integer>\"\n    }\n  }\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/device-location/location:verify?api-version=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"device-location",
+										"location:verify"
+									],
+									"query": [
+										{
+											"key": "api-version",
+											"value": "<string>",
+											"description": "(Required) The API version to use for this operation."
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "x-ms-client-request-id",
+									"value": "<uuid>",
+									"description": {
+										"content": "An opaque, globally-unique, client-generated string identifier for the request.",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "x-ms-request-id",
+									"value": "<uuid>",
+									"description": {
+										"content": "An opaque, globally-unique, server-generated string identifier for the request.",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"verificationResult\": \"<boolean>\"\n}"
+						},
+						{
+							"name": "An unexpected error response.",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"description": "An opaque, globally-unique, client-generated string identifier for the request.",
+										"key": "x-ms-client-request-id",
+										"value": "<uuid>"
+									},
+									{
+										"description": "(Required) The identifier of the APC Gateway resource which should handle this request.",
+										"key": "apc-gateway-id",
+										"value": "<string>"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"description": "Added as a part of security scheme: oauth2",
+										"key": "Authorization",
+										"value": "<token>"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"networkIdentifier\": {\n    \"identifierType\": \"<string>\",\n    \"identifier\": \"<string>\"\n  },\n  \"latitude\": \"<double>\",\n  \"longitude\": \"<double>\",\n  \"accuracy\": \"<integer>\",\n  \"locationDevice\": {\n    \"networkAccessIdentifier\": \"<string>\",\n    \"phoneNumber\": \"07639862\",\n    \"ipv4Address\": {\n      \"ipv4\": \"<string>\",\n      \"port\": \"<integer>\"\n    },\n    \"ipv6Address\": {\n      \"ipv6\": \"<string>\",\n      \"port\": \"<integer>\"\n    }\n  }\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/device-location/location:verify?api-version=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"device-location",
+										"location:verify"
+									],
+									"query": [
+										{
+											"key": "api-version",
+											"value": "<string>",
+											"description": "(Required) The API version to use for this operation."
+										}
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": {\n    \"code\": \"<string>\",\n    \"message\": \"<string>\",\n    \"target\": \"<string>\",\n    \"details\": [\n      {\n        \"code\": \"<string>\",\n        \"message\": \"<string>\",\n        \"target\": \"<string>\",\n        \"details\": [\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          },\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          }\n        ],\n        \"innererror\": {\n          \"code\": \"<string>\",\n          \"innererror\": {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.InnerError detected>\"\n          }\n        }\n      },\n      {\n        \"code\": \"<string>\",\n        \"message\": \"<string>\",\n        \"target\": \"<string>\",\n        \"details\": [\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          },\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          }\n        ],\n        \"innererror\": {\n          \"code\": \"<string>\",\n          \"innererror\": {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.InnerError detected>\"\n          }\n        }\n      }\n    ],\n    \"innererror\": {\n      \"code\": \"<string>\",\n      \"innererror\": {\n        \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.InnerError detected>\"\n      }\n    },\n    \"consentUrl\": \"<uri>\"\n  }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "number-verification",
+			"item": [
+				{
+					"name": "Number Verification Verify",
+					"protocolProfileBehavior": {
+						"followRedirects": false
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "An opaque, globally-unique, client-generated string identifier for the request.",
+								"key": "x-ms-client-request-id",
+								"value": "{{$guid}}"
+							},
+							{
+								"key": "Timestamp",
+								"value": "{{$isoTimestamp}}",
+								"type": "text"
+							},
+							{
+								"description": "(Required) The identifier of the APC Gateway resource which should handle this request.",
+								"key": "apc-gateway-id",
+								"value": "{{apc-id}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n  \"networkIdentifier\": {\n    \"identifierType\": \"NetworkCode\",\n    \"identifier\": \"your-network-code\"\n  },\n  \"phoneNumber\": \"your-phone-number\",\n  \"redirectUri\": \"https://localhost:7127/api/APC/number-verification/apcauthcallback\"\n}\n",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/number-verification/number:verify",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"number-verification",
+								"number:verify"
+							],
+							"query": [
+								{
+									"key": "api-version",
+									"value": "<string>",
+									"description": "(Required) The API version to use for this operation.",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Verifies the phone number (MSISDN) associated with a device."
+					},
+					"response": [
+						{
+							"name": "The request has succeeded.",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"description": "An opaque, globally-unique, client-generated string identifier for the request.",
+										"key": "x-ms-client-request-id",
+										"value": "<uuid>"
+									},
+									{
+										"description": "(Required) The identifier of the APC Gateway resource which should handle this request.",
+										"key": "apc-gateway-id",
+										"value": "<string>"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"description": "Added as a part of security scheme: oauth2",
+										"key": "Authorization",
+										"value": "<token>"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"networkIdentifier\": {\n    \"identifierType\": \"<string>\",\n    \"identifier\": \"<string>\"\n  },\n  \"phoneNumber\": \"+895745741631\",\n  \"hashedPhoneNumber\": \"<string>\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/number-verification/number:verify?api-version=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"number-verification",
+										"number:verify"
+									],
+									"query": [
+										{
+											"key": "api-version",
+											"value": "<string>",
+											"description": "(Required) The API version to use for this operation."
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "x-ms-client-request-id",
+									"value": "<uuid>",
+									"description": {
+										"content": "An opaque, globally-unique, client-generated string identifier for the request.",
+										"type": "text/plain"
+									}
+								},
+								{
+									"key": "x-ms-request-id",
+									"value": "<uuid>",
+									"description": {
+										"content": "An opaque, globally-unique, server-generated string identifier for the request.",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"verificationResult\": \"<boolean>\"\n}"
+						},
+						{
+							"name": "An unexpected error response.",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"description": "An opaque, globally-unique, client-generated string identifier for the request.",
+										"key": "x-ms-client-request-id",
+										"value": "<uuid>"
+									},
+									{
+										"description": "(Required) The identifier of the APC Gateway resource which should handle this request.",
+										"key": "apc-gateway-id",
+										"value": "<string>"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"description": "Added as a part of security scheme: oauth2",
+										"key": "Authorization",
+										"value": "<token>"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"networkIdentifier\": {\n    \"identifierType\": \"<string>\",\n    \"identifier\": \"<string>\"\n  },\n  \"phoneNumber\": \"+895745741631\",\n  \"hashedPhoneNumber\": \"<string>\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/number-verification/number:verify?api-version=<string>",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"number-verification",
+										"number:verify"
+									],
+									"query": [
+										{
+											"key": "api-version",
+											"value": "<string>",
+											"description": "(Required) The API version to use for this operation."
+										}
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": {\n    \"code\": \"<string>\",\n    \"message\": \"<string>\",\n    \"target\": \"<string>\",\n    \"details\": [\n      {\n        \"code\": \"<string>\",\n        \"message\": \"<string>\",\n        \"target\": \"<string>\",\n        \"details\": [\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          },\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          }\n        ],\n        \"innererror\": {\n          \"code\": \"<string>\",\n          \"innererror\": {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.InnerError detected>\"\n          }\n        }\n      },\n      {\n        \"code\": \"<string>\",\n        \"message\": \"<string>\",\n        \"target\": \"<string>\",\n        \"details\": [\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          },\n          {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.Error detected>\"\n          }\n        ],\n        \"innererror\": {\n          \"code\": \"<string>\",\n          \"innererror\": {\n            \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.InnerError detected>\"\n          }\n        }\n      }\n    ],\n    \"innererror\": {\n      \"code\": \"<string>\",\n      \"innererror\": {\n        \"value\": \"<Circular reference to #/components/schemas/Azure.Core.Foundations.InnerError detected>\"\n      }\n    },\n    \"consentUrl\": \"<uri>\"\n  }\n}"
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "tokenName",
+				"value": "hol",
+				"type": "string"
+			},
+			{
+				"key": "tokenType",
+				"value": "Bearer",
+				"type": "string"
+			},
+			{
+				"key": "accessToken",
+				"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6InEtMjNmYWxldlpoaEQzaG05Q1Fia1A1TVF5VSIsImtpZCI6InEtMjNmYWxldlpoaEQzaG05Q1Fia1A1TVF5VSJ9.eyJhdWQiOiJodHRwczovL21hbmFnZW1lbnQuYXp1cmUuY29tIiwiaXNzIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvOWIyMGI3MGMtZTU3Zi00NjA0LTk2MGEtNWI3NzkzMjdlZTNhLyIsImlhdCI6MTcxMjc2NzQ4MCwibmJmIjoxNzEyNzY3NDgwLCJleHAiOjE3MTI3NzEzODAsImFpbyI6IkUyTmdZUGozTG1GM2FITlIraGVKSDZLV0hiOXpBUT09IiwiYXBwaWQiOiJjNGMyNjI0Yi02YjU0LTRhYjUtODljNS0wNWFmODdiODQyZDMiLCJhcHBpZGFjciI6IjEiLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC85YjIwYjcwYy1lNTdmLTQ2MDQtOTYwYS01Yjc3OTMyN2VlM2EvIiwiaWR0eXAiOiJhcHAiLCJvaWQiOiJiOTljZWJmNi0wNTg1LTQ2ZjAtODFkNS1kZWQ5OTliNjNjZTYiLCJyaCI6IjAuQVVjQURMY2dtM19sQkVhV0NsdDNreWZ1T2taSWYza0F1dGRQdWtQYXdmajJNQk1OQVFBLiIsInN1YiI6ImI5OWNlYmY2LTA1ODUtNDZmMC04MWQ1LWRlZDk5OWI2M2NlNiIsInRpZCI6IjliMjBiNzBjLWU1N2YtNDYwNC05NjBhLTViNzc5MzI3ZWUzYSIsInV0aSI6Im9nLTUydE9NN2ttYUkyNk1DVUx3QUEiLCJ2ZXIiOiIxLjAiLCJ4bXNfdGNkdCI6MTQ2Mjg3Nzc0NH0.X0xpJKnrNhkxHEjcdbQtMuqEl-7JRidKUDfw9itVHqjhyvfK011f4xUi_FKHvkzM2UDwQROnf5uAdCSi8S-DODbRed-dfntmBqpmjRP0zZp7pzeCTny77Kfkb7qBvRjpr4R2Kn3uNMR3qUus9GoHfZqa3gPeDk1UTwU3YwH0HLhTTVtywP4FlK2WiF3wZcTfE4qNbRhdr-NtHKevifbXPgEkXrf6w8YJVNXTt-JJlJTOzgXkIDlroYYw2waU777NiL627RVWgwSTHD1003o_abRILTf9Rk_gkEf-hY3gsu8UHiFZh2WHGyMXDjEqT1-OldV5N9qjbfjEnInE98Dgfw",
+				"type": "string"
+			},
+			{
+				"key": "accessTokenUrl",
+				"value": "https://login.microsoftonline.com/{{auth-tenantid}}/oauth2/v2.0/token",
+				"type": "string"
+			},
+			{
+				"key": "clientSecret",
+				"value": "{{auth-secret}}",
+				"type": "string"
+			},
+			{
+				"key": "clientId",
+				"value": "{{auth-clientId}}",
+				"type": "string"
+			},
+			{
+				"key": "client_authentication",
+				"value": "header",
+				"type": "string"
+			},
+			{
+				"key": "scope",
+				"value": "https://management.azure.com/.default",
+				"type": "string"
+			},
+			{
+				"key": "grant_type",
+				"value": "client_credentials",
+				"type": "string"
+			},
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			},
+			{
+				"key": "authUrl",
+				"value": "https://login.microsoftonline.com/common/oauth2/authorize",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "auth-secret",
+			"value": "your-entraid-app-secret",
+			"type": "string"
+		},
+		{
+			"key": "auth-clientId",
+			"value": "your-entraid-app-clientid",
+			"type": "string"
+		},
+		{
+			"key": "auth-tenantid",
+			"value": "your entraid tenantid",
+			"type": "string"
+		},
+		{
+			"key": "apc-id",
+			"value": "your-apc-gateway",
+			"type": "string"
+		},
+		{
+			"key": "endpoint",
+			"value": "https://eastus.prod.apcgatewayapi.azure.com"
+		},
+		{
+			"key": "baseUrl",
+			"value": "{{endpoint}}"
+		},
+		{
+			"key": "apc-version",
+			"value": "1.0",
+			"type": "string"
+		},
+		{
+			"key": "apc-proxy-url-local",
+			"value": "your-local-be-url\n",
+			"type": "string"
+		},
+		{
+			"key": "apc-proxy-url-azure",
+			"value": "your-be-url",
+			"type": "string"
+		}
+	]
+}

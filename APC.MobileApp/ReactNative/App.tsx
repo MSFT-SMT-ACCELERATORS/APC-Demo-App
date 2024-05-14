@@ -8,7 +8,6 @@ import Welcome from './app/screens/Welcome';
 import Consents from './app/screens/Consents';
 import Success from './app/screens/Success';
 import Steps from './app/screens/Steps';
-import Debug from './app/screens/Debug';
 import { ApiClientProvider } from './app/api/ApiClientProvider';
 import Settings from './app/screens/Settings';
 import { useState } from 'react';

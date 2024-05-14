@@ -2,13 +2,13 @@
 {
     public class NetworkIdentifier
     {
-        public string IdentifierType { get; set; }
-        public string Identifier { get; set; }
+        public required string IdentifierType { get; set; }
+        public required string Identifier { get; set; }
     }
 
     public class NetworkRetrievalResult
     {
-        public string NetworkCode { get; set; }
+        public required string NetworkCode { get; set; }
     }
 
 }

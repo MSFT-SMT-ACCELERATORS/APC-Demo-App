@@ -1,8 +1,8 @@
 import axios from "axios";
 import { LocationObjectCoords } from "expo-location";
 import countries from 'i18n-iso-countries';
-import { BING_MAPS_API_KEY } from './SettingsService'
 import { Logger } from '../utils/Logger';
+import {BING_URL, BING_KEY} from '@env';
 
 countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 
@@ -39,7 +39,7 @@ interface BingSuggestion {
 
 
 export const translateCoordsToLocation = async (coords: LocationObjectCoords, verbosePlaceNames: boolean = false) => {
-  const res = await axios.get(`https://dev.virtualearth.net/REST/v1/Locations/${coords.latitude},${coords.longitude}?verboseplacenames=${verbosePlaceNames}&key=${BING_MAPS_API_KEY}`);
+  const res = await axios.get(`${BING_URL}/Locations/${coords.latitude},${coords.longitude}?verboseplacenames=${verbosePlaceNames}&key=${BING_KEY}`);
 
   if (res.status == 200 && res.data && res.data.resourceSets[0].resources[0].address) {
     const address = res.data.resourceSets[0].resources[0].address;
@@ -56,7 +56,7 @@ export const translateCoordsToLocation = async (coords: LocationObjectCoords, ve
 
 
 export const getCountrySuggestions = async (query: string): Promise<string[]> => {
-  const url = `https://dev.virtualearth.net/REST/v1/Autosuggest?query=${encodeURIComponent(query)}&key=${BING_MAPS_API_KEY}`;
+  const url = `${BING_URL}/Autosuggest?query=${encodeURIComponent(query)}&key=${BING_KEY}`;
 
   try {
     const response = await fetch(url);
@@ -66,7 +66,6 @@ export const getCountrySuggestions = async (query: string): Promise<string[]> =>
       .map((suggestion: BingSuggestion) => suggestion.address.countryRegion)
       .filter((countryRegion): countryRegion is string => countryRegion != null);
 
-    // Podrías querer asegurarte de que los resultados son únicos si hay duplicados
     return Array.from(new Set(countrySuggestions));
   } catch (error) {
     Logger.error('Error fetching country suggestions from Bing Maps:', error);
@@ -78,7 +77,7 @@ export const getCountrySuggestions = async (query: string): Promise<string[]> =>
 export const getStateSuggestions = async (query: string, country: string): Promise<string[]> => {
 
   const countryCode = countries.getAlpha2Code(country, 'en') || '';
-  const url = `https://dev.virtualearth.net/REST/v1/Autosuggest?query=${encodeURIComponent(query)}&countryFilter=${countryCode}&key=${BING_MAPS_API_KEY}`;
+  const url = `${BING_URL}/Autosuggest?query=${encodeURIComponent(query)}&countryFilter=${countryCode}&key=${BING_KEY}`;
 
   try {
     const response = await fetch(url);
@@ -99,7 +98,7 @@ export const getStateSuggestions = async (query: string, country: string): Promi
 export const getCitySuggestions = async (query: string, country: string, state: string): Promise<string[]> => {
 
   const countryCode = countries.getAlpha2Code(country, 'en') || '';
-  const url = `https://dev.virtualearth.net/REST/v1/Autosuggest?query=${encodeURIComponent(query)}&countryFilter=${countryCode}&key=${BING_MAPS_API_KEY}`;
+  const url = `${BING_URL}/Autosuggest?query=${encodeURIComponent(query)}&countryFilter=${countryCode}&key=${BING_KEY}`;
 
   try {
     const response = await fetch(url);
@@ -122,7 +121,7 @@ export const getCitySuggestions = async (query: string, country: string, state: 
 
 export const getCityCoordinates = async (cityName: string, countryName: string) => {
   const encodedCity = `${encodeURIComponent(cityName)},${encodeURIComponent(countryName)}`;
-  const url = `https://dev.virtualearth.net/REST/v1/Locations?q=${encodedCity}&key=${BING_MAPS_API_KEY}`;
+  const url = `${BING_URL}/Locations?q=${encodedCity}&key=${BING_KEY}`;
   Logger.log("getCityCoordinates:", url);
   try {
     const response = await fetch(url);
