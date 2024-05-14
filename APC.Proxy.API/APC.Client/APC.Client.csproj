@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Communication.ProgrammableConnectivity" Version="1.0.0-beta.1" />
     <PackageReference Include="Azure.Identity" Version="1.11.3" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
@@ -15,7 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\APC.DataModel\APC.DataModel.csproj" />
-    <ProjectReference Include="..\Azure.Communication.ProgrammableConnectivity\Azure.Communication.ProgrammableConnectivity.csproj" />
   </ItemGroup>
 
 </Project>

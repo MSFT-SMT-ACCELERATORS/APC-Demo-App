@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APC.Client", "APC.Client\AP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APC.DataModel", "APC.DataModel\APC.DataModel.csproj", "{5024CE54-FF80-4DCE-834A-543229D9848F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azure.Communication.ProgrammableConnectivity", "Azure.Communication.ProgrammableConnectivity\Azure.Communication.ProgrammableConnectivity.csproj", "{95F9564B-C177-4479-81C3-65B962177583}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{5024CE54-FF80-4DCE-834A-543229D9848F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5024CE54-FF80-4DCE-834A-543229D9848F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5024CE54-FF80-4DCE-834A-543229D9848F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{95F9564B-C177-4479-81C3-65B962177583}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{95F9564B-C177-4479-81C3-65B962177583}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{95F9564B-C177-4479-81C3-65B962177583}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{95F9564B-C177-4479-81C3-65B962177583}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
