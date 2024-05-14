@@ -4,6 +4,8 @@ Welcome to the Azure Programmable Connectivity (APC) Demo App and Hands-on Lab (
 
 In order to be able to use APC in your apps you curently need to [Sign up for the public preview of Azure Programmable Connectivity](https://aka.ms/APCpublicpreview). 
 
+For an introduction to APC go to the Microsoft official docs here: [What is Azure Programmable Connectivity?](https://learn.microsoft.com/en-us/azure/programmable-connectivity/azure-programmable-connectivity-overview)
+
 This repository contains valuable resources to help you understand and implement APC in your applications. It is divided into two main sections:
 
 ## 1. Hands-On Lab (HOL)
