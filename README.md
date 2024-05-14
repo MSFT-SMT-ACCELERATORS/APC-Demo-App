@@ -1,4 +1,4 @@
-# Azure Programmable Connectivity (APC) learning material repository
+# Azure Programmable Connectivity (APC) demo/example app and Hands-On-Lab repository
 
 Welcome to the Azure Programmable Connectivity (APC) Demo App and Hands-on Lab (HOL) repository! 
 
