@@ -1,83 +1,31 @@
-# APC-Demo-App
-Mobile App with Cloud Service Demo consuming Azure Programmable Connectivity APIs with Telcos network APIs under the covers
+# Azure Programmable Connectivity (APC) Repository
 
-## Components
+Welcome to the Azure Programmable Connectivity (APC) Demo App and Hands-on Lab (HOL) repository! [Sign up for the public preview of Azure Programmable Connectivity](https://aka.ms/APCpublicpreview) and start building with APC. 
+This repository contains valuable resources to help you understand and implement APC in your applications. It is divided into two main sections:
 
-### APC API
-- **Location**: Cloud.
-- **Functionality**: WIP
+## 1. Hands-On Lab (HOL)
 
-### APCProxyServer
-- **Hosting**: Azure App Service API.
-- **Role**: Acts as an intermediary between the React Native app and the APC API.
-- **Responsibilities**: Authentication, request forwarding, and minimal data processing.
+The Hands-On Lab provides a step-by-step guide to get you started with APC, from setting up your environment to using APC's powerful network APIs for SIM swap detection, location services, phone number verification, and more.
 
-### React Native Application
-- **Environment**: Client devices (smartphones).
-- **Features**: Interaction demo with the APCProxyServer for APC interactions.
-- **Technology**: Built using React Native and Expo Go.
+- **Location**: `/docs/APC-HOL.md`
+- **Contents**: Introduction to APC, APC SDK set up, APC Network APIs with APC SDK, REST HTTP Client/Postman and advanced implementation details.
+
+To dive into the Hands-On Lab, [click here](./docs/APC-HOL.md).
+
+## 2. APC Demo Application
+
+Source and instructions to build and deploy the APC Demo Application "Leaves Banking App" which showcases a real-life use case of leveraging APC Network APIs for anti fraud features into a banking application.
+
+- **Readme location**: Guide for setting up and understanding the demo application can now be found at `/docs/APC-Demo-App/leaves-README.md`.
+- **Source code**: find the client app and API modules in `/APC.MobileApp` and `/APC.Proxy.API`, respectively.
+
+For more information on the APC Demo Application, [click here](./docs/leaves-README.md).
+
+![Leaves Bank app](./docs/imgs/main-image-2.png)
+
 
 ## Repository Structure
 - `/APCProxyServer`: Source code for the proxy server (.NET 8 with ASP.NET Core).
 - `/APC.MobileApp/ReactNativeApp`: Source code for the React Native application.
-- `/docs`: Documentation, including diagrams.
-- `README.md`: Setup guide and project overview.
-
-
-## Get Started (temporal)
-
-This section provides a step-by-step guide to get the project up and running on your local machine and mobile device.
-
-### Prerequisites
-Before starting, ensure you have the following installed:
-- Git
-- Node.js
-
-### Local Setup and Testing
-
-To set up and run the project locally, follow these steps:
-
-1. **Clone the Project**
-   ```
-   git clone [Repository URL]
-   ```
-
-2. **Navigate to the React Native App Directory**
-   ```
-   cd [Repo path]/APC.MobileApp/ReactNative
-   ```
-
-3. **Install Dependencies**
-   ```
-   npm install
-   ```
-
-4. **Start the Application**
-   ```
-   npm start
-   ```
-
-5. **Open in a Web Browser**
-   - Once the Metro Bundler is running in your terminal, press `W` to open the app in your web browser. Use responsive mode when opening the developer console with F12.
-
-![Dev Responsive](docs/img/desktop.png)
-
-### Mobile Testing
-
-To test the app on a mobile device, follow these additional steps:
-
-1. **Download Expo Go**
-   - Install the Expo Go application from your device's app store (available on iOS and Android).
-
-2. **Scan QR Code**
-   - Open the Expo Go app on your mobile device.
-   - Select the option to scan the QR code.
-   - Scan the QR code that appears in your terminal after you've run `npm start` from the React Native app directory.
-
-![QR Code](docs/img/QR.png)
-![Scan QR](docs/img/scan.png)
-
-
-This will open the app on your mobile device, allowing you to test its features in a mobile environment.
-
+- `/docs`: Setup guide and project overview and Hands on Lab (HOL) documentation.
 

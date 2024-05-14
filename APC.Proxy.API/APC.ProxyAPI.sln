@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34408.163
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APC.ProxyServer", "APC.ProxyServer\APC.ProxyServer.csproj", "{21C96CFF-2DD8-4D06-9A79-59046819A472}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APC.ProxyServer", "APC.ProxyServer\APC.ProxyServer.csproj", "{21C96CFF-2DD8-4D06-9A79-59046819A472}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APC.Client", "APC.Client\APC.Client.csproj", "{EB921C35-46BC-4F1E-975D-188B4B10105E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APC.Client", "APC.Client\APC.Client.csproj", "{EB921C35-46BC-4F1E-975D-188B4B10105E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APC.DataModel", "APC.DataModel\APC.DataModel.csproj", "{5024CE54-FF80-4DCE-834A-543229D9848F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APC.DataModel", "APC.DataModel\APC.DataModel.csproj", "{5024CE54-FF80-4DCE-834A-543229D9848F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
