@@ -1,7 +1,7 @@
 # Azure Programmable Connectivity (APC) Repository
 
-Welcome to the Azure Programmable Connectivity (APC) Demo App  repository! This repository contains valuable resources to help you understand and implement APC in your applications. It is divided into two main sections:
-
+Welcome to the Azure Programmable Connectivity (APC) Demo App and Hands-on Lab (HOL) repository! [Sign up for the public preview of Azure Programmable Connectivity](https://aka.ms/APCpublicpreview) and start building with APC. 
+This repository contains valuable resources to help you understand and implement APC in your applications. It is divided into two main sections:
 
 ## 1. Hands-On Lab (HOL)
 
