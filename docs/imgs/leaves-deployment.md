@@ -113,7 +113,7 @@ To authenticate and access the APC Gateway, create a Microsoft Entra application
    }
    ```
 
-   Find more information on the application settings for this app in the [implementation details file](implementation-details.md)
+   Find more information on the application settings for this app in the [implementation details file](leaves-implementation-details.md)
 
 4. **Build the Project**
    ```
@@ -287,9 +287,9 @@ To test the app on a mobile device, follow these additional steps:
 - Select the option to scan the QR code.
 - Scan the QR code that appears in your terminal after you've run `npm start` from the React Native app directory.
 
-   ![QR Code](img/QR.png)
+   ![QR Code](imgs/QR.png)
 
-   ![Scan QR](img/scan.png)
+   ![Scan QR](imgs/scan.png)
 
 **TODO Update with iOS screen recording**
 
