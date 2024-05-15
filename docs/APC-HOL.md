@@ -94,7 +94,7 @@ Azure Programmable Connectivity (APC) is an Azure service that connects cloud ap
 
 Here is an overview diagram depicting the interaction between these components:
 
-![APC Simple diagram](./imgs/image-54.png)
+![APC Simple diagram](./imgs/hol-image-54.png)
 
 ### APC Planned Operator APIs
 
@@ -206,7 +206,7 @@ Once your gateway is created, you'll need to configure it:
     - SIM Swap
     - Number Verification
 
-    ![alt text](./imgs/image-47.png)
+    ![alt text](./imgs/hol-image-47.png)
 
 2. Complete the application details, which will be shared with the operator for validation.
 
@@ -218,7 +218,7 @@ Now, note down relevant resource information for later steps:
 
 1. Navigate to your APC Gateway resource in the Azure portal and copy the `resource Id` and the `endpoint` value:
 
-![APC Gateway resource](./imgs/image-38.png)
+![APC Gateway resource](./imgs/hol-image-38.png)
 
 #### Set up authentication
 
@@ -232,7 +232,7 @@ To authenticate and access the APC Gateway, create a Microsoft Entra application
     1. Don´t specify any return URI as it´s not needed for these HOL exercises.
     1. Select **Register**.
 
-    ![App Registration](./imgs/image-40.png)
+    ![App Registration](./imgs/hol-image-40.png)
 
 2. Create and record the application client ID and client secret or certificate for future use.
     1. Browse to **Identity** > **Applications** > **App registrations**, then select your application.
@@ -241,7 +241,7 @@ To authenticate and access the APC Gateway, create a Microsoft Entra application
     1. Provide a description of the secret, and a duration.
     1. Select **Add**.
 
-        ![Record Client Secret](./imgs/image-34.png)
+        ![Record Client Secret](./imgs/hol-image-34.png)
 
 3. Assign the necessary role to interact with the APC Gateway to your application by running the following Azure CLI command. Replace or assign values to `$SUB_ID` with your subscription id, `RG_NAME` with resource group name where the APC Gateway resource is and `$GATEWAY_NAME` for and the APC Gateway resource name. Log in using `az login` if you have to:
 
@@ -269,7 +269,7 @@ With your project created, the next step is to install the APC SDK:
 
 1. Use the NuGet Package Manager to find a prerelease NuGet by checking `Include prerelease` checkbox and search for `Azure.Communication.ProgrammableConnectivity`. Install the latest version of the SDK to your project.
 
-    ![APC SDK nugget install](./imgs/image-57.png)
+    ![APC SDK nugget install](./imgs/hol-image-57.png)
     
 2. or use dotnet CLI to install the NuGet Package from the project folder path:
 
@@ -287,7 +287,7 @@ The client library uses [`Azure.Identity`](https://learn.microsoft.com/dotnet/ap
     dotnet add package Azure.Identity
     ```
 
-    ![Azure.Identity nugget install](./imgs/image-41.png)
+    ![Azure.Identity nugget install](./imgs/hol-image-41.png)
 
 2. In Program.cs, create values for the recorded APC Gateway information and Entra client credentials from earlier steps.
 
@@ -315,7 +315,7 @@ The client library uses [`Azure.Identity`](https://learn.microsoft.com/dotnet/ap
     // Instantiate the APC client
     ProgrammableConnectivityClient apcClient = new ProgrammableConnectivityClient(new(apcEndpoint), credential));
     ```
-![Console app APC SDK setup with auth](./imgs/image-58.png)
+![Console app APC SDK setup with auth](./imgs/hol-image-58.png)
 
 
 #### Make APC SDK requests
@@ -363,7 +363,7 @@ To make APC operator API calls, you'll need the network identifier for the cellu
     Console.WriteLine($"Network Identifier result: {networkResponse.Value}");
     ```
 
-![alt text](./imgs/image-59.png)
+![alt text](./imgs/hol-image-59.png)
 
 
 ##### APC SDK: Sim Swap retrieve/verify
@@ -394,7 +394,7 @@ Once you have the client configured and retrieved the network identifier, procee
     Console.WriteLine($"Verification result: {response.Value.VerificationResult}");
     ```
 
-![alt text](./imgs/image-60.png)
+![alt text](./imgs/hol-image-60.png)
 
 (OPTIONAL) If you wish to test more APC APIs using this method, find in the annex additional APC API calls with implementation details using the APC .NET SDK approach:
 
@@ -423,24 +423,24 @@ To make authenticated requests to the APC API, you need to set up Postman with t
 
 1. Open Postman, click import and drag the collection linked in this repo [Link to APC Postman collection](Azure%20Programmable%20Connectivity%20(APC)%20HOL.postman_collection.json)
 
-    ![Import collection](./imgs/image-6.png)
+    ![Import collection](./imgs/hol-image-6.png)
 
 2. Double click the collection name that appeared on the collection side menu and go to the tab `Variables`. From there, update the `auth-secret`, `auth-clientId`, `auth-tenantid` and also the `apc-id` and `endpont` values. 
 
-    ![Collection auth var](./imgs/image-30.png)
-    ![Collection APC Gateway id var](./imgs/image-33.png)
+    ![Collection auth var](./imgs/hol-image-30.png)
+    ![Collection APC Gateway id var](./imgs/hol-image-33.png)
 
 3. Click save or press `Ctrl+S` and go to the tab `Authorization`
 
-    ![Collection auth tab](./imgs/image-7.png)
+    ![Collection auth tab](./imgs/hol-image-7.png)
 
 4. Scroll down to `Configure New Token` advanced section and click the button `Generate New Access Token`
 
-    ![Collection Get new token](./imgs/image-32.png)
+    ![Collection Get new token](./imgs/hol-image-32.png)
 
 5. Once succeeded, select `Use Token`. This token will be valid for 1 hour. You can skip to the Generate New Token step every time it expires.
 
-    ![Collection use token](./imgs/image-31.png)
+    ![Collection use token](./imgs/hol-image-31.png)
 
 
 ##### Postman APC SimSwap Verify Request
@@ -449,7 +449,7 @@ To make APC operator API calls, you'll need the network identifier for the cellu
 
 1. Navigate to `network:retrive` request
 
-  ![alt text](./imgs/image-42.png)
+  ![alt text](./imgs/hol-image-42.png)
 
 2. **Obtain Your Public IP Address**: Before adjusting the request payload, you need to obtain the public IP address of your cellular connection. You can do this by:
    
@@ -469,17 +469,17 @@ To make APC operator API calls, you'll need the network identifier for the cellu
    }
     ```
 
-    ![alt text](./imgs/image-43.png)
+    ![alt text](./imgs/hol-image-43.png)
 
 3. Click `Send` and view the response
 
-    ![alt text](./imgs/image-11.png)
+    ![alt text](./imgs/hol-image-11.png)
 
 ##### Postman APC SimSwap Verify Request
 
 1. Navigate to `sim-swap:verify` request
 
-    ![alt text](./imgs/image-44.png)
+    ![alt text](./imgs/hol-image-44.png)
 
 2. Adjust the request payload in the `Body` tab
 
@@ -500,11 +500,11 @@ Here's an example for the request payload to perform a SIM Swap verify:
     }
   }
   ```
-  ![alt text](./imgs/image-10.png)
+  ![alt text](./imgs/hol-image-10.png)
 
 3. Click `Send` and view the response
 
-  ![alt text](./imgs/image-11.png)
+  ![alt text](./imgs/hol-image-11.png)
 
 #### B. Make APC requests with .NET HttpClient
 
@@ -531,7 +531,7 @@ You can also use the .NET HttpClient to make authenticated calls to APC. Here's 
     dotnet add package Azure.Identity
     ```
 
-    ![Azure.Identity nugget install](./imgs/image-41.png)
+    ![Azure.Identity nugget install](./imgs/hol-image-41.png)
 
 4. Add the following code to Retrieve a token for your HttpClient.:
     ```csharp
@@ -552,7 +552,7 @@ You can also use the .NET HttpClient to make authenticated calls to APC. Here's 
 
 Now you are ready to start calling APC API:
 
-![alt text](./imgs/image-18.png)
+![alt text](./imgs/hol-image-18.png)
 
 ##### Http APC Call #1: Retrieve Network Information
 To make APC operator API calls, you'll need the network identifier for the cellular network device address you are calling from. More informtion on this APC Call: [Device Netwrok](#device-network).
@@ -594,7 +594,7 @@ To make APC operator API calls, you'll need the network identifier for the cellu
     var networkResult = await JsonSerializer.DeserializeAsync<NetworkRetrievalResult>(await networkResponse.Content.ReadAsStreamAsync(), new JsonSerializerOptions{PropertyNameCaseInsensitive = true});
     Console.WriteLine($"Network retrieval result: {networkResult}");
     ```
-    ![alt text](./imgs/image-49.png)
+    ![alt text](./imgs/hol-image-49.png)
 
 ##### Http APC Call #2: Verify Sim Swap
 
@@ -629,7 +629,7 @@ Once you have the HTTP client configured and retrieved the network identifier, p
         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
     Console.WriteLine($"Sim swap verification result: {simSwapResult.VerificationResult}");
     ```
-    ![alt text](./imgs/image-50.png)
+    ![alt text](./imgs/hol-image-50.png)
 
 (OPTIONAL) If you wish to test more APC APIs using this method, find in the annex additional REST calls with implementation details using the HttpClient approach:
 
@@ -655,7 +655,7 @@ In this section, we explore how Azure Programmable Connectivity (APC) can be int
 
 This section provides a brief technical description of the demo application's architecture. The application is designed to interact with APC for enhanced anti-fraud security measures such as SIM swap detection, number verification and user location verification.
 
-![Architecture Diagram](./imgs/image-55.png)
+![Architecture Diagram](./imgs/hol-image-55.png)
 
 #### Components
 
@@ -707,7 +707,7 @@ The APC request flow is a critical component of the application. Understanding t
 
 This diagram shows the request flow from the app to the backend and then to the APC Gateway:
 
-![APC Simple diagram](./imgs/image-54.png)
+![APC Simple diagram](./imgs/hol-image-54.png)
 
 Direct APC calls from the frontend are not advisable due to the sensitive nature of the credentials involved (client ID and secret). Exposing these details can lead to unauthorized access and misuse of Azure resources, as browser tools allow easy access to frontend code. Instead, APC calls are delegated to the backend service, the APC Proxy, which securely handles authentication and integration.
 
@@ -820,7 +820,7 @@ For this reason, there are some considerations within the app implementation:
 
 2. **Click Get Started:** During the first steps, the application will make a **device-network request** to the backend, where the backend captures the caller IP.
 
-    ![alt text](./imgs/image-52.png)
+    ![alt text](./imgs/hol-image-52.png)
 
 Additionally, operations like number verification follow a specific process that requires these requests to come from the same network as the phone number being checked. Making requests from IP addresses outside the intended network will result in unathorized results in APC hence **the client application must use the cellular network instead of an available WiFI** connection from a non cellular network.
 
@@ -829,11 +829,11 @@ Additionally, operations like number verification follow a specific process that
 1. Input the phone number for the cellular network you are using.
     - This could be either phone number for the sim card used in your device or if you are connecting to a hotspot network for this exercise, the phone number for the hotspot device. More information in [network limitations](#network-limitations).
 
-    ![alt text](./imgs/image-51.png)
+    ![alt text](./imgs/hol-image-51.png)
 
 2. Press the checkmark icon to verify the phone number
 
-    ![alt text](./imgs/image-53.png)
+    ![alt text](./imgs/hol-image-53.png)
 
 One of the main challenges in implementing number verification is that it requires part of the user flow to be performed from the client app, not just the backend. This is necessary because [Number Verification Network API request](#number-verification) follows an OAuth authentication flow, which involves multiple steps and interactions between the client app, the backend, the APC service and the Operator auth servers.
 
@@ -853,7 +853,7 @@ Here's an overview of the number verification process:
 
 The diagram below illustrates the detailed flow of the number verification process:
 
-![alt text](./imgs/image-62.png)
+![alt text](./imgs/hol-image-62.png)
 
 #### Initial Request from Client App to Backend Service:
 1. **Client App (Leaves Bank App)** sends a request to initiate number verification.
@@ -958,7 +958,7 @@ Verifies whether a device is within a specified location area, defined as an acc
 - If location data access is denied by the operator, the API will return an HTTP 403 error response with code: `CONSENT_URL_ERROR`. This type of message also contains the `consent_url` property with an url valuable pointing to the operator permission form the user has to accept.
 - Error handling should account for permissions being revoked or not granted by the user or operator, ensuring that the application complies with privacy laws and user preferences. The error message wit
 
-![alt text](./imgs/image-61.png)
+![alt text](./imgs/hol-image-61.png)
 
 ##### Request Properties
 - **networkIdentifier**: Network identifier for the query.
@@ -1096,7 +1096,7 @@ var deviceLocationVerificationContent = new DeviceLocationVerificationContent(ne
 Response<DeviceLocationVerificationResult> result = deviceLocationClient.Verify(apcGatewayId, deviceLocationVerificationContent);
 Console.WriteLine(result.Value.VerificationResult);
 ```
-![alt text](./imgs/image-15.png)
+![alt text](./imgs/hol-image-15.png)
 
 ##### APC SDK: Number verification
 
@@ -1124,7 +1124,7 @@ var locationUrl = response.GetRawResponse().Headers.TryGetValue("location", out 
 
 Console.WriteLine($"location redirect URL: {locationUrl}");
 ```
-![alt text](./imgs/image-16.png)
+![alt text](./imgs/hol-image-16.png)
 
 For the second call
 
@@ -1141,7 +1141,7 @@ NumberVerificationWithCodeContent numberVerificationWithCodeContent = new Number
 Response<NumberVerificationResult> numberVerificationResponse = await numberVerificationClient.VerifyWithCodeAsync(apcGatewayId, numberVerificationWithCodeContent);
 Console.WriteLine(numberVerificationResponse.Value.VerificationResult);
 ```
-![alt text](./imgs/image-17.png)
+![alt text](./imgs/hol-image-17.png)
 
 
 
@@ -1169,7 +1169,7 @@ var locationResult = await JsonSerializer.DeserializeAsync<DeviceLocationVerific
     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 Console.WriteLine($"Device location verification result: {locationResult.VerificationResult}");
 ```
-![alt text](./imgs/image-20.png)
+![alt text](./imgs/hol-image-20.png)
 
 ##### HttpClient APC: Number verification
 
@@ -1211,7 +1211,7 @@ Number verification involves 2 APC requests along with some HTTP 302 redirection
         };
         var initRequestContent = new StringContent(JsonSerializer.Serialize(numberVerificationInitContent), Encoding.UTF8, "application/json");
         ```
-        ![alt text](./imgs/image-36.png)
+        ![alt text](./imgs/hol-image-36.png)
 
     2. **First APC Request:** Make the HTTP Request. The result should be a HTTP `302` response with a Location header containing the next call in the number verification flow. This location won't be followed automatically since we configured the HttpClient when instanciating it.
     
@@ -1226,7 +1226,7 @@ Number verification involves 2 APC requests along with some HTTP 302 redirection
         string firstRedirectUri = initialNumberVerificationResponse.Headers.Location?.ToString();
         HttpResponseMessage firstRedirectResponse = await httpClient.GetAsync(firstRedirectUri);
         ```
-        ![Initial request with first redirection](./imgs/image-37.png)
+        ![Initial request with first redirection](./imgs/hol-image-37.png)
 
     4. Add the three remaining manual redirects.
         ```csharp
@@ -1252,7 +1252,7 @@ NumberVerificationWithCodeContent numberVerificationWithCodeContent = new Number
 Response<NumberVerificationResult> numberVerificationResponse = await numberVerificationClient.VerifyWithCodeAsync(apcGatewayId, numberVerificationWithCodeContent);
 Console.WriteLine(numberVerificationResponse.Value.VerificationResult);
 ```
-![alt text](./imgs/image-17.png)
+![alt text](./imgs/hol-image-17.png)
 
 ### Additional APC REST HTTP examples using Postman
 
@@ -1270,27 +1270,27 @@ Console.WriteLine(numberVerificationResponse.Value.VerificationResult);
     "redirectUri": "your-service-auth-callback"
   }
   ```
-![alt text](./imgs/image-22.png)
+![alt text](./imgs/hol-image-22.png)
 
 3. Go to the settings tab and make sure the setting `Automatically follow redirects` is set to OFF. Following this step, you will procceed to manually follow **three** 302 redirect calls. In a normal scenario these would befollowed automatically, refer to [Part 2: TODO LINk](#part-2-advanced-use-case---integrating-apc-into-a-banking-app) for real-word number verification example. 
 
-![alt text](./imgs/image-23.png)
+![alt text](./imgs/hol-image-23.png)
 
 4. Click Send and once it completes the result should be a HTTP `302` response with a Location header containing the next call in the number verification flow. Copy the url value for the `Location` header. 
 
-![alt text](./imgs/image-24.png)
+![alt text](./imgs/hol-image-24.png)
 
 5. **1/3 302 request**: Create a new request in a new tab and paste the url value from the step before. Make sure the `Automatically follow redirects` setting is OFF. Send the GET request and copy the next `Location` header value from the new 302 response.
 
-![alt text](./imgs/image-26.png)
+![alt text](./imgs/hol-image-26.png)
 
 5. **2/3 302 request**: Create a new request in a new tab and paste the url value from the step before. Make sure the `Automatically follow redirects` setting is OFF. Send the GET request and copy the next `Location` header value from the new 302 response.
 
-![alt text](./imgs/image-27.png)
+![alt text](./imgs/hol-image-27.png)
 
 5. **3/3 302 request**: Create a new request in a new tab and paste the url value from the step before. Make sure the `Automatically follow redirects` setting is OFF. Send the GET request and copy the query param named `apcCode` in the `Location` header value from the new 302 response.
 
-![alt text](./imgs/image-28.png)
+![alt text](./imgs/hol-image-28.png)
 
 6. Go back to and modify the original `number-verification > number:verify` request's payload with the following content, then click Send to retrieve the number verification result.
 
@@ -1299,5 +1299,5 @@ Console.WriteLine(numberVerificationResponse.Value.VerificationResult);
     "apcCode": "your-apc-code-retrieved-in-step-5"
 }
 ```
-![alt text](./imgs/image-29.png)
+![alt text](./imgs/hol-image-29.png)
 
