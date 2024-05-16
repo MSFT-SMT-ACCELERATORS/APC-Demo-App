@@ -21,7 +21,7 @@ export const ApiClientProvider: React.FC<ApiClientProviderProps> = ({ children }
   );
 };
 
-// Hook personalizado para usar el cliente API
+
 export const useApiClient = (): APCApi => {
   const context = useContext(ApiClientContext);
   if (context === null) {
