@@ -824,7 +824,7 @@ For this reason, there are some considerations within the app implementation:
 
 Additionally, operations like number verification follow a specific process that requires these requests to come from the same network as the phone number being checked. Making requests from IP addresses outside the intended network will result in unathorized results in APC hence **the client application must use the cellular network instead of an available WiFI** connection from a non cellular network.
 
-### Number Verification Process Overview
+#### Number Verification Process Overview
 
 1. Input the phone number for the cellular network you are using.
     - This could be either phone number for the sim card used in your device or if you are connecting to a hotspot network for this exercise, the phone number for the hotspot device. More information in [network limitations](#network-limitations).
@@ -855,15 +855,22 @@ The diagram below illustrates the detailed flow of the number verification proce
 
 ![alt text](./imgs/hol-image-62.png)
 
-#### Initial Request from Client App to Backend Service:
-1. **Client App (Leaves Bank App)** sends a request to initiate number verification.
+##### Initial Request from Client App to Backend Service:
+1. **Client App (Leaves Bank App)** sends a request to initiate number verification using standard HTTP request libraries like Axios. This phase is crucial as it sets the foundation for the authentication process that follows. Note that this request doesn't require special handling; it is a typical HTTP request initiated by the client.
 2. **Leaves Bank Backend Service** prepares to request an authentication code from the APC gateway.
 
-#### Backend Service Requests APC Gateway:
+##### Backend Service Requests APC Gateway:
+After receiving the initial request, the Leaves Bank Backend Service prepares to interact with the APC gateway. 
+
 3. **APC Gateway Call**: The backend makes a POST request to APC Gateway, the response will have Status HTTP 302 but the redirections must be followed by the frontend, as these requests must come from the cellular network the client app is using.
 
-#### Manually handling redirections in the backend:
 4. **302 Redirect Response**: APC responds with a 302 redirect containing a URL for client app interaction.
+
+##### Manually handling redirections in the backend:
+To ensure proper handling of the HTTP 302 responses from the APC gateway, configure the backend's HTTP client to prevent automatic redirection. The frontend has to handle the actual redirections for the authentication flow against the Operator Authentication Services.
+
+To implement this, you can use the .NET HTTP client in the backend to configure the handling of HTTP redirect responses manually. Here's how you can modify the .NET HTTP client to prevent automatic redirection:
+
 5. **Prevent Automatic Redirection in .NET 8 HttpClient**:
 
     ```csharp
@@ -872,6 +879,43 @@ The diagram below illustrates the detailed flow of the number verification proce
     ```
 
 The client app can follow redirections automatically until it retrieves a response.
+
+##### Backend Service endpoints for Number Verification
+
+The number verification process utilizes two key backend endpoints, as seen in the APCController in the leaves bank backend service [Link to file](../APC.Proxy.API/APC.ProxyServer/Controllers/APCController.cs):
+
+1. **Initial Verification Endpoint**:
+   - This endpoint receives the initial request from the frontend, issuing an HTTP 302 response with a location URL.
+   - The frontend follows the redirection path outlined earlier, eventually receiving an authentication code from the operator's authentication service.
+
+    ```csharp
+    // Endpoint to initiate number verification
+    [HttpPost("number-verification/number:verify")]
+    public async Task<IActionResult> NumberVerificationVerify([FromBody] NumberVerificationWithoutCodeContent request)
+    {
+        _logger.LogInformation($"Request model: {JsonSerializer.Serialize(request)}");
+
+        return await HandleRequest(
+            () => _apcClient.NumberVerificationVerifyAsync(request),
+            "Error occurred while verifying phone number.");
+    }
+    ```
+
+2. **Callback Endpoint**:
+   - This endpoint handles the reception of the authentication code sent back by the frontend.
+   - The frontend client will call this endpoint when following the last HTTP 302 redirection. As this endpoint uri was provided in the initial number verification call in the `returnUrl` value/
+
+    ```csharp
+    // Callback endpoint to finalize verification
+    [HttpGet("number-verification/apcauthcallback")]
+    public async Task<IActionResult> NumberVerificationRetrieve(string apcCode)
+    {
+        return await HandleRequest(
+            () => _apcClient.NumberVerificationCallbackVerifyAsync(new NumberVerificationWithCodeContent() { ApcCode = apcCode }),
+            "Error occurred while retrieving phone number.");
+    }
+    ```
+
 
 #### Handling Consent Permission for Location Verification
 
@@ -1064,7 +1108,6 @@ This endpoint retrieves the timestamp of the most recent SIM swap event for a gi
 
 **Response:**
 - **date**: The datetime of the most recent SIM swap.
-
 
 
 ### Additional APC SDK examples using .NET SDK
