@@ -918,7 +918,6 @@ The number verification process utilizes two key backend endpoints, as seen in t
 
 
 #### Handling Consent Permission for Location Verification
-
 For Network API operations that require device location information, such as location verification, it's essential to manage consent permissions effectively. This section outlines how the banking app ensures compliance with privacy regulations and operator terms during such processes.
 
 1. **User Redirects for Consent**: If the operator requires user consent for location verification, the banking app redirects users to a consent page. This step is crucial for maintaining compliance with privacy regulations and respecting user and operator terms.
@@ -927,6 +926,39 @@ For Network API operations that require device location information, such as loc
    - The backend service should capture any errors related to location access denials.
    - These errors typically include a URL provided by the operator that contains instructions for the user to grant location verification permissions.
    - The frontend should then open a browser window directing the user to this URL, allowing them to follow their operator's instructions to grant necessary permissions.
+
+#### Handling Consent Permission for Location Verification
+
+Network APIs that access device location information such as [Device Location Verification](#device-location-verification) must manage user consent permissions to comply with privacy regulations and operator terms. 
+
+#### Implementation Guide
+Applications using such APIs must be prepared to handle consent errors by:
+
+1. **Detecting Consent Errors**: Identifying errors related to consent in the API responses.
+2. **Guiding User Action**: Informing the user of the need to grant permissions and providing a method to do so by redirecting to the operator permissions page.
+
+Example of an API response with a consent error:
+
+```json
+{
+    "error": {
+        "message": "Authorization failed due to lack of consent",
+        "code": "CONSENT_URL_ERROR",
+        "consent_url": "https://open-gate-consents.com.mytelco.io/?jwt=eyJjdH..."
+    }
+}
+```
+
+The application should display the error message and guide the user to the consent URL provided.
+
+#### Current Application Handling
+In this application, consent errors are captured but not managed actively. We had to use Postman or an HTTP client to manually fetch the errors and access the consent URLs to overcome these issues in the demo. If you encounter similar errors during the hands-on lab exercise, you can use the same method with Postman to handle them. Here are simple steps to follow:
+
+1. **Open Postman**: Start by launching Postman on your device.
+2. **Call the LocationVerify Endpoint**: Use Postman to make a request to the `LocationVerify` endpoint using the cellular connection of a SIM card for which consent has not yet been granted.
+3. **Open the Consent URL**: Using the same cellular network, open the consent URL you received in the error message.
+4. **Accept the Permissions**: Follow the instructions on the webpage to grant the necessary permissions.
+
 
 ## Annex
 
@@ -990,6 +1022,8 @@ Retrieves the network a given device is connected to, returning the network in a
 ##### Description
 Provide real-time location data of a mobile device with the consent of the mobile user. This API is particularly useful for applications that require precise geolocation, such as logistics tracking, personal security services, or compliance with local regulations.
 
+Device location verification Network API require managing consent permissions to ensure compliance with privacy regulations and operator terms.
+
 ##### Endpoint
 
 ```curl
@@ -1000,7 +1034,7 @@ Verifies whether a device is within a specified location area, defined as an acc
 
 ##### Consent Error - Operator Permission
 - If location data access is denied by the operator, the API will return an HTTP 403 error response with code: `CONSENT_URL_ERROR`. This type of message also contains the `consent_url` property with an url valuable pointing to the operator permission form the user has to accept.
-- Error handling should account for permissions being revoked or not granted by the user or operator, ensuring that the application complies with privacy laws and user preferences. The error message wit
+- Error handling should account for permissions being revoked or not granted by the user or operator, ensuring that the application complies with privacy laws and user preferences. 
 
 ![alt text](./imgs/hol-image-61.png)
 
