@@ -826,6 +826,8 @@ Additionally, operations like number verification follow a specific process that
 
 #### Number Verification Process Overview
 
+To demonstrate the functionality of the Number Verification API, follow these steps in the demo app:
+
 1. Input the phone number for the cellular network you are using.
     - This could be either phone number for the sim card used in your device or if you are connecting to a hotspot network for this exercise, the phone number for the hotspot device. More information in [network limitations](#network-limitations).
 
@@ -916,18 +918,37 @@ The number verification process utilizes two key backend endpoints, as seen in t
     }
     ```
 
+#### Location Verification Process Overview
 
-#### Handling Consent Permission for Location Verification
-For Network API operations that require device location information, such as location verification, it's essential to manage consent permissions effectively. This section outlines how the banking app ensures compliance with privacy regulations and operator terms during such processes.
+To demonstrate the functionality of the Location Verification API and its ability to detect manipulated GPS data, follow these steps in the demo app:
 
-1. **User Redirects for Consent**: If the operator requires user consent for location verification, the banking app redirects users to a consent page. This step is crucial for maintaining compliance with privacy regulations and respecting user and operator terms.
+1. **Navigate to the Residence Location section of the app**: In the number verification screen, select a loan amount and purpose then click next.
+2. **Enter some distant residence location**: Input a distant residence location, such a different country or state to your current location.
+   ![Residence Location Input Screen](./imgs/hol-image-63.png)  
 
-2. **Handling Location Access Errors**: Proper error handling is vital when operators deny location access. While the demo app does not handle this scenario explicitly, it's recommended to implement the following approach:
-   - The backend service should capture any errors related to location access denials.
-   - These errors typically include a URL provided by the operator that contains instructions for the user to grant location verification permissions.
-   - The frontend should then open a browser window directing the user to this URL, allowing them to follow their operator's instructions to grant necessary permissions.
+2. **Submit tampered Location Data**:
+   - Choose to report "Hacked GPS" coordinates. These should match the residence location you provided.
+   - Check the "Use Azure Programmable Connectivity backend"
+   - Click 'Submit' to process the coordinates through the API.
 
-#### Handling Consent Permission for Location Verification
+3. **View Results**:
+   - The app verifies the provided location against the actual device's location as its connected via the operator's network to a radio unit in known coordinates.
+   - If the data does not match, as in the case of hacked GPS inputs, an error message is displayed (see Screen 2 below).
+
+   ![Error Message for Wrong GPS Location](./imgs/hol-image-64.png)  
+4. **Skip APC verification to tamper with location data**:
+   - Uncheck the "Use Azure Programmable Connectivity backend" and click Next again with the "Hacked GPS" coordinates. The app will display a warning message letting the user know that APC location check is disabled.
+
+
+##### Explanation of Screens
+This feature tests the API’s effectiveness in identifying discrepancies between reported locations and those registered by the cellular network, critical for preventing location-based fraud.
+
+- **Screen 1**: Users input their residence location, which is verified against the actual location derived from the cellular network. This ensures the user is actually within the geographical area they claim.
+- **Screen 2**: Displays an error if the manipulated (hacked) location data is detected, highlighting the API's capability to prevent fraud by ensuring location accuracy.
+
+Besides disabling APC to proceed, you can input your current location as residence location, and try again with either option.
+
+##### Handling Consent Permission for Location Verification
 
 Network APIs that access device location information such as [Device Location Verification](#device-location-verification) must manage user consent permissions to comply with privacy regulations and operator terms. 
 
@@ -1020,9 +1041,18 @@ Retrieves the network a given device is connected to, returning the network in a
 #### Device Location Verification
 
 ##### Description
-Provide real-time location data of a mobile device with the consent of the mobile user. This API is particularly useful for applications that require precise geolocation, such as logistics tracking, personal security services, or compliance with local regulations.
+It provides a reliable way to verify that the device is indeed within the specified radius from the given coordinates. This verification process ensures that the location data cannot be tampered with or falsified. 
 
 Device location verification Network API require managing consent permissions to ensure compliance with privacy regulations and operator terms.
+
+##### How APC Verifies Location
+
+The Device Location Verification API performs a critical function by verifying the authenticity of the location data sent by a mobile device.
+
+1. **Connection and Request Origin**: The API utilizes the cellular network connection to determine the origin of the location verification request. Since the device is connected via 4G/5G to a specific radio unit, the API has access to the exact location of this unit.
+
+2. **Cross-Verification Process**: The API compares the coordinates provided in the request (latitude, longitude, and accuracy) with the actual location of the radio unit. This comparison is based on real-time data from the cellular network, which accurately reflects the location of the connected radio unit.
+
 
 ##### Endpoint
 
