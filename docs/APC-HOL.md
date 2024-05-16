@@ -190,11 +190,9 @@ Deploying an APC Gateway in Azure is a straightforward process that involves the
 
 1. **Search for `APC Gateways`** and then select **Create**. If the APC Gateway does not appear as an available resource, please revisit the [prerequisites section](#prerequisites) and ensure you have successfully registered for the [APC public preview](https://aka.ms/APCpublicpreview).
 
-   ![Search for APC Gateway](./imgs/001-01-set-up-portal-create.jpg)
-
 2. Select your **Subscription**, **Resource Group**, and **Region**.
 
-   ![Create APC Gateway](./imgs/001-02-set-up-portal-create-step1.jpg)
+  <img src="./imgs/001-02-set-up-portal-create-step1.jpg" alt="Create APC Gateway" height="460px"/>
 
 3. Provide a unique **Name** for your gateway and proceed to the next steps.
 
@@ -232,7 +230,7 @@ To authenticate and access the APC Gateway, create a Microsoft Entra application
     1. Don´t specify any return URI as it´s not needed for these HOL exercises.
     1. Select **Register**.
 
-    ![App Registration](./imgs/hol-image-40.png)
+    <img src="./imgs/hol-image-40.png" alt="App Registration" height="600px"/>
 
 2. Create and record the application client ID and client secret or certificate for future use.
     1. Browse to **Identity** > **Applications** > **App registrations**, then select your application.
@@ -425,22 +423,19 @@ To make authenticated requests to the APC API, you need to set up Postman with t
 
     ![Import collection](./imgs/hol-image-6.png)
 
-2. Double click the collection name that appeared on the collection side menu and go to the tab `Variables`. From there, update the `auth-secret`, `auth-clientId`, `auth-tenantid` and also the `apc-id` and `endpont` values. 
+2. Double click the collection name that appeared on the collection side menu and go to the tab `Variables`. From there, update the `auth-secret`, `auth-clientId`, `auth-tenantid` and also the `apc-id` and `endpont` values.
 
-    ![Collection auth var](./imgs/hol-image-30.png)
-    ![Collection APC Gateway id var](./imgs/hol-image-33.png)
+    <img src="./imgs/hol-image-33.png" alt="Collection APC Gateway id var" height="230px"/>
 
 3. Click save or press `Ctrl+S` and go to the tab `Authorization`
 
     ![Collection auth tab](./imgs/hol-image-7.png)
 
 4. Scroll down to `Configure New Token` advanced section and click the button `Generate New Access Token`
-
-    ![Collection Get new token](./imgs/hol-image-32.png)
+    <img src="./imgs/hol-image-32.png" alt="Collection auth var" height="360px"/>
 
 5. Once succeeded, select `Use Token`. This token will be valid for 1 hour. You can skip to the Generate New Token step every time it expires.
-
-    ![Collection use token](./imgs/hol-image-31.png)
+    <img src="./imgs/hol-image-31.png" alt="Collection use token" height="180px"/>
 
 
 ##### Postman APC SimSwap Verify Request
@@ -820,7 +815,7 @@ For this reason, there are some considerations within the app implementation:
 
 2. **Click Get Started:** During the first steps, the application will make a **device-network request** to the backend, where the backend captures the caller IP.
 
-    ![alt text](./imgs/hol-image-52.png)
+    <img src="./imgs/hol-image-52.png" alt="alt text" height="360px"/>
 
 Additionally, operations like number verification follow a specific process that requires these requests to come from the same network as the phone number being checked. Making requests from IP addresses outside the intended network will result in unathorized results in APC hence **the client application must use the cellular network instead of an available WiFI** connection from a non cellular network.
 
@@ -831,11 +826,11 @@ To demonstrate the functionality of the Number Verification API, follow these st
 1. Input the phone number for the cellular network you are using.
     - This could be either phone number for the sim card used in your device or if you are connecting to a hotspot network for this exercise, the phone number for the hotspot device. More information in [network limitations](#network-limitations).
 
-    ![alt text](./imgs/hol-image-51.png)
+    <img src="./imgs/hol-image-51.png" alt="alt text" height="360px"/>
 
 2. Press the checkmark icon to verify the phone number
 
-    ![alt text](./imgs/hol-image-53.png)
+    <img src="./imgs/hol-image-53.png" alt="alt text" height="360px"/>
 
 One of the main challenges in implementing number verification is that it requires part of the user flow to be performed from the client app, not just the backend. This is necessary because [Number Verification Network API request](#number-verification) follows an OAuth authentication flow, which involves multiple steps and interactions between the client app, the backend, the APC service and the Operator auth servers.
 
@@ -854,8 +849,7 @@ Here's an overview of the number verification process:
 6. Return Verification Result: APC returns the verification result to the **backend service**, which then communicates the **result back to the client**.
 
 The diagram below illustrates the detailed flow of the number verification process:
-
-![alt text](./imgs/hol-image-62.png)
+<img src="./imgs/hol-image-62.png" alt="alt text" height="600px"/>
 
 ##### Initial Request from Client App to Backend Service:
 1. **Client App (Leaves Bank App)** sends a request to initiate number verification using standard HTTP request libraries like Axios. This phase is crucial as it sets the foundation for the authentication process that follows. Note that this request doesn't require special handling; it is a typical HTTP request initiated by the client.
@@ -924,7 +918,8 @@ To demonstrate the functionality of the Location Verification API and its abilit
 
 1. **Navigate to the Residence Location section of the app**: In the number verification screen, select a loan amount and purpose then click next.
 2. **Enter some distant residence location**: Input a distant residence location, such a different country or state to your current location.
-   ![Residence Location Input Screen](./imgs/hol-image-63.png)  
+
+    <img src="./imgs/hol-image-63.png" alt="Residence Location Input Screen" height="400px"/>
 
 2. **Submit tampered Location Data**:
    - Choose to report "Hacked GPS" coordinates. These should match the residence location you provided.
@@ -935,7 +930,8 @@ To demonstrate the functionality of the Location Verification API and its abilit
    - The app verifies the provided location against the actual device's location as its connected via the operator's network to a radio unit in known coordinates.
    - If the data does not match, as in the case of hacked GPS inputs, an error message is displayed (see Screen 2 below).
 
-   ![Error Message for Wrong GPS Location](./imgs/hol-image-64.png)  
+    <img src="./imgs/hol-image-64.png" alt="Error Message for Wrong GPS Location" height="400px"/>
+
 4. **Skip APC verification to tamper with location data**:
    - Uncheck the "Use Azure Programmable Connectivity backend" and click Next again with the "Hacked GPS" coordinates. The app will display a warning message letting the user know that APC location check is disabled.
 
