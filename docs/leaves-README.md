@@ -7,7 +7,7 @@ The Leaves Banking App is a demo application showcasing the capabilities of Azur
 ### Phone Number Validation
 
 - **Purpose**: Validates the authenticity of the phone number provided by the user.
-- **How it works**: The entered phone number is verified via APC APIs and the mobile operator to ensure it is legitimate and active, preventing identity theft.
+- **How it works**: The entered phone number is verified via APC APIs and the mobile operator to ensure it is legitimate and active, preventing identity theft. [More detailed explanation in the HOL](./APC-HOL.md#number-verification-process-overview)
 
 <img src="./imgs/leaves-image-33.png" alt="alt text" style="max-height: 360px;"/>
 <img src="./imgs/leaves-image-34.png" alt="alt text" style="max-height: 360px;"/>
@@ -15,7 +15,7 @@ The Leaves Banking App is a demo application showcasing the capabilities of Azur
 ### Location Validation
 
 - **Purpose**: Ensures that the loan application is initiated from a geographically consistent location.
-- **How it works**: Users must enter their residence location, which is verified through APC network APIs to confirm the device's physical presence in the stated area or country. This feature counters potential frauds like location spoofing.
+- **How it works**: Users must enter their residence location, which is verified through APC network APIs to confirm the device's physical presence in the stated area or country. This feature counters potential frauds like location spoofing. [More detailed explanation in the HOL](./APC-HOL.md#location-verification-process-overview)
 
 <img src="./imgs/leaves-image-30.png" alt="alt text" style="max-height: 360px;"/>
 <img src="./imgs/leaves-image-31.png" alt="alt text" style="max-height: 360px;"/>

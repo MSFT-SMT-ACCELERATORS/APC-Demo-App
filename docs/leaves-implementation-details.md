@@ -14,8 +14,12 @@ This demo app implements dependency injection (DI) to handle various implementat
   - **APCRestClient:** Uses a custom implementation with an HttpClient for more complex scenarios or where SDK support is limited.
   - **APCMockService:** Provides preconfigured responses for testing purposes without making actual calls to APC.
 
-![alt text](image-37.png)
+![alt text](./imgs/leaves-image-37.png)
 
 ### Number Verification Process Overview
 
-Find this information in the HOL [Number Verification Process Overview](./APC-HOL.md/md#number-verification-process-overview)
+Find this information in the HOL [Number Verification Process Overview](./APC-HOL.md#number-verification-process-overview)
+
+### Device Location Verification Process Overview
+
+Find this information in the HOL [Device Location Verification Process Overview](./APC-HOL.md#location-verification-process-overview)
