@@ -1033,45 +1033,38 @@ verificationResult: Boolean indicating if the phone number is verified.
   "verificationResult": true
 }
 ```
-#### SIM Swap Detection
 
-##### Description
-Detect changes in SIM card associations with mobile numbers to enhance security and fraud detection mechanisms. This API monitors and alerts on suspicious activity suggesting a SIM swap, which is often indicative of identity theft or fraudulent attempts to gain access to user accounts.
+#### SimSwap Detection
+SimSwap Detection provides verification and retrieval services for SIM swap events associated with a device's phone number.
 
-This API is crucial for applications requiring high-security measures to prevent fraud, especially in financial services, by ensuring that any change in SIM information is promptly and accurately detected.
+##### SimSwapVerify
+This endpoint verifies if a SIM swap has occurred within a specified period. It returns a boolean indicating whether a SIM swap was detected.
 
-TODO add retrieve endpoint 
+**Endpoint:** `/sim-swap/sim-swap:verify`
 
-##### Endpoint
-```curl
-POST /sim-swap/sim-swap:verify
-```
-##### Description
-Verifies if a SIM swap has occurred for a given phone number within a specified time period.
+**Method:** POST
 
-##### Request Properties
-- **phoneNumber:** Phone number in E.164 format.
-- **maxAgeHours:** Time period in hours to check for SIM swap.
-- **networkIdentifier:** Network identifier for the query.
-##### Response Properties
-verificationResult: Boolean indicating if a SIM swap has occurred in the specified period.
-##### Example Request
-```json
-{
-  "phoneNumber": "+1234567890",
-  "maxAgeHours": 48,
-  "networkIdentifier": {
-    "identifierType": "NetworkCode",
-    "identifier": "network-code-here"
-  }
-}
-```
-##### Example Response
-```json
-{
-  "verificationResult": false
-}
-```
+**Request Parameters:**
+- **phoneNumber**: The phone number in E.164 format.
+- **maxAgeHours**: Maximum lookback period in hours for verifying SIM swaps.
+
+**Response:**
+- **verificationResult**: `true` if a SIM swap has occurred within the specified period, `false` otherwise.
+
+##### SimSwapRetrieve
+This endpoint retrieves the timestamp of the most recent SIM swap event for a given phone number.
+
+**Endpoint:** `/sim-swap/sim-swap:retrieve`
+
+**Method:** POST
+
+**Request Parameters:**
+- **phoneNumber**: The phone number in E.164 format.
+- **networkIdentifier**: Identifier for the network to query for this device.
+
+**Response:**
+- **date**: The datetime of the most recent SIM swap.
+
 
 
 ### Additional APC SDK examples using .NET SDK
