@@ -948,7 +948,7 @@ Besides disabling APC to proceed, you can input your current location as residen
 
 Network APIs that access device location information such as [Device Location Verification](#device-location-verification) must manage user consent permissions to comply with privacy regulations and operator terms. 
 
-#### Implementation Guide
+##### Implementation Guide
 Applications using such APIs must be prepared to handle consent errors by:
 
 1. **Detecting Consent Errors**: Identifying errors related to consent in the API responses.
@@ -968,7 +968,7 @@ Example of an API response with a consent error:
 
 The application should display the error message and guide the user to the consent URL provided.
 
-#### Current Application Handling
+##### Current Application Handling
 In this application, consent errors are captured but not managed actively. We had to use Postman or an HTTP client to manually fetch the errors and access the consent URLs to overcome these issues in the demo. If you encounter similar errors during the hands-on lab exercise, you can use the same method with Postman to handle them. Here are simple steps to follow:
 
 1. **Open Postman**: Start by launching Postman on your device.
@@ -1106,7 +1106,7 @@ Verify the authenticity of a mobile number to ensure it is currently active and 
 
 ##### OAuth Flow
 The number verification process may involve an OAuth flow to ensure that the verification request is authenticated and authorized properly.
-WIP TODO simplified flow diagram + explanation
+Take a look at the detailed explanation in [Number Verification Process Overview](#number-verification-process-overview)
 
 ##### Endpoint
 
@@ -1174,7 +1174,7 @@ This endpoint retrieves the timestamp of the most recent SIM swap event for a gi
 
 ##### APC SDK: Device Location
 
-Device location verification can fail if the operator line owner has not given location verification permission for this application. More on this and how to approach it in code [here](#handling-consent-permission-for-locaction-verification)
+Device location verification can fail if the operator line owner has not given location verification permission for this application. More on this: [Device Location Verification](#device-location-verification)
 
 1. Add code to access the subclient for sim-swap from the base client created earlier `apcClient`:
 ```csharp
@@ -1182,9 +1182,9 @@ var deviceLocationClient = apcClient.GetDeviceLocationClient();
 ```
 2. Create the location-verify request content using the SDK class `DeviceLocationVerificationContent`. PhoneNumber `phone-number` with your actual number associated with the cellular network you are using:
 ```csharp
-var deviceLocationVerificationContent = new DeviceLocationVerificationContent(new NetworkIdentifier("NetworkCode", "Telefonica_Brazil"), 80.0, 85.1, 50, new LocationDevice
+var deviceLocationVerificationContent = new DeviceLocationVerificationContent(new NetworkIdentifier("NetworkCode", "<your-operator-code>"), 80.0, 85.1, 50, new LocationDevice
 {
-    PhoneNumber = "+8000000000000",
+    PhoneNumber = "<phoneNumber>",
 });
 ```
 3. Retrieve the device-network response:
@@ -1196,50 +1196,103 @@ Console.WriteLine(result.Value.VerificationResult);
 
 ##### APC SDK: Number verification
 
-Number verification involves 2 steps. In the first request, you receive a redirect URL that must be followed, in order to get teh ApcCode. Then in the second request, the ApcCode gets sent in.
+Number verification involves 2 steps. In the first request, you receive a HTTP 302 redirect response with a location header that must be followed in order to get the `apcCode` which is later used in the second request.
 
-For the fist call:
+1. **Create a HttpClient that doesn't automatically follow redirects** Create a `HttpClientHandler` with `AllowAutoRedirect` property set to false
 
-1. Add code to access the subclient for sim-swap from the base client created earlier `apcClient`:
-```csharp
-NumberVerification numberVerificationClient = apcClient.GetNumberVerificationClient();
+    ```csharp
+    // Number verification
+    var handler = new HttpClientHandler
+    {
+        AllowAutoRedirect = false
+    };
+    ```
+2. Add the handler as a parameter in the httpClient constructor call.
 
-```
+    ```csharp
+    using var httpClient = new HttpClient(handler);
+    ```
+1. **First APC Request:** Add code to access the subclient for sim-swap from the base client created earlier `apcClient`:
+    ```csharp
+    NumberVerification numberVerificationClient = apcClient.GetNumberVerificationClient();
+    ```
 2. Create the number verification request content using the SDK class `NumberVerificationWithoutCodeContent`. PhoneNumber `phone-number` with your actual number associated with the cellular network you are using:
-```csharp
-NumberVerificationWithoutCodeContent numberVerificationWithoutCodeContent = new NumberVerificationWithoutCodeContent(
-    new NetworkIdentifier("NetworkCode", "Telefonica_Spain"),
-    new Uri("http://your-redirect-url.com")){ PhoneNumber = "<phoneNumber>", };
+    ```csharp
+    NumberVerificationWithoutCodeContent numberVerificationWithoutCodeContent = new NumberVerificationWithoutCodeContent(
+        new NetworkIdentifier("NetworkCode", "<your-operator-code>"),
+        new Uri("http://your-redirect-url.com")){ PhoneNumber = "<phoneNumber>", };
 
-```
-3. Retrieve the apcCode from the response:
-```csharp
-var response = await numberVerificationClient.VerifyWithoutCodeAsync(apcGatewayId, numberVerificationWithoutCodeContent);
+    ```
+3. Retrieve the response and extract the `Location` header value:
+    ```csharp
+    var response = await numberVerificationClient.VerifyWithoutCodeAsync(apcGatewayId, numberVerificationWithoutCodeContent);
 
-var locationUrl = response.GetRawResponse().Headers.TryGetValue("location", out var location) ? location : "not found";
+    var locationUrl = response.GetRawResponse().Headers.TryGetValue("location", out var location) ? location : "not found";
 
-Console.WriteLine($"location redirect URL: {locationUrl}");
-```
-![alt text](./imgs/hol-image-16.png)
+    Console.WriteLine($"location redirect URL: {locationUrl}");
+    ```
 
-For the second call
+5. Make a new HTTP GET to the url value from the `Location` header on the previous response. Send the GET request and copy the next `Location` header value from the new 302 response.
+    ```csharp
+    // Following redirects manually
+    string firstRedirectUri = initialNumberVerificationResponse.Headers.Location?.ToString();
+    HttpResponseMessage firstRedirectResponse = await httpClient.GetAsync(firstRedirectUri);
+    ```
 
-1. Retrieve the code by following the previous `locationUrl`:
-```csharp
-var apcCode = "aad"; // WIP follow locationUrl
-```
-2. Create the number verification request content using the SDK class `NumberVerificationWithCodeContent`. Use the `apcCode` retrieved:
-```csharp
-NumberVerificationWithCodeContent numberVerificationWithCodeContent = new NumberVerificationWithCodeContent(apcCode);
-```
+6. Add the three remaining manual redirects.
+    ```csharp
+    var secondRedirectUri = firstRedirectResponse.Headers.Location?.ToString();
+    HttpResponseMessage secondRedirectResponse = await httpClient.GetAsync(secondRedirectUri);
+
+    var thirdRedirectUri = secondRedirectResponse.Headers.Location?.ToString();
+    HttpResponseMessage thirdRedirectResponse = await httpClient.GetAsync(thirdRedirectUri);
+
+    var fourthRedirectUri = thirdRedirectResponse.Headers.Location?.ToString();
+    HttpResponseMessage fourthRedirectResponse = await httpClient.GetAsync(fourthRedirectUri);
+    ```
+    
+7. Extract the authentication code the `Location` header value for the fourth redirect. It should contain the `redirectUri` you specified plus an `apcCode` parameter.
+    ```csharp
+    // Retrieve APC Code
+    var finalRedirectUri = fourthRedirectResponse.Headers.Location?.ToString();
+    var uri = new Uri(finalRedirectUri);
+    var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+    var apcCode = query["apcCode"];
+    Console.WriteLine($"Captured APC Code: {apcCode}"); 
+    ```
+
+8. **Second APC Request:** remaining manual redirects.
+    ```csharp
+    var secondRedirectUri = firstRedirectResponse.Headers.Location?.ToString();
+    HttpResponseMessage secondRedirectResponse = await httpClient.GetAsync(secondRedirectUri);
+
+    var thirdRedirectUri = secondRedirectResponse.Headers.Location?.ToString();
+    HttpResponseMessage thirdRedirectResponse = await httpClient.GetAsync(thirdRedirectUri);
+
+    var fourthRedirectUri = thirdRedirectResponse.Headers.Location?.ToString();
+    HttpResponseMessage fourthRedirectResponse = await httpClient.GetAsync(fourthRedirectUri);
+    ```
+    
+7. Extract the authentication code the `Location` header value for the fourth redirect. It should contain the `redirectUri` you specified plus an `apcCode` parameter.
+    ```csharp
+    // Retrieve APC Code
+    var finalRedirectUri = fourthRedirectResponse.Headers.Location?.ToString();
+    var uri = new Uri(finalRedirectUri);
+    var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+    var apcCode = query["apcCode"];
+    Console.WriteLine($"Captured APC Code: {apcCode}"); 
+    ```
+
+9. Create the number verification request content using the SDK class `NumberVerificationWithCodeContent`. Use the `apcCode` retrieved:
+    ```csharp
+    NumberVerificationWithCodeContent numberVerificationWithCodeContent = new NumberVerificationWithCodeContent(apcCode);
+    ```
 3. Retrieve the verification result with the code `NumberVerificationWithCodeContent`. Use the `apcCode` retrieved:
-```csharp
-Response<NumberVerificationResult> numberVerificationResponse = await numberVerificationClient.VerifyWithCodeAsync(apcGatewayId, numberVerificationWithCodeContent);
-Console.WriteLine(numberVerificationResponse.Value.VerificationResult);
-```
+    ```csharp
+    Response<NumberVerificationResult> numberVerificationResponse = await numberVerificationClient.VerifyWithCodeAsync(apcGatewayId, numberVerificationWithCodeContent);
+    Console.WriteLine(numberVerificationResponse.Value.VerificationResult);
+    ```
 ![alt text](./imgs/hol-image-17.png)
-
-
 
 ### Additional APC REST HTTP examples using .NET HttpClient
 
@@ -1269,86 +1322,99 @@ Console.WriteLine($"Device location verification result: {locationResult.Verific
 
 ##### HttpClient APC: Number verification
 
-
-Number verification involves 2 APC requests along with some HTTP 302 redirections that in a normal scenario would befollowed automatically, refer to [Part 2: TODO LINk](#part-2-advanced-use-case---integrating-apc-into-a-banking-app) for real-word number verification example. 
+Number verification involves 2 APC requests along with some HTTP 302 redirections that in a normal scenario would befollowed automatically, refer to [Number Verification Process Overview](#number-verification-process-overview) for real-word number verification example. 
 
 **APC Requests for number verification:**
 
-- Retrieve APC auth code flow: you receive some HTTP 302 redirect responses from and to operator authentication servers that should be followed to retrieve the APC Code.
+- Retrieve APC auth code flow: you receive some HTTP 302 redirect responses from and to operator authentication servers. For this exercise, these redirect responses are followed manually to retrieve the APC Code.
 - Verify the retrieved APC auth code.
 
+1. **Modify or create the HttpClient up to not automatically follow redirects** Create a `HttpClientHandler` with `AllowAutoRedirect` property set to false
 
-1. Since the first call returns HTTP 302 redirect responses, set up the HttpClient you instanciated earlier to not automatically follow redirects.
-    1. Create a `HttpClientHandler` with `AllowAutoRedirect` property set to false
+    ```csharp
+    // Number verification
+    var handler = new HttpClientHandler
+    {
+        AllowAutoRedirect = false
+    };
+    ```
 
-        ```csharp
-        var handler = new HttpClientHandler
-        {
-            AllowAutoRedirect = false
-        };
-        ```
-    2. Add the handler as a parameter in the httpCleint constructor call.
+2. Add the handler as a parameter in the httpClient constructor call.
 
-        ```csharp
-        using var httpClient = new HttpClient(handler);
-        ```
+    ```csharp
+    using var httpClient = new HttpClient(handler);
+    ```
 
-2. Now that you disabled automatic redirection, make the first APC request and follow redirections  manually, as this is a demo exercise and not the intended setup.
-    1. Prepare the number verification apc code retrieval request. The request content property `redirectUri` can be any Uri as it won't be followed in this case, however in real-word scenarios, this should a service of yours capable of making or propagating APC requests. ead more about real-word scenarios in [Part 2: TODO LINk](#part-2-advanced-use-case---integrating-apc-into-a-banking-app)
-        ```csharp
-        // Number verification
-        // First Number Verification Request
-        string numberVerificationInitUrl = $"{baseUrl}/number-verification/number:verify";
-        var numberVerificationInitContent = new
-        {
-            networkIdentifier = new { identifierType = "NetworkCode", identifier = networkResult.networkCode },
-            phoneNumber = "+34618125036",
-            redirectUri = "https://localhost:7127/api/APC/number-verification/apcauthcallback"
-        };
-        var initRequestContent = new StringContent(JsonSerializer.Serialize(numberVerificationInitContent), Encoding.UTF8, "application/json");
-        ```
-        ![alt text](./imgs/hol-image-36.png)
+3. Prepare the number verification apc code retrieval request. The request content property `redirectUri` can be any Uri as it won't be followed in this case, however in real-word scenarios, this should a service of yours capable of making or propagating APC requests. Read more about real-word scenarios in [Number Verification Process Overview](#number-verification-process-overview)
 
-    2. **First APC Request:** Make the HTTP Request. The result should be a HTTP `302` response with a Location header containing the next call in the number verification flow. This location won't be followed automatically since we configured the HttpClient when instanciating it.
+    ```csharp
+    // First Number Verification Request
+    string numberVerificationInitUrl = $"{baseUrl}/number-verification/number:verify";
+    var numberVerificationInitContent = new
+    {
+        networkIdentifier = new { identifierType = "NetworkCode", identifier = networkResult.networkCode },
+        phoneNumber = "+3460000006",
+        redirectUri = "https://localhost:7127/api/APC/number-verification/apcauthcallback"
+    };
+    var initRequestContent = new StringContent(JsonSerializer.Serialize(numberVerificationInitContent), Encoding.UTF8, "application/json");
+    ```
+
+4. **First APC Request:** Make the HTTP Request. The result should be a HTTP `302` response with a Location header containing the next call in the number verification flow. This location won't be followed automatically since we configured the HttpClient when instanciating it.
+
+    ```csharp
+    // Send the initial request and handle redirects to capture apcCode
+    HttpResponseMessage initialNumberVerificationResponse = await httpClient.PostAsync(numberVerificationInitUrl, initRequestContent);
+    ```
+
+5. Make a new HTTP GET to the url value from the `Location` header on the previous response. Send the GET request and copy the next `Location` header value from the new 302 response.
+    ```csharp
+    // Following redirects manually
+    string firstRedirectUri = initialNumberVerificationResponse.Headers.Location?.ToString();
+    HttpResponseMessage firstRedirectResponse = await httpClient.GetAsync(firstRedirectUri);
+    ```
+
+6. Add the three remaining manual redirects.
+    ```csharp
+    var secondRedirectUri = firstRedirectResponse.Headers.Location?.ToString();
+    HttpResponseMessage secondRedirectResponse = await httpClient.GetAsync(secondRedirectUri);
+
+    var thirdRedirectUri = secondRedirectResponse.Headers.Location?.ToString();
+    HttpResponseMessage thirdRedirectResponse = await httpClient.GetAsync(thirdRedirectUri);
+
+    var fourthRedirectUri = thirdRedirectResponse.Headers.Location?.ToString();
+    HttpResponseMessage fourthRedirectResponse = await httpClient.GetAsync(fourthRedirectUri);
+    ```
     
-        ```csharp
-        // Send the initial request and handle redirects to capture apcCode
-        HttpResponseMessage initialNumberVerificationResponse = await httpClient.PostAsync(numberVerificationInitUrl, initRequestContent);
-        ```
+7. Extract the authentication code the `Location` header value for the fourth redirect. It should contain the `redirectUri` you specified plus an `apcCode` parameter.
+    ```csharp
+    // Retrieve APC Code
+    var finalRedirectUri = fourthRedirectResponse.Headers.Location?.ToString();
+    var uri = new Uri(finalRedirectUri);
+    var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+    var apcCode = query["apcCode"];
+    Console.WriteLine($"Captured APC Code: {apcCode}"); 
+    ```
 
-    3. Make a new HTTP GET to the url value from the `Location` header on the previous response. Send the GET request and copy the next `Location` header value from the new 302 response.
-        ```csharp
-        // Following redirects manually
-        string firstRedirectUri = initialNumberVerificationResponse.Headers.Location?.ToString();
-        HttpResponseMessage firstRedirectResponse = await httpClient.GetAsync(firstRedirectUri);
-        ```
-        ![Initial request with first redirection](./imgs/hol-image-37.png)
+8. **Second APC Request:**Create the number verification request content. Use the `apcCode` retrieved earlier:
+    ```csharp
+    // Using the apcCode to verify number
+    string numberVerificationUrl = $"{baseUrl}/number-verification/number:verify";
+    var numberVerificationContent = new
+    {
+        apcCode = apcCode
+    };
+    var verifyRequestContent = new StringContent(JsonSerializer.Serialize(numberVerificationContent), Encoding.UTF8, "application/json");
+    ```
+9. Retrieve the verification result:
+    ```csharp
+    HttpResponseMessage verificationResponse = await httpClient.PostAsync(numberVerificationUrl, verifyRequestContent);
+    var verificationResult = await JsonSerializer.DeserializeAsync<dynamic>(await verificationResponse.Content.ReadAsStreamAsync(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-    4. Add the three remaining manual redirects.
-        ```csharp
-        // Following redirects manually
-        string firstRedirectUri = initialNumberVerificationResponse.Headers.Location?.ToString();
-        HttpResponseMessage firstRedirectResponse = await httpClient.GetAsync(firstRedirectUri);
-        ```
-        
-    5. Recod the `Location` header value for the fourth redirect. It should contain the `redirectUri` you specified plus an `redirectUri` parameter.
+    Console.WriteLine($"Number verification result: {verificationResult}");
+    ```
 
-For the second call
+![alt text](./imgs/hol-image-65.png)
 
-1. Retrieve the code by following the previous `locationUrl`:
-```csharp
-var apcCode = "aad"; // WIP follow locationUrl
-```
-2. Create the number verification request content using the SDK class `NumberVerificationWithCodeContent`. Use the `apcCode` retrieved:
-```csharp
-NumberVerificationWithCodeContent numberVerificationWithCodeContent = new NumberVerificationWithCodeContent(apcCode);
-```
-3. Retrieve the verification result with the code `NumberVerificationWithCodeContent`. Use the `apcCode` retrieved:
-```csharp
-Response<NumberVerificationResult> numberVerificationResponse = await numberVerificationClient.VerifyWithCodeAsync(apcGatewayId, numberVerificationWithCodeContent);
-Console.WriteLine(numberVerificationResponse.Value.VerificationResult);
-```
-![alt text](./imgs/hol-image-17.png)
 
 ### Additional APC REST HTTP examples using Postman
 
@@ -1368,7 +1434,7 @@ Console.WriteLine(numberVerificationResponse.Value.VerificationResult);
   ```
 ![alt text](./imgs/hol-image-22.png)
 
-3. Go to the settings tab and make sure the setting `Automatically follow redirects` is set to OFF. Following this step, you will procceed to manually follow **three** 302 redirect calls. In a normal scenario these would befollowed automatically, refer to [Part 2: TODO LINk](#part-2-advanced-use-case---integrating-apc-into-a-banking-app) for real-word number verification example. 
+3. Go to the settings tab and make sure the setting `Automatically follow redirects` is set to OFF. Following this step, you will procceed to manually follow **three** 302 redirect calls. In a normal scenario these would befollowed automatically, refer to [Number Verification Process Overview](#number-verification-process-overview) for real-word number verification example. 
 
 ![alt text](./imgs/hol-image-23.png)
 
