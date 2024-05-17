@@ -21,10 +21,10 @@ To dive into the Hands-On Lab, [click here](./HOL/APC-HOL.md).
 
 Source and instructions to build and deploy the APC Demo Application "Leaves Banking App" which showcases a real-life use case of leveraging APC Network APIs for anti fraud features into a banking application.
 
-- **Readme location**: Guide for setting up and understanding the demo application can now be found at `/Demo-App/docs/leaves-README.md`.
+- **Readme location**: Guide for setting up and understanding the demo application can now be found at `/Demo-App/README.md`.
 - **Source code**: find the client app and API modules in `/Demo-App/src/APC.MobileApp` and `/Demo-App/src/APC.Proxy.API`, respectively.
 
-For more information on the APC Demo Application, [click here](/Demo-App/docs/leaves-README.md).
+For more information on the APC Demo Application, [click here](/Demo-App/README.md).
 
 ![Leaves Bank app](/Demo-App/docs/imgs/main-image-2.png)
 

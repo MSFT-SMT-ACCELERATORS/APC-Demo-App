@@ -634,7 +634,7 @@ Once you have the HTTP client configured and retrieved the network identifier, p
 
 ## Part 2: Advanced Use Case - Integrating APC into a Banking App
 
-In this section, we explore how Azure Programmable Connectivity (APC) can be integrated into an example banking application, leveraging network APIs to enhance security and user experience. The sample application is detailed in this [README file](../leaves-README.md) located in the repository.
+In this section, we explore how Azure Programmable Connectivity (APC) can be integrated into an example banking application, leveraging network APIs to enhance security and user experience. The sample application is detailed in this [README file](/Demo-App/README.md) located in the repository.
 
 ### Contents
 
@@ -686,7 +686,7 @@ And will require
  
 #### Setup Instructions
 
-Follow the steps in the [demo application README](../leaves-README.md) to set up:
+Follow the steps in the [demo application README](/Demo-App/README.md) to set up:
 
 - **APC Proxy running in an Azure Web App**
 - **Leaves Bank mobile app running on your phone using Expo Go**
