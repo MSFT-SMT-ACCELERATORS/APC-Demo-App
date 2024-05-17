@@ -32,7 +32,7 @@ The 'Leaves Bank App' is a demo application showcasing the capabilities of Azure
 
 This section provides a brief technical description of the demo application's architecture. The application is designed to interact with APC for enhanced anti-fraud security measures such as SIM swap detection, number verification, and user location verification.
 
-<img src="./docs/imgs/leaves-image-36.png" alt="Architecture Diagram" height="360px"/>
+<img src="./docs/imgs/leaves-image-36.png" alt="Architecture Diagram" height="768px"/>
 
 ### Components
 
