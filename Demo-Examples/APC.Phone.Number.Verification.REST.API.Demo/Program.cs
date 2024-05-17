@@ -33,7 +33,7 @@ using var httpClient = new HttpClient(handler);
 httpClient.BaseAddress = new Uri(baseUrl);
 httpClient.DefaultRequestHeaders.Add("apc-gateway-id", apcGatewayId);
 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-httpClient.DefaultRequestHeaders.Add("x-ms-client-request-id", Guid.NewGuid().ToString()); // Maybe remove this and mention it in part 2?
+httpClient.DefaultRequestHeaders.Add("x-ms-client-request-id", Guid.NewGuid().ToString()); 
 
 // Example: Retrieve network information using a direct HTTP call.
 string networkApiUrl = $"{baseUrl}/device-network/network:retrieve";

@@ -34,15 +34,16 @@ Console.WriteLine("");
 
 
 // Verify device location
+// Location of Seattle Convention Center Summit
 var deviceLocationClient = apcClient.GetDeviceLocationClient();
 var deviceLocationVerificationContent = new DeviceLocationVerificationContent(
     new NetworkIdentifier("NetworkCode", networkResponse.Value.NetworkCode),
-    latitude: 26.0174,
-    longitude: -80.3660,
+    latitude: 47.6140,
+    longitude: -122.3319,
     accuracy: 10,
     new LocationDevice
     {
-        PhoneNumber = "+34682335745",
+        PhoneNumber = "+34682335745",  //Change to your phone number
     });
 
 Response<DeviceLocationVerificationResult> deviceLocationResponse = deviceLocationClient.Verify(apcGatewayId, deviceLocationVerificationContent);
