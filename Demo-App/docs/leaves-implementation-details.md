@@ -18,8 +18,8 @@ This demo app implements dependency injection (DI) to handle various implementat
 
 ### Number Verification Process Overview
 
-Find this information in the HOL [Number Verification Process Overview](./APC-HOL.md#number-verification-process-overview)
+Find this information in the HOL [Number Verification Process Overview](/HOL/APC-HOL.md#number-verification-process-overview)
 
 ### Device Location Verification Process Overview
 
-Find this information in the HOL [Device Location Verification Process Overview](./APC-HOL.md#location-verification-process-overview)
+Find this information in the HOL [Device Location Verification Process Overview](/HOL/APC-HOL.md#location-verification-process-overview)
