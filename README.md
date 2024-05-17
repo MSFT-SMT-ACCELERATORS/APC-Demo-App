@@ -18,7 +18,7 @@ The Hands-On Lab provides a step-by-step guide to get you started with APC, from
 To dive into the Hands-On Lab, [click here](./HOL/APC-HOL.md).
 
 <a href="./HOL/APC-HOL.md">
-<img width="400" alt="image" src="https://github.com/MSFT-SMT-ACCELERATORS/APC-Demo-App/assets/1712635/542c5561-1efd-436c-a33d-90288db657b6">
+<img width="400" alt="image" src="https://github.com/MSFT-SMT-ACCELERATORS/APC-Demo-App/assets/1712635/57b4152a-b8ec-4d9d-b11c-3a14ed68d924">
 </a>
 
 ## 2. APC Demo Application
