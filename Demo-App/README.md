@@ -1,6 +1,6 @@
 # APC-Demo-App
 
-The Leaves Banking App is a demo application showcasing the capabilities of Azure Programmable Connectivity (APC) in the context of a micro-loan service. Designed to operate with any mobile operator supporting APC's network APIs, this app emphasizes anti-fraud features leveraging Network APIs.
+The 'Leaves Bank App' is a demo application showcasing the capabilities of Azure Programmable Connectivity (APC) in the context of a micro-loan service. Designed to operate with any mobile operator supporting APC's network APIs, this app emphasizes anti-fraud features leveraging Network APIs.
 
 ## Features
 
@@ -53,13 +53,13 @@ This section provides a brief technical description of the demo application's ar
 - **Technology**: Azure service
 - **Features**: Interfaces with mobile network operator APIs.
 
-Find detailed implementation details in this guide: [Implementation Details](leaves-implementation-details.md) or refer to the [APC Hands on Lab](/HOL/APC-HOL.md).
+Find detailed implementation details in this guide: [Implementation Details](./docs/leaves-implementation-details.md) or refer to the [APC Hands on Lab](/HOL/APC-HOL.md).
 
-## Get Started: Deploy and Configure Leaves Banking app
+## Get Started: Deploy and Configure the 'Leaves Bank' demo application
 
 | | |
 |--------|--------|
-| <img width="150" alt="Get started rocket" src="https://github.com/MSFT-SMT-ACCELERATORS/APC-Demo-App/assets/1712635/f738cb51-b237-4b60-9d45-cf976e03c714"> | Follow this guide to [Deploy and configure the APC demo app](leaves-deployment.md) |
+| <img width="150" alt="Get started rocket" src="https://github.com/MSFT-SMT-ACCELERATORS/APC-Demo-App/assets/1712635/f738cb51-b237-4b60-9d45-cf976e03c714"> | Follow this guide to [Deploy and configure the APC demo app](./docs/leaves-deployment.md) |
 
 Note that the above link is a document on how to deploy the example/demo app, including the cloud Azure WebApp with the backend service and the mobile app.
 We also provide here an additional [step-by-step HOL (Hands-On-Lab) about how to use APC APIs](/HOL/APC-HOL.md). 
