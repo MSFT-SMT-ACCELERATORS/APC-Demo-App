@@ -12,27 +12,30 @@ This repository contains valuable resources to help you understand and implement
 
 The Hands-On Lab provides a step-by-step guide to get you started with APC, from setting up your environment to using APC's powerful network APIs for SIM swap detection, location services, phone number verification, and more.
 
-- **Location**: `/docs/APC-HOL.md`
+- **Location**: `/HOL/APC-HOL.md`
 - **Contents**: Introduction to APC, APC SDK set up, APC Network APIs with APC SDK, REST HTTP Client/Postman and advanced implementation details.
 
-To dive into the Hands-On Lab, [click here](./docs/APC-HOL.md).
+To dive into the Hands-On Lab, [click here](./HOL/APC-HOL.md).
 
 ## 2. APC Demo Application
 
 Source and instructions to build and deploy the APC Demo Application "Leaves Banking App" which showcases a real-life use case of leveraging APC Network APIs for anti fraud features into a banking application.
 
-- **Readme location**: Guide for setting up and understanding the demo application can now be found at `/docs/APC-Demo-App/leaves-README.md`.
-- **Source code**: find the client app and API modules in `/APC.MobileApp` and `/APC.Proxy.API`, respectively.
+- **Readme location**: Guide for setting up and understanding the demo application can now be found at `/Demo-App/docs/leaves-README.md`.
+- **Source code**: find the client app and API modules in `/Demo-App/src/APC.MobileApp` and `/Demo-App/src/APC.Proxy.API`, respectively.
 
-For more information on the APC Demo Application, [click here](./docs/leaves-README.md).
+For more information on the APC Demo Application, [click here](/Demo-App/docs/leaves-README.md).
 
-![Leaves Bank app](./docs/imgs/main-image-2.png)
+![Leaves Bank app](/Demo-App/docs/imgs/main-image-2.png)
 
 
 ## Repository Structure
-- `/APCProxyServer`: Source code for the proxy server (.NET 8 with ASP.NET Core).
-- `/APC.MobileApp/ReactNativeApp`: Source code for the React Native application.
-- `/docs`: Setup guide and project overview and Hands on Lab (HOL) documentation.
+
+- `/Demo-App`: End-to-end APC demo app with a mobile app (iOS and Android support) developed with  React Native and a backend proxy service (.NET 8 with ASP.NET Core).
+
+- `/Demo-Examples`: Simple APC code examples in C#, running as console-application, showcasing the several possible combinations between the available APC APIs consumed through the APC Client SDK or plain HTTP requests.
+
+- `/HOL`: An comprehensive and extensive Hands-on-Lab (HOL) to get you started with APC, step by step.
 
 
 ## Contributing

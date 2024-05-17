@@ -1,4 +1,4 @@
-## Get Started
+## Deploy the APC demo application
 
 This section provides a step-by-step guide to get the project up and running on your local machine and mobile device.
 
@@ -19,7 +19,7 @@ Before starting, ensure you have the following installed:
 
 Before you proceed with creating an APC Gateway instance, ensure you have completed all prerequisites outlined in the [prerequisites section](#prerequisites). This includes signing up for the APC Public Preview, which is necessary for the APC Gateway to be available in your Azure portal.
 
-* Follow the [guide](https://learn.microsoft.com/azure/programmable-connectivity/azure-programmable-connectivity-create-gateway) to create a gateway, or have one already.
+* Follow the official [APC guide - How to create a Gateway](https://learn.microsoft.com/azure/programmable-connectivity/azure-programmable-connectivity-create-gateway) to create a gateway, or have one already.
 * Once you are done creating the gateway, note down the APC Gateway resoruce id endpoint, as explained in this section.
 
 Deploying an APC Gateway in Azure is a straightforward process that involves the following steps:
