@@ -38,7 +38,7 @@ using var httpClient = new HttpClient(handler);
 httpClient.BaseAddress = new Uri(baseUrl);
 httpClient.DefaultRequestHeaders.Add("apc-gateway-id", apcGatewayId);
 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-httpClient.DefaultRequestHeaders.Add("x-ms-client-request-id", Guid.NewGuid().ToString()); // Maybe remove this and mention it in part 2?
+httpClient.DefaultRequestHeaders.Add("x-ms-client-request-id", Guid.NewGuid().ToString()); 
 
 // Example: Retrieve network information using a direct HTTP call.
 string networkApiUrl = $"{baseUrl}/device-network/network:retrieve";
@@ -57,14 +57,14 @@ Console.WriteLine($"Network retrieval result: {networkResult.networkCode}");
 // Example: Verify device location using a direct HTTP call.
 string locationApiUrl = $"{baseUrl}/device-location/location:verify";
 
-//(CDLTLL) Location at FL
+//Location of Seattle Convention Center Summit
 var locationContent = new
 {
     networkIdentifier = new { identifierType = "NetworkCode", identifier = networkResult.networkCode },
-                            latitude = 26.0174,   
-                            longitude = -80.3660, 
+                            latitude = 47.6140,   
+                            longitude = -122.3319, 
                             accuracy = 10,
-                            device = new { phoneNumber = "+34682335745" }
+                            device = new { phoneNumber = "+34682335745" }  //Change to your phone number
 };
 var locationRequestContent = new StringContent(JsonSerializer.Serialize(locationContent), Encoding.UTF8, "application/json");
 

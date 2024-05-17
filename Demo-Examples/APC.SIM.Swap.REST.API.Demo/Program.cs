@@ -29,14 +29,14 @@ using var httpClient = new HttpClient();
 httpClient.BaseAddress = new Uri(baseUrl);
 httpClient.DefaultRequestHeaders.Add("apc-gateway-id", apcGatewayId);
 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-httpClient.DefaultRequestHeaders.Add("x-ms-client-request-id", Guid.NewGuid().ToString()); // Maybe remove this and mention it in part 2?
+httpClient.DefaultRequestHeaders.Add("x-ms-client-request-id", Guid.NewGuid().ToString()); 
 
 // Example: Retrieve network information using a direct HTTP call.
 string networkApiUrl = $"{baseUrl}/device-network/network:retrieve";
 var networkIdentifier = new
 {
-identifierType = "IPv4",
-identifier = "176.83.74.44" // This should be the actual IP address of the device's cellular network adapter.
+    identifierType = "IPv4",
+    identifier = APCAppSecrets.SampleTelcoOperatorIP // This should be the actual IP address of the device's cellular network adapter.
 };
 var networkContent = new StringContent(JsonSerializer.Serialize(networkIdentifier), Encoding.UTF8, "application/json");
 
@@ -50,7 +50,7 @@ Console.WriteLine($"Network in use: {networkResult.networkCode}");
 string simSwapApiUrl = $"{baseUrl}/sim-swap/sim-swap:verify";
 var simSwapContent = new
 {
-    phoneNumber = "+34682335745",
+    phoneNumber = "+34682335745",  //Change to your phone number
     maxAgeHours = 240,
     networkCode = networkResult.networkCode
 };

@@ -35,7 +35,7 @@ Console.WriteLine("");
 // SIM swap input data
 SimSwapVerificationContent simSwapContent = new SimSwapVerificationContent(new NetworkIdentifier("NetworkCode", networkResponse.Value.NetworkCode))
 {
-    PhoneNumber = "+34682335745",
+    PhoneNumber = "+34682335745",   //Change to your phone number
     MaxAgeHours = 72  //3 days
 };
 
