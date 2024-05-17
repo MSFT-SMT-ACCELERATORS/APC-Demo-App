@@ -16,6 +16,7 @@ The Hands-On Lab provides a step-by-step guide to get you started with APC, from
 - **Contents**: Introduction to APC, APC SDK set up, APC Network APIs with APC SDK, REST HTTP Client/Postman and advanced implementation details.
 
 To dive into the Hands-On Lab, [click here](./HOL/APC-HOL.md).
+<img width="200" alt="image" src="https://github.com/MSFT-SMT-ACCELERATORS/APC-Demo-App/assets/1712635/542c5561-1efd-436c-a33d-90288db657b6">
 
 ## 2. APC Demo Application
 
