@@ -2,17 +2,17 @@
 
 Welcome to the Azure Programmable Connectivity Hands-On Lab. In this lab, we will explore the powerful features of APC that enable developers to integrate telecom operator services directly into their applications. This lab is designed to give you practical experience with APC, taking you from the basics of setup and testing to advanced integration scenarios.
 
-### Suggested Timeline
+### Suggested timeline
 | Time    | Activity |
 | ------- | -------- |
 | 10 min  | [Introduction to Azure Programmable Connectivity (APC)](#introduction-to-azure-programmable-connectivity-apc) |
-| 30 min  | **Part 1:** [Get Started with APC](#part-1-get-started-with-apc)   |
-|         | [Use Network APIs with the APC SDK Client](#use-network-apis-with-the-apc-sdk-client) |
-|         | [Use Network APIs with APC REST APIs](#use-network-apis-with-apc-rest-apis) |
-|  1 hour | **Part 2:** [Advanced Use Case - Integrating APC into a Banking App](#part-2-advanced-use-case---integrating-apc-into-a-banking-app) |
-|         | [Architecture](#architecture) |
-|         | [Exercise: Deploying and Testing a Demo Banking Application](#exercise-deploying-and-testing-a-demo-banking-application) |
-|         | [Advanced Integration Details](#advanced-integration-details) |
+| 30 min  | **Part 1:** [Get started with APC](#part-1-get-started-with-apc)   |
+|         | [Use network APIs with the APC SDK client](#use-network-apis-with-the-apc-sdk-client) |
+|         | [Use network APIs with APC REST APIs](#use-network-apis-with-apc-rest-apis) |
+|  1 hour | **Part 2:** [Advanced use case - integrating APC into a banking app](#part-2-advanced-use-case---integrating-apc-into-a-banking-app) |
+|         | [Application architecture](#application-architecture) |
+|         | [Exercise: deploying and testing a demo banking application](#exercise-deploying-and-testing-a-demo-banking-application) |
+|         | [Hands-on: application code highlights](#hands-on-application-code-highlights) |
 | 30 min  | [Annex](#annex) (optional)   |
 
 
@@ -26,50 +26,49 @@ Welcome to the Azure Programmable Connectivity Hands-On Lab. In this lab, we wil
 - [Introduction](#introduction-to-azure-programmable-connectivity-apc)
   - [Overview of APC](#overview-of-apc)
   - [Architecture](#architecture)
-  - [APC Planned Operator APIs](#apc-planned-operator-apis)
-  - [Additional Information](#additional-information)
-- **Part 1:** [Get Started with APC](#part-1-get-started-with-apc)
+  - [APC planned operator APIs](#apc-planned-operator-apis)
+  - [Additional information](#additional-information)
+- **Part 1:** [Get started with APC](#part-1-get-started-with-apc)
   - [Prerequisites](#prerequisites)
-    - [Create APC Gateway Instance](#create-apc-gateway-instance)
-    - [Set up Authentication](#set-up-authentication)
-  - [Use Network APIs with the APC SDK Client](#use-network-apis-with-the-apc-sdk-client)
-    - [Create a Console Application](#create-a-console-application)
+    - [Create APC gateway instance](#create-apc-gateway-instance)
+    - [Set up authentication](#set-up-authentication)
+  - [Use network APIs with the APC SDK client](#use-network-apis-with-the-apc-sdk-client)
+    - [Create a console application](#create-a-console-application)
     - [Install the APC SDK](#install-the-apc-sdk)
-    - [Instantiate an Authenticated Client](#instantiate-an-authenticated-client)
-    - [Make APC SDK Requests](#make-apc-sdk-requests)
-      - [APC Call: Retrieve Network Information](#apc-sdk-retrieve-network-information)
-      - [APC Call: Sim Swap Retrieve/Verify](#apc-sdk-sim-swap-retrieveverify)
-  - [Use Network APIs with APC REST APIs](#use-network-apis-with-apc-rest-apis)
-    - [Postman APC requests](#a-make-apc-requests-with-postman)
-      - [Postman APC SimSwap Verify Request](#postman-apc-simswap-verify-request)
-      - [Postman APC Number Verification Request](#postman-apc-number-verification-request)
-    - [.NET HttpClient APC requests](#b-make-apc-requests-with-net-httpclient)
-      - [HttpClient APC Retrieve Network Information Request](#http-apc-call-1-retrieve-network-information)
-      - [HttpClient APC Verify Sim Swap Request](#http-apc-call-2-verify-sim-swap)
-- **Part 2:** [Advanced Use Case - Integrating APC into a Banking App](#part-2-advanced-use-case---integrating-apc-into-a-banking-app)
-  - [Architecture](#architecture)
-  - [Exercise: Deploying and Testing a Demo Banking Application](#exercise-deploying-and-testing-a-demo-banking-application)
-  - [Advanced Integration Details](#advanced-integration-details)
-    - [React Service Calling APC](#react-service-calling-apc)
-    - [APC Proxy SDK Usage](#apc-proxy-sdk-usage)
-    - [Dependency Injection for SDK + HttpClient](#dependency-injection-for-sdk--httpclient)
-    - [Handling Consent Permission for Location Number Verification](#handling-consent-permission-for-location-number-verification)
-    - [Handling Redirections for Number Verification](#handling-redirections-for-number-verification)
+    - [Instantiate an authenticated client](#instantiate-an-authenticated-client)
+    - [Make APC SDK requests](#make-apc-sdk-requests)
+      - [APC SDK: retrieve network information](#apc-sdk-retrieve-network-information)
+      - [APC SDK: sim swap retrieve/verify](#apc-sdk-sim-swap-retrieveverify)
+  - [Use network APIs with APC REST APIs](#use-network-apis-with-apc-rest-apis)
+    - [Postman APC requests](#postman-apc-requests)
+      - [Postman APC sim swap verify request](#postman-apc-simswap-verify-request)
+      - [Postman APC number verification request](#postman-apc-number-verification-request)
+    - [.NET HttpClient APC requests](#net-httpclient-apc-requests)
+      - [HttpClient APC retrieve network information request](#httpclient-apc-retrieve-network-information)
+      - [HttpClient APC verify sim swap request](#httpclient-apc-verify-sim-swap)
+- **Part 2:** [Advanced use case - integrating APC into a banking app](#part-2-advanced-use-case---integrating-apc-into-a-banking-app)
+  - [Application architecture](#application-architecture)
+  - [Exercise: deploying and testing a demo banking application](#exercise-deploying-and-testing-a-demo-banking-application)
+  - [Hands-on: application code highlights](#hands-on-application-code-highlights)
+    - [Make APC requests from an app: APC request flow](#make-apc-requests-from-an-app-apc-request-flow)
+    - [Handling consent permission for location verification](#handling-consent-permission-for-location-verification)
+    - [Network limitations](#network-limitations)
+    - [Number verification process overview](#number-verification-process-overview)
+    - [Location verification process overview](#location-verification-process-overview)
 - [Annex](#annex)
   - [Network APIs](#network-apis)
-    - [Device Network Retrieval](#device-network-retrieval)
-    - [SIM Swap Detection](#sim-swap-detection)
-    - [Number Verification](#number-verification)
-    - [Device Location Verification](#device-location-verification) 
-  - [Additional REST APC calls using .NET HttpClient](#additional-rest-apc-calls-using-net-httpclient)
-    - [Location REST APC calls using .NET HttpClient](#location-rest-apc-calls-using-net-httpclient)
-    - [Number Verification REST APC calls using .NET HttpClient](#number-verification-rest-apc-calls-using-net-httpclient)
-  - [Additional REST APC calls using Postman](#additional-rest-apc-calls-using-postman)
-    - [Location REST APC calls using Postman](#location-rest-apc-calls-using-postman)
-    - [Number Verification REST APC calls using Postman](#number-verification-rest-apc-calls-using-postman)
-  - [.NET HttpClient APC requests](#b-make-apc-requests-with-net-httpclient)
-    - [HttpClient APC Verify Device Location Request](#http-apc-call-2-verify-device-location)
-    - [HttpClient APC Number Verification Request](#http-apc-call-4-number-verification)
+    - [Device network retrieval](#device-network-retrieval)
+    - [SIM swap detection](#sim-swap-detection)
+    - [Number verification](#number-verification)
+    - [Device location verification](#device-location-verification)
+  - [Additional APC SDK examples using .NET SDK](#additional-apc-sdk-examples-using-net-sdk)
+    - [APC SDK: device location](#apc-sdk-device-location)
+    - [APC SDK: number verification](#apc-sdk-number-verification)
+  - [Additional APC REST HTTP examples using .NET HttpClient](#additional-apc-rest-http-examples-using-net-httpclient)
+    - [HttpClient APC: verify device location](#httpclient-apc-verify-device-location)
+    - [HttpClient APC: number verification](#httpclient-apc-number-verification)
+  - [Additional APC REST HTTP examples using Postman](#additional-apc-rest-http-examples-using-postman)
+    - [Postman APC number verification request](#postman-apc-number-verification-request)
 
 
 ## Introduction to Azure Programmable Connectivity (APC)
@@ -106,7 +105,7 @@ APC provides direct access to a range of operator APIs, designed to streamline c
 |-----------------------------|-----------------------------------------------------------------------------------------------|
 | [SIM Swap Detection](#sim-swap-detection) | Checks the last time a SIM was swapped, crucial for fraud prevention. Alerts if a SIM swap has occurred recently, indicating potential fraud. |
 | [Number Verification](#number-verification) | Validates phone numbers to authenticate mobile devices seamlessly, reducing the need for SMS one-time passwords and enabling faster, more secure login and registration processes. |
-| [Device Location Verification](#device-location)   | Validates the geographical location of devices using network technologies. Offers precise location tracking, enhancing anti-fraud measures. |
+| [Device Location Verification](#device-location-verification)   | Validates the geographical location of devices using network technologies. Offers precise location tracking, enhancing anti-fraud measures. |
 
 
 **Near Future Focus**
@@ -134,34 +133,33 @@ For a deeper understanding of Azure Programmable Connectivity (APC), including i
 
 ### Contents
 
-  - [Prerequisites](#prerequisites)
-    - [Create APC Gateway Instance](#create-apc-gateway-instance)
-    - [Set up Authentication](#set-up-authentication)
-  - [Use Network APIs with the APC SDK Client](#use-network-apis-with-the-apc-sdk-client)
-    - [Create a Console Application](#create-a-console-application)
+- [Prerequisites](#prerequisites)
+    - [Create APC gateway instance](#create-apc-gateway-instance)
+    - [Set up authentication](#set-up-authentication)
+- [Use network APIs with the APC SDK client](#use-network-apis-with-the-apc-sdk-client)
+    - [Create a console application](#create-a-console-application)
     - [Install the APC SDK](#install-the-apc-sdk)
-    - [Instantiate an Authenticated Client](#instantiate-an-authenticated-client)
-    - [Make APC SDK Requests](#make-apc-sdk-requests)
-      - [APC Call: Retrieve Network Information](#apc-sdk-retrieve-network-information)
-      - [APC Call: Sim Swap Retrieve/Verify](#apc-sdk-sim-swap-retrieveverify)
-  - [Use Network APIs with APC REST APIs](#use-network-apis-with-apc-rest-apis)
-    - [Postman APC requests](#a-make-apc-requests-with-postman)
-      - [Postman APC SimSwap Verify Request](#postman-apc-simswap-verify-request)
-      - [Postman APC Number Verification Request](#postman-apc-number-verification-request)
-    - [.NET HttpClient APC requests](#b-make-apc-requests-with-net-httpclient)
-      - [HttpClient APC Retrieve Network Information Request](#http-apc-call-1-retrieve-network-information)
-      - [HttpClient APC Verify Sim Swap Request](#http-apc-call-2-verify-sim-swap)
+    - [Instantiate an authenticated client](#instantiate-an-authenticated-client)
+- [Make APC SDK requests](#make-apc-sdk-requests)
+    - [APC SDK: retrieve network information](#apc-sdk-retrieve-network-information)
+    - [APC SDK: sim swap retrieve/verify](#apc-sdk-sim-swap-retrieveverify)
+- [Use network APIs with APC REST APIs](#use-network-apis-with-apc-rest-apis)
+- [Postman APC requests](#postman-apc-requests)
+    - [Postman APC sim swap verify request](#postman-apc-simswap-verify-request)
+    - [Postman APC number verification request](#postman-apc-number-verification-request)
+- [.NET HttpClient APC requests](#net-httpclient-apc-requests)
+    - [HttpClient APC retrieve network information request](#httpclient-apc-retrieve-network-information)
+    - [HttpClient APC verify sim swap request](#httpclient-apc-verify-sim-swap)
 
 (Optional annex sections) 
-  - [Additional REST APC calls using .NET HttpClient](#additional-rest-apc-calls-using-net-httpclient)
-    - [Location REST APC calls using .NET HttpClient](#location-rest-apc-calls-using-net-httpclient)
-    - [Number Verification REST APC calls using .NET HttpClient](#number-verification-rest-apc-calls-using-net-httpclient)
-  - [Additional REST APC calls using Postman](#additional-rest-apc-calls-using-postman)
-    - [Location REST APC calls using Postman](#location-rest-apc-calls-using-postman)
-    - [Number Verification REST APC calls using Postman](#number-verification-rest-apc-calls-using-postman)
-  - [.NET HttpClient APC requests](#b-make-apc-requests-with-net-httpclient)
-    - [HttpClient APC Verify Device Location Request](#http-apc-call-2-verify-device-location)
-    - [HttpClient APC Number Verification Request](#http-apc-call-4-number-verification)
+  - [Additional APC SDK examples using .NET SDK](#additional-apc-sdk-examples-using-net-sdk)
+    - [APC SDK: device location](#apc-sdk-device-location)
+    - [APC SDK: number verification](#apc-sdk-number-verification)
+  - [Additional APC REST HTTP examples using .NET HttpClient](#additional-apc-rest-http-examples-using-net-httpclient)
+    - [HttpClient APC: verify device location](#httpclient-apc-verify-device-location)
+    - [HttpClient APC: number verification](#httpclient-apc-number-verification)
+  - [Additional APC REST HTTP examples using Postman](#additional-apc-rest-http-examples-using-postman)
+    - [Postman APC number verification request](#postman-apc-number-verification-request)
 
 ### Prerequisites
 
@@ -638,13 +636,14 @@ In this section, we explore how Azure Programmable Connectivity (APC) can be int
 
 ### Contents
 
-- [Application  Architecture](#applicaction-architecture)
-- [Exercise: Deploying and Testing a Demo Banking Application](#exercise-deploying-and-testing-a-demo-application)
-- [Advanced Integration Details](#hands-on-application-code-highlighs)
-  - [React Service Calling APC](#make-apc-requests-from-an-app-apc-request-flow)
-  - [APC Proxy SDK Usage](#apc-proxy-sdk-usage)
-  - [Handling Consent Permission for Location Number Verification](#handling-consent-permission-for-location-number-verification)
-  - [Handling Redirections for Number Verification](#handling-redirections-for-number-verification)
+- [Application architecture](#application-architecture)
+- [Exercise: deploying and testing a demo banking application](#exercise-deploying-and-testing-a-demo-banking-application)
+- [Hands-on: application code highlights](#hands-on-application-code-highlights)
+    - [Make APC requests from an app: APC request flow](#make-apc-requests-from-an-app-apc-request-flow)
+    - [Handling consent permission for location verification](#handling-consent-permission-for-location-verification)
+    - [Network limitations](#network-limitations)
+    - [Number verification process overview](#number-verification-process-overview)
+    - [Location verification process overview](#location-verification-process-overview)
 
 ### Applicaction Architecture
 
@@ -976,26 +975,26 @@ In this application, consent errors are captured but not managed actively. We ha
 3. **Open the Consent URL**: Using the same cellular network, open the consent URL you received in the error message.
 4. **Accept the Permissions**: Follow the instructions on the webpage to grant the necessary permissions.
 
+---
 
 ## Annex
 
 ### Contents
 
----
 - [Annex](#annex)
   - [Network APIs](#network-apis)
-    - [Device Network Retrieval](#device-network-retrieval)
-    - [SIM Swap Detection](#sim-swap-detection)
-    - [Number Verification](#number-verification)
-    - [Device Location Verification](#device-location-verification) 
-  - [Additional APC SDK requests using .NET SDK](#additional-apc-sdk-examples-using-net-sdk)
-    - [Location APC SDK request](#apc-sdk-device-location)
-    - [Number Verification APC SDK request](#apc-sdk-number-verification)
-  - [Additional REST APC requests using .NET HttpClient](#additional-apc-rest-http-examples-using-net-httpclient)
-    - [Location APC REST .NET HttpClient request](#httpclient-apc-verify-device-location)
-    - [Number Verification APC REST HttpClient request](#httpclient-apc-number-verification)
-  - [Additional REST APC requests using Postman](#additional-apc-rest-http-examples-using-postman)
-    - [Number Verification APC REST Postman request](#postman-apc-number-verification-request)
+    - [Device network retrieval](#device-network-retrieval)
+    - [SIM swap detection](#sim-swap-detection)
+    - [Number verification](#number-verification)
+    - [Device location verification](#device-location-verification)
+  - [Additional APC SDK examples using .NET SDK](#additional-apc-sdk-examples-using-net-sdk)
+    - [APC SDK: device location](#apc-sdk-device-location)
+    - [APC SDK: number verification](#apc-sdk-number-verification)
+  - [Additional APC REST HTTP examples using .NET HttpClient](#additional-apc-rest-http-examples-using-net-httpclient)
+    - [HttpClient APC: verify device location](#httpclient-apc-verify-device-location)
+    - [HttpClient APC: number verification](#httpclient-apc-number-verification)
+  - [Additional APC REST HTTP examples using Postman](#additional-apc-rest-http-examples-using-postman)
+    - [Postman APC number verification request](#postman-apc-number-verification-request)
 
 ### Network APIs
 
