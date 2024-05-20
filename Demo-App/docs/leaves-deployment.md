@@ -279,22 +279,22 @@ To set up and run the project locally, follow these steps:
 
 To test the app on a mobile device, follow these additional steps:
 
-1. **Download Expo Go**
-- Install the Expo Go application from your device's app store (available on iOS and Android).
+1. **Download Expo Go App**
+   - Install the Expo Go application from your device's app store (available on iOS and Android) and sign in using your Expo account.
 
-2. **Scan QR Code**
-- Open the Expo Go app on your mobile device.
-- Select the option to scan the QR code.
-- Scan the QR code that appears in your terminal after you've run `npm start` from the React Native app directory.
+2. **Open on Mobile**
+   - Open the Expo Go app on your mobile device.
+   - If you are using an **iOS** device, select the available development server named `Microsoft APC Demo on - YOUR SYSTEM NAME`:
+      <img src="imgs/leaves-expo-iphone.png" alt="iOS app" height="800px"/>
 
-   ![QR Code](imgs/QR.png)
+   - If you are using an **android** device, select the option to scan the QR code.
+      <img src="imgs/leaves-expo-android.png" alt="Android Scan QR" height="800px"/>
 
-   ![Scan QR](imgs/scan.png)
+   - Scan the QR code that appears in your terminal after you've run `npm start` from the React Native app directory.
+      ![QR Code](imgs/QR.png)
 
-**TODO Update with iOS screen recording**
 
-
-This will open the app on your mobile device, allowing you to test its features in a mobile environment.
+This will open the app on your mobile device, allowing you to test its features in a mobile environment using your local devopment server.
 
 ### Deploy the app on App Store and Play Store
 
